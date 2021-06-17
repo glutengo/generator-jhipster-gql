@@ -1,5 +1,3 @@
-const nodejsUtils = require('generator-jhipster-nodejs/generators/utils');
-const jhipsterUtils = require('generator-jhipster/generators/utils');
 const nodejsConstants = require('generator-jhipster-nodejs/generators/generator-nodejs-constants');
 const utils = require('../util');
 const { Project } = require('ts-morph');

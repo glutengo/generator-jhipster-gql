@@ -1,0 +1,44 @@
+import { Args, Query, Resolver, Mutation } from '@nestjs/graphql';
+import { <%= entityClass %>Service } from '../../service/<%= entityFileName %>.service';
+import { PaginationArgs } from './pagination-args';
+import { <%= entityClass %>, Paginated<%= entityClass %>, Create<%= entityClass %>Args, Update<%= entityClass %>Args } from '../../service/graphql/<%= entityFileName %>.object-type';
+import { PageRequest } from '../../domain/base/pagination.entity';
+
+<%_
+const pkTypeInterface = getPkType(databaseType) === 'Long' ? 'Number' : 'String';
+const pkType = pkTypeInterface.toLowerCase();
+_%>
+
+@Resolver()
+export class <%= entityClass %>Resolver {
+constructor(private <%= asEntity(entityInstance) %>Service: <%= entityClass %>Service) {}
+
+  @Query(() => Paginated<%= entityClass %>)
+  async get<%= entityClass %>s(@Args() options: PaginationArgs): Promise<Paginated<%= entityClass %>> {
+    const pageRequest: PageRequest = new PageRequest(options.page, options.size, options.sort);
+    return this.<%= asEntity(entityInstance) %>Service.findAndCount(pageRequest.toFindManyOptions())
+        .then(([results, count]) => new Paginated<%= entityClass %>(results, count, true));
+  }
+
+  @Query(() => <%= entityClass %>)
+  async get<%= entityClass %>(@Args('id') id: <%= pkType %>): Promise<<%= entityClass %>> {
+    return this.<%= asEntity(entityInstance) %>Service.findById(id)
+  }
+
+  @Mutation(() => <%= entityClass %>)
+  async create<%= entityClass %>(@Args('<%= entityInstance %>') <%= entityInstance %>: Create<%= entityClass %>Args): Promise<<%= entityClass %>> {
+    return await this.<%= asEntity(entityInstance) %>Service.save(<%= entityInstance %>);
+  }
+
+  @Mutation(() => <%= entityClass %>)
+  async update<%= entityClass %>(@Args('<%= entityInstance %>') <%= entityInstance %>: Update<%= entityClass %>Args): Promise<<%= entityClass %>> {
+    return await this.<%= asEntity(entityInstance) %>Service.update(<%= entityInstance %>);
+  }
+
+  @Mutation(() => <%= pkTypeInterface %>)
+  async delete<%= entityClass %>(@Args('id') id: <%= pkType %>): Promise<<%= pkType %>> {
+    await this.<%= asEntity(entityInstance) %>Service.deleteById(id);
+    return id;
+  }
+}
+

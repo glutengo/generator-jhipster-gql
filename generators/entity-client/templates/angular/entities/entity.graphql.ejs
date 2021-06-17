@@ -1,0 +1,56 @@
+<%_
+const listQueryName = `get${entityClass}s`;
+const pkType = getPkType(databaseType) === 'Long' ? 'Int' : 'String';
+const findQueryName = `get${entityClass}`;
+const deleteMutationName = `delete${entityClass}`;
+const createMutationName = `create${entityClass}`;
+const updateMutationName = `update${entityClass}`;
+_%>
+
+query <%= listQueryName %> {
+    result: <%= listQueryName %> {
+        edges {
+            node {
+                ...Detail<%= entityClass %>
+            }
+        }
+        totalCount
+    }
+}
+
+query <%= findQueryName %>($id: <%= pkType %>!) {
+    result: <%= findQueryName %>(id: $id) {
+        ...Detail<%= entityClass %>
+    }
+}
+
+mutation <%= deleteMutationName %>($id: <%= pkType %>!) {
+    result: <%= deleteMutationName %>(id: $id)
+}
+
+mutation <%= createMutationName %>($<%= entityInstance %>: Create<%= entityClass %>Args!) {
+    result: <%= createMutationName %>(<%= entityInstance %>: $<%= entityInstance %>) {
+        ...Detail<%= entityClass %>
+    }
+}
+
+mutation <%= updateMutationName %>($<%= entityInstance %>: Update<%= entityClass %>Args!) {
+    result: <%= updateMutationName %>(<%= entityInstance %>: $<%= entityInstance %>) {
+        ...Detail<%= entityClass %>
+    }
+}
+
+fragment Base<%= entityClass %> on <%= entityClass %> {
+<%_ for (const field of fields) { _%>
+    <%= field.fieldName%>
+<%_ } _%>
+}
+
+fragment Detail<%= entityClass %> on <%= entityClass %> {
+    ...Base<%= entityClass %>
+<%_ for (const relationship of relationships) { _%>
+    <%= relationship.relationshipName %> {
+        <%= relationship.otherEntityField%>
+    }
+<%_ } _%>
+}

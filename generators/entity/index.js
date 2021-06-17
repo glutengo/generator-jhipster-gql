@@ -8,7 +8,7 @@ module.exports = class extends BaseGenerator {
         return {
             readConfig() {
                 this.entityConfig = this.options.entityConfig;
-                this.jhipsterAppConfig = this.getAllJhipsterConfig();
+                this.jhipsterAppConfig = this.getJhipsterConfig();
                 if (!this.jhipsterAppConfig) {
                     this.error('Cannot read .yo-rc.json');
                 }
@@ -27,31 +27,15 @@ module.exports = class extends BaseGenerator {
         };
     }
 
-    prompting() {
-        // don't prompt if data are imported from a file
-        if (
-            this.entityConfig.useConfigurationFile === true &&
-            this.entityConfig.data &&
-            typeof this.entityConfig.data.yourOptionKey !== 'undefined'
-        ) {
-            this.yourOptionKey = this.entityConfig.data.yourOptionKey;
-            return;
-        }
-        const done = this.async();
-        const prompts = [
-            {
-                type: 'confirm',
-                name: 'enableOption',
-                message: 'Some option here?',
-                default: false
-            }
-        ];
-
-        this.prompt(prompts).then(answers => {
-            this.promptAnswers = answers;
-            // To access props answers use this.promptAnswers.someOption;
-            done();
-        });
+    composing() {
+        const subGenerators = ['../entity-client', '../entity-server'];
+        subGenerators.forEach(gen => this.composeWith(require.resolve(gen), {
+           context: this.context,
+           skipInstall: this.options.skipInstall,
+           fromCli: true,
+           force: this.options.force,
+           debug: this.configOptions.isDebugEnabled
+        }));
     }
 
     get writing() {
@@ -66,7 +50,7 @@ module.exports = class extends BaseGenerator {
                 this.buildTool = this.jhipsterAppConfig.buildTool;
 
                 // use function in generator-base.js from generator-jhipster
-                this.angularAppName = this.getAngularXAppName();
+                this.angularAppName = this.getFrontendAppName();
 
                 // use constants from generator-constants.js
                 const javaDir = `${jhipsterConstants.SERVER_MAIN_SRC_DIR + this.packageFolder}/`;
@@ -85,16 +69,14 @@ module.exports = class extends BaseGenerator {
                 this.log(`entityName=${entityName}`);
 
                 this.log('------\n');
-
-                // do your stuff here
             },
 
             writeFiles() {
-                this.template('dummy.txt', 'dummy.txt');
+                //this.template('dummy.txt', 'dummy.txt');
             },
 
             updateConfig() {
-                this.updateEntityConfig(this.entityConfig.filename, 'yourOptionKey', this.yourOptionKey);
+                // TODO: store GQL settings for entity
             }
         };
     }
