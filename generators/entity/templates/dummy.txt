@@ -1,0 +1,2 @@
+hello gql:entity sub generator!
+It's dummy.txt

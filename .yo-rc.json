@@ -1,0 +1,10 @@
+{
+  "generator-jhipster-module": {
+    "promptValues": {
+      "githubName": "glutengo",
+      "authorName": "Markus Glutting",
+      "authorEmail": "markus.glutting@student.htw-berlin.de",
+      "authorUrl": "https://glutting.net"
+    }
+  }
+}
