@@ -39,18 +39,20 @@ module.exports = class extends BaseGenerator {
         };
     }
 
-    prompting() {
-        const prompts = [
-            {
-                when: () => typeof this.message === 'undefined',
-                type: 'input',
-                name: 'message',
-                message: 'Please put something',
-                default: 'hello world!'
-            }
-        ];
+    composing() {
+        const subGenerators = ['../client', '../server'];
+        subGenerators.forEach(gen => this.composeWith(require.resolve(gen), {
+           context: this.context,
+           skipInstall: this.options.skipInstall,
+           fromCli: true,
+           force: this.options.force,
+           debug: this.configOptions.isDebugEnabled
+        }));
+    }
 
+    prompting() {
         const done = this.async();
+        const prompts = [];
         this.prompt(prompts).then(answers => {
             this.promptAnswers = answers;
             // To access props answers use this.promptAnswers.someOption;

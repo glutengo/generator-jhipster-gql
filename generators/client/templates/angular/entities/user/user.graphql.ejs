@@ -1,0 +1,52 @@
+query getUsers($size: Int, $page: Int, $sort: String) {
+    result: getUsers(size: $size, page: $page, sort: $sort) {
+        edges {
+            node {
+                ...DetailUser
+            }
+        }
+        totalCount
+    }
+}
+
+query getUser($login: String!) {
+    result: getUser(login: $login) {
+        ...DetailUser
+    }
+}
+
+mutation createUser($user: CreateUserArgs!) {
+    result: createUser(user: $user) {
+        ...DetailUser
+    }
+}
+
+mutation updateUser($user: UpdateUserArgs!) {
+    result: updateUser(user: $user) {
+        ...DetailUser
+    }
+}
+
+mutation deleteUser($login: String!) {
+    result: deleteUser(login: $login) {
+        ...BaseUser
+    }
+}
+
+fragment BaseUser on User {
+    login
+    id
+}
+
+fragment DetailUser on User {
+    ...BaseUser
+    email
+    langKey
+    firstName
+    lastName
+    createdDate
+    lastModifiedDate
+    lastModifiedBy
+    authorities
+}
+

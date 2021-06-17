@@ -1,0 +1,39 @@
+import { NgModule } from '@angular/core';
+import { APOLLO_OPTIONS } from 'apollo-angular';
+import { ApolloClientOptions, DefaultOptions, InMemoryCache } from '@apollo/client/core';
+import { HttpBatchLink } from 'apollo-angular/http';
+
+// fragments, addTypename: false and caching do not work well together: https://github.com/apollographql/apollo-client/issues/7006
+
+const defaultOptions: DefaultOptions = {
+  watchQuery: {
+    fetchPolicy: 'no-cache',
+    errorPolicy: 'ignore',
+  },
+  query: {
+    fetchPolicy: 'no-cache',
+    errorPolicy: 'all',
+  },
+}
+
+const uri = '/graphql';
+export function createApollo(httpLink: HttpBatchLink): ApolloClientOptions<any> {
+  return {
+    link: httpLink.create({ uri }),
+    cache: new InMemoryCache({
+      addTypename: false
+    }),
+    defaultOptions,
+  };
+}
+
+@NgModule({
+  providers: [
+    {
+      provide: APOLLO_OPTIONS,
+      useFactory: createApollo,
+      deps: [HttpBatchLink],
+    },
+  ],
+})
+export class GraphQLModule {}
