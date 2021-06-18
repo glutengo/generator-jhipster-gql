@@ -14,7 +14,7 @@ module.exports = class extends BaseGenerator {
                 }
             },
             displayLogo() {
-                this.log(chalk.white(`Running ${chalk.bold('JHipster rain')} Generator! ${chalk.yellow(`v${packagejs.version}\n`)}`));
+                this.log(chalk.white(`Running ${chalk.bold('JHipster GraphQL')} Generator! ${chalk.yellow(`v${packagejs.version}\n`)}`));
             },
             validate() {
                 // this shouldn't be run directly
@@ -34,6 +34,7 @@ module.exports = class extends BaseGenerator {
            skipInstall: this.options.skipInstall,
            fromCli: true,
            force: this.options.force,
+           entityConfig: this.entityConfig,
            debug: this.configOptions.isDebugEnabled
         }));
     }
@@ -83,7 +84,7 @@ module.exports = class extends BaseGenerator {
 
     end() {
         if (this.yourOptionKey) {
-            this.log(`\n${chalk.bold.green('rain enabled')}`);
+            this.log(`\n${chalk.bold.green('GraphQL enabled')}`);
         }
     }
 };

@@ -28,7 +28,7 @@ export class UserGraphQLService {
 
   create(user: IUser): Observable<EntityResponseType> {
     return this.createUserGQL
-      .mutate({email: user.email ??'', login: user.login ??''})
+      .mutate({user: {email: user.email ??'', login: user.login ??''}})
       .pipe(map(res => this.graphQLUtils.toHttpResponse(res)));
   }
 

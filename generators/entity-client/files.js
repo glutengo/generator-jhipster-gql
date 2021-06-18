@@ -10,12 +10,12 @@ const clientFiles = {
             condition: generator => !generator.embedded && generator.clientFramework === constants.SUPPORTED_CLIENT_FRAMEWORKS.ANGULAR,
             templates: [
                 {
-                    file: `angular/${constants.ANGULAR_DIR}entities/service/entity.gql.service.ts`,
+                    file: `angular/entities/service/entity.gql.service.ts`,
                     renameTo: generator =>
                         `${constants.ANGULAR_DIR}entities/${generator.entityFolderName}/service/${generator.entityFileName}.gql.service.ts`
                 },
                 {
-                    file: `angular/${constants.ANGULAR_DIR}entities/entity.graphql`,
+                    file: `angular/entities/entity.graphql`,
                     renameTo: generator =>
                         `${constants.ANGULAR_DIR}entities/${generator.entityFolderName}/${generator.entityFileName}.graphql`
                 }
@@ -27,9 +27,9 @@ const clientFiles = {
 
 function writeFiles() {
     return {
-        writeGraphQLFiles() {
-            this.clientFramework = this.getJhipsterConfig().clientFramework;
-            this.writeFilestoDisk(serverFiles, this, false);
+        graphQLEntityFiles () {
+            this.clientFramework = this.getJhipsterConfig().get('clientFramework');
+            this.writeFilesToDisk(clientFiles, this, false);
         }
     }
 }

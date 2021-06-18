@@ -1,6 +1,5 @@
 const nodejsConstants = require('generator-jhipster-nodejs/generators/generator-nodejs-constants');
 const utils = require('../util');
-const { Project } = require('ts-morph');
 
 module.exports = {
     writeFiles
@@ -29,7 +28,7 @@ function adjustAppModule(tsProject) {
 
     if (added) {
         // add NestJS module import
-        const _class = appModule.getClass('AppModule');
+        const _class = appModule.getClass(() => true);
         const moduleDecorator = _class.getDecorator('Module');
         const moduleImports = moduleDecorator.getArguments()[0].getProperty('imports').getInitializer();
         const graphQLimportAssignment =
@@ -54,7 +53,7 @@ function adjustUserModule(tsProject) {
 
     if (added) {
         // add User resolver to providers
-        const _class = userModule.getClass('UserModule');
+        const _class = userModule.getClass(() => true);
         const moduleDecorator = _class.getDecorator('Module');
         const moduleProviders = moduleDecorator.getArguments()[0].getProperty('providers').getInitializer();
         moduleProviders.addElement('UserResolver');
@@ -74,7 +73,7 @@ function adjustBaseDTO(tsProject) {
 
     if (added) {
         // add class decorators
-        const _class = dto.getClass('BaseDTO');
+        const _class = dto.getClass(() => true);
         _class.addDecorator({ name: 'ObjectType', arguments: [] });
         _class.addDecorator({ name: 'InputType', arguments: [] });
         // add id decorator
@@ -93,9 +92,9 @@ function adjustUserDTO(tsProject) {
 
     if (added) {
         // add class decorators
-        const _class = dto.getClass('UserDTO');
+        const _class = dto.getClass(() => true);
         _class.addDecorator({ name: 'ObjectType', arguments: [] });
-        _class.addDecorator({ name: 'InputType', arguments: [`'user'`] });
+        _class.addDecorator({ name: 'InputType', arguments: [`'_user'`] });
         // adjust type of authorities
         _class.getInstanceProperty('authorities').setType(`string[]`);
 
@@ -107,11 +106,9 @@ function writeFiles() {
     return {
         writeGraphQLFiles() {
             this.writeFilesToDisk(serverFiles, this, false);
-
-            const tsConfigFilePath = `${nodejsConstants.SERVER_NODEJS_SRC_DIR}/tsconfig.json`
-            const tsProject = new Project({
-                tsConfigFilePath
-            });
+        },
+        adjustFiles() {
+            const tsProject = utils.getTsProject(true);
             adjustAppModule(tsProject);
             adjustUserModule(tsProject);
             adjustBaseDTO(tsProject);

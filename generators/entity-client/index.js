@@ -1,7 +1,21 @@
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
+const { writeFiles } = require('./files');
 
 module.exports = class extends BaseGenerator {
-    postWriting() {
-        console.log('POST WRITING ENTITY CLIENT');
+
+    initializing() {
+        this.entityClass = this.options.entityConfig.entityClass;
+        this.entityFileName = this.options.entityConfig.entityFileName;
+        this.entityInstance = this.options.entityConfig.entityInstance;
+        this.entityFolderName = this.options.entityConfig.entityFolderName;
+        this.fields = this.options.entityConfig.fields;
+        this.relationships = this.options.entityConfig.relationships;
+        this.databaseType = this.config.get('databaseType');
+    }
+
+    get writing() {
+        return {
+            ...writeFiles()
+        }
     }
 }
