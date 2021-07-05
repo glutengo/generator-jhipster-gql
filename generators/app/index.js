@@ -3,6 +3,8 @@ const semver = require('semver');
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
 const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
 const packagejs = require('../../package.json');
+const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
+
 
 module.exports = class extends BaseGenerator {
     get initializing() {
@@ -18,6 +20,8 @@ module.exports = class extends BaseGenerator {
                 if (!this.jhipsterAppConfig) {
                     this.error('Cannot read .yo-rc.json');
                 }
+                this.clientFramework = this.jhipsterAppConfig.get(OptionNames.CLIENT_FRAMEWORK);
+                this.clientPackageManager = this.jhipsterAppConfig.get(OptionNames.CLIENT_PACKAGE_MANAGER);
             },
             displayLogo() {
                 // it's here to show that you can use functions from generator-jhipster
@@ -61,16 +65,8 @@ module.exports = class extends BaseGenerator {
     }
 
     writing() {
-        // read config from .yo-rc.json
-        this.baseName = this.jhipsterAppConfig.baseName;
-        this.packageName = this.jhipsterAppConfig.packageName;
-        this.packageFolder = this.jhipsterAppConfig.packageFolder;
-        this.clientFramework = this.jhipsterAppConfig.clientFramework;
-        this.clientPackageManager = this.jhipsterAppConfig.clientPackageManager;
-        this.buildTool = this.jhipsterAppConfig.buildTool;
 
-        // use function in generator-base.js from generator-jhipster
-        this.angularAppName = this.getFrontendAppName();
+
 
         // use constants from generator-constants.js
         const javaDir = `${jhipsterConstants.SERVER_MAIN_SRC_DIR + this.packageFolder}/`;
@@ -84,36 +80,8 @@ module.exports = class extends BaseGenerator {
 
         // show all variables
         this.log('\n--- some config read from config ---');
-        this.log(`baseName=${this.baseName}`);
-        this.log(`packageName=${this.packageName}`);
-        this.log(`clientFramework=${this.clientFramework}`);
         this.log(`clientPackageManager=${this.clientPackageManager}`);
-        this.log(`buildTool=${this.buildTool}`);
 
-        this.log('\n--- some function ---');
-        this.log(`angularAppName=${this.angularAppName}`);
-
-        this.log('\n--- some const ---');
-        this.log(`javaDir=${javaDir}`);
-        this.log(`resourceDir=${resourceDir}`);
-        this.log(`webappDir=${webappDir}`);
-
-        this.log('\n--- variables from questions ---');
-        this.log(`message=${this.message}`);
-        this.log('------\n');
-
-        if (this.clientFramework === 'react') {
-            this.template('dummy.txt', 'dummy-react.txt');
-        }
-        if (this.clientFramework === 'angularX') {
-            this.template('dummy.txt', 'dummy-angularX.txt');
-        }
-        if (this.buildTool === 'maven') {
-            this.template('dummy.txt', 'dummy-maven.txt');
-        }
-        if (this.buildTool === 'gradle') {
-            this.template('dummy.txt', 'dummy-gradle.txt');
-        }
         try {
             this.registerModule('generator-jhipster-gql', 'entity', 'post', 'entity', 'GraphQL integration for JHipster');
         } catch (err) {
@@ -123,23 +91,14 @@ module.exports = class extends BaseGenerator {
 
     install() {
         const logMsg = `To install your dependencies manually, run: ${chalk.yellow.bold(`${this.clientPackageManager} install`)}`;
-
-        const injectDependenciesAndConstants = err => {
-            if (err) {
-                this.warning('Install of dependencies failed!');
-                this.log(logMsg);
-            }
-        };
-        const installConfig = {
-            bower: false,
-            npm: this.clientPackageManager !== 'yarn',
-            yarn: this.clientPackageManager === 'yarn',
-            callback: injectDependenciesAndConstants
-        };
+        const isNodeJSBlueprint = !! this.jhipsterAppConfig.get('blueprints').find(b => b.name === 'generator-jhipster-nodejs');
         if (this.options['skip-install']) {
             this.log(logMsg);
         } else {
-            // this.installDependencies(installConfig);
+            this.spawnCommandSync(this.clientPackageManager, ['install']);
+            if (isNodeJSBlueprint) {
+                this.spawnCommandSync(this.clientPackageManager, ['install'], { cwd: `${process.cwd()}/server` });
+            }
         }
     }
 
