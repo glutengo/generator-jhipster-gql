@@ -1,0 +1,10 @@
+overwrite: true
+schema: 'server/src/schema.gql'
+generates:
+  src/main/webapp/graphql.ts:
+    plugins:
+      - 'typescript'
+      - 'graphql-typeop/plugins'
+    config:
+      skipTypename: true
+      maybeValue: T | undefined

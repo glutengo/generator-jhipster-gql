@@ -21,15 +21,33 @@ const clientFiles = {
                     renameTo: () => `${ANGULAR_DIR}/core/util/graphql-util.service.ts`
                 },
                 {
+                    file: 'angular/entities/user/user.gql.service.ts',
+                    renameTo: () => `${ANGULAR_DIR}/entities/user/user.gql.service.ts`
+                }
+            ]
+        },
+        {
+            condition: generator => generator.clientFramework === 'angularX' && generator.typeDefinition === 'TypeScript',
+            templates: [
+                {
+                    file: 'angular/entities/user/user.gql.ts',
+                    renameTo: () => `${ANGULAR_DIR}/entities/user/user.gql.ts`
+                },
+                {
+                    file: 'angular/codegen-typescript.yml',
+                    renameTo: () => 'codegen.yml'
+                }
+            ]
+        },
+        {
+            condition: generator => generator.clientFramework === 'angularX' && generator.typeDefinition === 'GraphQL',
+            templates: [
+                {
                     file: 'angular/entities/user/user.graphql',
                     renameTo: () => `${ANGULAR_DIR}/entities/user/user.graphql`
                 },
                 {
-                    file: 'angular/entities/user/user.gql.service.ts',
-                    renameTo: () => `${ANGULAR_DIR}/entities/user/user.gql.service.ts`
-                },
-                {
-                    file: 'angular/codegen.yml',
+                    file: 'angular/codegen-graphql.yml',
                     renameTo: () => 'codegen.yml'
                 }
             ]
@@ -76,7 +94,7 @@ function addGraphQLTransformer(config) {
   const awp = config.plugins.find(p => !!p.pluginOptions);
   const oldFunction = awp.createFileEmitter;
   awp.createFileEmitter = (program, transformers, getExtraDependencies, onAfterEmit) => {
-    const factory = GraphQLTransformer.create(program.getProgram());
+    const factory = GraphQLTransformer.default.create(program.getProgram());
     transformers.before = [factory, ...transformers.before];
     return oldFunction.call(awp, program, transformers, getExtraDependencies, onAfterEmit);
   }

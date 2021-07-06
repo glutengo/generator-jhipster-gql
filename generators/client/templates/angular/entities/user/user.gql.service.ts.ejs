@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { Pagination } from 'app/core/request/request.model';
 import { map } from 'rxjs/operators';
 import { GraphQLUtils } from 'app/core/util/graphql-util.service';
-import { GetUserGQL, GetUsersGQL, CreateUserGQL, DeleteUserGQL } from '../../../graphql';
+import { GetUserGQL, GetUsersGQL, CreateUserGQL, DeleteUserGQL } from '<%= typeDefinition === 'TypeScript' ? './user.gql' : '../../../graphql' %>';
 import { IUser } from 'app/admin/user-management/user-management.model';
 import { from } from 'rxjs';
 
@@ -33,7 +33,8 @@ export class UserGraphQLService {
   }
 
   delete(login: string): Observable<HttpResponse<{}>> {
-    return of(new HttpResponse());
+    return this.deleteUserGQL
+      .mutate({login}).pipe(map(res => this.graphQLUtils.toHttpResponse(res)));
   }
 
   find(login: string): Observable<IUser> {

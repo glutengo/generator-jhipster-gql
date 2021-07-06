@@ -1,12 +1,16 @@
 /* eslint-disable max-classes-per-file*/
 import { Paginated } from './paginated.object-type';
 import { UserDTO } from '../dto/user.dto';
-import { InputType, Field, HideField, ObjectType } from '@nestjs/graphql';
+import { InputType, Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class User extends UserDTO {
-  @HideField()
-  password: string;
+  @Field({nullable: true})
+  login: string;
+  @Field({nullable: true})
+  email: string;
+  @Field({nullable: true})
+  id?: number;
 }
 
 @InputType()
@@ -17,7 +21,7 @@ export class CreateUserArgs extends User {
 
 @InputType()
 export class UpdateUserArgs extends User {
-  @Field()
+  @Field({nullable: true})
   password: string;
 }
 

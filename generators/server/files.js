@@ -95,7 +95,7 @@ function adjustUserDTO(tsProject) {
         // add class decorators
         const _class = dto.getClass(() => true);
         _class.addDecorator({ name: 'ObjectType', arguments: [] });
-        _class.addDecorator({ name: 'InputType', arguments: [`'_user'`] });
+        _class.addDecorator({ name: 'InputType', arguments: [`'_User'`] });
         // adjust type of authorities
         _class.getInstanceProperty('authorities').setType(`string[]`);
         // add password decorator

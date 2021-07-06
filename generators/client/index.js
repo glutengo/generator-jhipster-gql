@@ -32,11 +32,7 @@ module.exports = class extends BaseGenerator {
                     dependenciesStorage.set('graphql', '15.5.0');
                     if (this.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
                         dependenciesStorage.set('graphql-typeop', '0.1.0-SNAPSHOT');
-                        if (this.experimentalTransformer) {
-                            // TODO: adjust the webpack config to use the transformer
-                        }
                     }
-
                     devDependenciesStorage.set('@graphql-codegen/cli', '1.21.4');
                     devDependenciesStorage.set('@graphql-codegen/typescript', '1.22.0');
                     devDependenciesStorage.set('@graphql-codegen/typescript-apollo-angular', '2.3.3');
@@ -52,6 +48,9 @@ module.exports = class extends BaseGenerator {
                     const compilerOptionsStorage = tsConfigJsonStorage.createStorage('compilerOptions');
                     const libs = compilerOptionsStorage.get('lib');
                     compilerOptionsStorage.set('lib', [...libs, 'esnext.asynciterable']);
+                    if (this.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
+                        compilerOptionsStorage.set('emitDecoratorMetadata', true);
+                    }
                     tsConfigJsonStorage.save();
 
                     // import graphQL Module in app module. graphql.module.ts is added via files.js

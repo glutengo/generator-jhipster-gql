@@ -8,7 +8,7 @@ async function askForTypeDefinition() {
         {
             type: 'list',
             name: 'typeDefinition',
-            message: 'Where do you want to specfiy how the GraphQL API is used?',
+            message: 'Where do you want to specfiy your GraphQL operations?',
             choices: [
                 {
                     value: TYPE_DEFINITION_GRAPHQL,
