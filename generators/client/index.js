@@ -8,7 +8,13 @@ module.exports = class extends BaseGenerator {
 
     get prompting() {
         return {
-            askForTypeDfinition: askForTypeDefinition
+            askForTypeDfinition: askForTypeDefinition,
+            saveConfig() {
+                this.config.set('gql', {
+                    typeDefinition: this.typeDefinition,
+                    experimentalTransformer: this.experimentalTransformer
+                });
+            }
         }
     }
 
@@ -31,7 +37,7 @@ module.exports = class extends BaseGenerator {
                     dependenciesStorage.set('apollo-angular', '2.6.0');
                     dependenciesStorage.set('graphql', '15.5.0');
                     if (this.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
-                        dependenciesStorage.set('graphql-typeop', '0.1.0-SNAPSHOT');
+                        dependenciesStorage.set('graphql-typeop', '0.1.0-SNAPSHOTA');
                     }
                     devDependenciesStorage.set('@graphql-codegen/cli', '1.21.4');
                     devDependenciesStorage.set('@graphql-codegen/typescript', '1.22.0');

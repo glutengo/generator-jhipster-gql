@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 import { ArgsType, Field, ObjectType, buildQuery, buildMutation } from 'graphql-typeop';
-import { CreateUserArgs, CreateUserArgsImpl, Mutation, PaginatedUser, Query, QueryGetUserArgs, QueryGetUsersArgs, UpdateUserArgsImpl, User, UserEdge } from 'src/main/webapp/graphql';
+import { CreateUserArgsImpl, Mutation, PaginatedUser, Query, QueryGetUserArgs, QueryGetUsersArgs, UpdateUserArgsImpl, User, UserEdge } from 'src/main/webapp/graphql';
 import * as Apollo from 'apollo-angular';
 
 @ObjectType()
-class BaseUser implements Partial<User> {
+export class BaseUser implements Partial<User> {
   id!: number;
   login!: string;
 }
 
 @ObjectType()
-class DetailUser extends BaseUser implements Partial<User> {
+export class DetailUser extends BaseUser implements Partial<User> {
   email!: string;
   langKey!: string;
   firstName!: string;

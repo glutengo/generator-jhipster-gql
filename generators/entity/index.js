@@ -2,6 +2,7 @@ const chalk = require('chalk');
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
 const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
 const packagejs = require('../../package.json');
+const constants = require('../generator-gql-constants');
 
 module.exports = class extends BaseGenerator {
     get initializing() {
@@ -12,6 +13,8 @@ module.exports = class extends BaseGenerator {
                 if (!this.jhipsterAppConfig) {
                     this.error('Cannot read .yo-rc.json');
                 }
+                this.gqlConfig = this.config.get(constants.CONFIG_KEY);
+                this.databaseType = this.config.get('databaseType');
             },
             displayLogo() {
                 this.log(chalk.white(`Running ${chalk.bold('JHipster GraphQL')} Generator! ${chalk.yellow(`v${packagejs.version}\n`)}`));
@@ -35,7 +38,9 @@ module.exports = class extends BaseGenerator {
            fromCli: true,
            force: this.options.force,
            entityConfig: this.entityConfig,
-           debug: this.configOptions.isDebugEnabled
+           debug: this.configOptions.isDebugEnabled,
+           gqlConfig: this.gqlConfig,
+           databaseType: this.databaseType
         }));
     }
 

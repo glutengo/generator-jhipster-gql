@@ -5,7 +5,7 @@ import { Pagination } from 'app/core/request/request.model';
 import { map } from 'rxjs/operators';
 import { I<%= entityClass %> } from 'app/entities/<%= entityFileName %>/<%= entityFileName %>.model';
 import { GraphQLUtils } from 'app/core/util/graphql-util.service';
-import { Create<%= entityClass %>Args, Create<%= entityClass %>GQL, Get<%= entityClass %>sGQL, Get<%= entityClass %>GQL, Delete<%= entityClass %>GQL, Update<%= entityClass %>Args, Update<%= entityClass %>GQL } from '../../../../graphql';
+import { Create<%= entityClass %>Args, Create<%= entityClass %>GQL, Get<%= entityClass %>sGQL, Get<%= entityClass %>GQL, Delete<%= entityClass %>GQL, Update<%= entityClass %>Args, Update<%= entityClass %>GQL } from '<%= typeDefinition === 'TypeScript' ? `./${entityFileName}.gql` : '../../../../graphql' %>';
 
 export type EntityResponseType = HttpResponse<I<%= entityClass %>>;
 export type EntityArrayResponseType = HttpResponse<I<%= entityClass %>[]>;

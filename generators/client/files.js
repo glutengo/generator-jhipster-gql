@@ -4,13 +4,15 @@ const babelGenerator = require('@babel/generator').default;
 const fs = require('fs');
 const path = require('path');
 const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
+const constants = require('../generator-gql-constants');
+const { isAngular, isReact } = require('../util');
 
 const ANGULAR_DIR = jhipsterConstants.ANGULAR_DIR;
 
 const clientFiles = {
-    graphQL: [
+    angular: [
         {
-            condition: generator => generator.clientFramework === 'angularX',
+            condition: generator => isAngular(generator),
             templates: [
                 {
                     file: 'angular/graphql/graphql.module.ts',
@@ -27,7 +29,7 @@ const clientFiles = {
             ]
         },
         {
-            condition: generator => generator.clientFramework === 'angularX' && generator.typeDefinition === 'TypeScript',
+            condition: generator => isAngular(generator) && generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT,
             templates: [
                 {
                     file: 'angular/entities/user/user.gql.ts',
@@ -40,7 +42,7 @@ const clientFiles = {
             ]
         },
         {
-            condition: generator => generator.clientFramework === 'angularX' && generator.typeDefinition === 'GraphQL',
+            condition: generator => isAngular(generator) && generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL,
             templates: [
                 {
                     file: 'angular/entities/user/user.graphql',

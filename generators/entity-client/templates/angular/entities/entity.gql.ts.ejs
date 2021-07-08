@@ -1,0 +1,134 @@
+<%_
+const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'boolean';
+_%>
+import { Injectable } from '@angular/core';
+import { ArgsType, Field, ObjectType, buildQuery, buildMutation } from 'graphql-typeop';
+import { Create<%= entityClass %>ArgsImpl, Mutation, MutationCreate<%= entityClass %>Args, MutationUpdate<%= entityClass %>Args, Paginated<%= entityClass %>, <%= entityClass %>, <%= entityClass %>Edge, Query, QueryGet<%= entityClass %>Args, Update<%= entityClass %>ArgsImpl } from 'src/main/webapp/graphql';
+import * as Apollo from 'apollo-angular';
+<%_ for (const r of relationships) { _%>
+import { Base<%= r.otherEntityNameCapitalized %> } from '../<%= r.otherEntity.entityFolderName %>/<%= r.otherEntity.entityFileName %>.gql' %>
+<%_ } _%>
+
+@ObjectType()
+class Base<%= entityClass %> implements Partial<<%= entityClass %>> {
+<%_ for (const field of fields) { _%>
+  <%= field.fieldName%>!: <%= field.tsType %>
+<%_ } _%>
+}
+
+@ObjectType()
+class Detail<%= entityClass %> extends Base<%= entityClass %> implements Partial<<%= entityClass %>> {
+<%_ for (const relationship of relationships) { _%>
+  <%= relationship.relationshipName %>!: Base<%= relationship.otherEntityNameCapitalized %>
+<%_ } _%>
+}
+
+@ArgsType()
+class Get<%= entityClass %>Vars implements QueryGet<%= entityClass %>Args {
+  id!: <%= pkType %>;
+}
+
+@ObjectType()
+class Get<%= entityClass %>Query {
+  @Field<Query, Get<%= entityClass %>Vars>({aliasFor: 'get<%= entityClass %>'})
+  result!: Detail<%= entityClass %>;
+}
+
+@ArgsType()
+class Get<%= entityClass %>sVars {
+}
+
+@ObjectType()
+class <%= entityClass %>EdgeResult implements Partial<<%= entityClass %>Edge> {
+  node!: Detail<%= entityClass %>;
+}
+
+@ObjectType()
+class Get<%= entityClass %>sResult implements Partial<Paginated<%= entityClass %>> {
+  edges!: <%= entityClass %>EdgeResult[];
+  totalCount?: number;
+}
+
+@ObjectType()
+class Get<%= entityClass %>sQuery {
+  @Field<Query, Get<%= entityClass %>sVars>({aliasFor: 'get<%= entityClass %>s'})
+  result!: Get<%= entityClass %>sResult;
+}
+
+@ArgsType()
+class Create<%= entityClass %>Vars implements MutationCreate<%= entityClass %>Args {
+  <%= entityInstance %>!: Create<%= entityClass %>ArgsImpl;
+}
+
+@ObjectType()
+class Create<%= entityClass %>Mutation {
+  @Field<Mutation, Create<%= entityClass %>Vars>({aliasFor: 'create<%= entityClass %>'})
+  result!: Detail<%= entityClass %>;
+}
+
+@ArgsType()
+class Update<%= entityClass %>Vars implements MutationUpdate<%= entityClass %>Args {
+  <%= entityInstance %>!: Update<%= entityClass %>ArgsImpl;
+}
+
+@ObjectType()
+class Update<%= entityClass %>Mutation {
+  @Field<Mutation, Update<%= entityClass %>Vars>({aliasFor: 'update<%= entityClass %>'})
+  result!: Detail<%= entityClass %>;
+}
+
+@ObjectType()
+class Delete<%= entityClass %>Mutation {
+  @Field<Mutation, Get<%= entityClass %>Vars>({aliasFor: 'delete<%= entityClass %>'})
+  result!: number;
+}
+
+const Get<%= entityClass %>Document = buildQuery(Get<%= entityClass %>Query, Get<%= entityClass %>Vars);
+@Injectable({ providedIn: 'root'})
+export class Get<%= entityClass %>GQL extends Apollo.Query<Get<%= entityClass %>Query, Get<%= entityClass %>Vars> {
+  document = Get<%= entityClass %>Document;
+
+  constructor(apollo: Apollo.Apollo) {
+    super(apollo)
+  }
+}
+
+const Get<%= entityClass %>sDocument = buildQuery(Get<%= entityClass %>sQuery, Get<%= entityClass %>sQuery);
+@Injectable({ providedIn: 'root'})
+export class Get<%= entityClass %>sGQL extends Apollo.Query<Get<%= entityClass %>sQuery, Get<%= entityClass %>sVars> {
+  document = Get<%= entityClass %>sDocument;
+
+  constructor(apollo: Apollo.Apollo) {
+    super(apollo);
+  }
+}
+
+const Create<%= entityClass %>Document = buildMutation(Create<%= entityClass %>Mutation, Create<%= entityClass %>Vars)
+@Injectable({ providedIn: 'root'})
+export class Create<%= entityClass %>GQL extends Apollo.Mutation<Create<%= entityClass %>Mutation, Create<%= entityClass %>Vars> {
+  document = Create<%= entityClass %>Document;
+
+  constructor(apollo: Apollo.Apollo) {
+    super(apollo);
+  }
+}
+
+const Update<%= entityClass %>Document = buildMutation(Update<%= entityClass %>Mutation, Update<%= entityClass %>Vars)
+@Injectable({ providedIn: 'root'})
+export class Update<%= entityClass %>GQL extends Apollo.Mutation<Update<%= entityClass %>Mutation, Update<%= entityClass %>Vars> {
+  document = Update<%= entityClass %>Document;
+
+  constructor(apollo: Apollo.Apollo) {
+    super(apollo);
+  }
+}
+
+const Delete<%= entityClass %>Document = buildMutation(Delete<%= entityClass %>Mutation, Get<%= entityClass %>Vars)
+@Injectable({ providedIn: 'root'})
+export class Delete<%= entityClass %>GQL extends Apollo.Mutation<Delete<%= entityClass %>Mutation, Get<%= entityClass %>Vars> {
+  document = Delete<%= entityClass %>Document;
+
+  constructor(apollo: Apollo.Apollo) {
+    super(apollo);
+  }
+}

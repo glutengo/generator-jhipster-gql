@@ -1,4 +1,5 @@
 const nodejsConstants = require('generator-jhipster-nodejs/generators/generator-nodejs-constants');
+const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
 const path = require('path');
 const { Project } = require('ts-morph');
 
@@ -23,8 +24,18 @@ function getTsProject(server = false) {
     return new Project({tsConfigFilePath});
 }
 
+function isAngular(generator) {
+    return generator.clientFramework === jHipsterConstants.SUPPORTED_CLIENT_FRAMEWORKS.ANGULAR;
+}
+
+function isReact(generator) {
+    return generator.clientFramework === jHipsterConstants.SUPPORTED_CLIENT_FRAMEWORKS.REACT;
+}
+
 module.exports = {
     addImportIfMissing,
     getTsProject,
-    getSourceFile
+    getSourceFile,
+    isAngular,
+    isReact
 }

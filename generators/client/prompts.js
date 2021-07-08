@@ -1,7 +1,4 @@
-const TYPE_DEFINITION_GRAPHQL = 'GraphQL';
-const TYPE_DEFINITION_TYPESCRIPT = 'TypeScript';
-
-const constants = { TYPE_DEFINITION_GRAPHQL, TYPE_DEFINITION_TYPESCRIPT };
+const constants = require('../generator-gql-constants');
 
 async function askForTypeDefinition() {
     const prompts = [
@@ -11,11 +8,11 @@ async function askForTypeDefinition() {
             message: 'Where do you want to specfiy your GraphQL operations?',
             choices: [
                 {
-                    value: TYPE_DEFINITION_GRAPHQL,
+                    value: constants.TYPE_DEFINITION_GRAPHQL,
                     name: 'GraphQL documents'
                 },
                 {
-                    value: TYPE_DEFINITION_TYPESCRIPT,
+                    value: constants.TYPE_DEFINITION_TYPESCRIPT,
                     name: 'TypeScript classes'
                 }
             ]
@@ -23,7 +20,7 @@ async function askForTypeDefinition() {
     ]
     const props = await this.prompt(prompts);
     this.typeDefinition = props.typeDefinition;
-    if (this.typeDefinition === TYPE_DEFINITION_TYPESCRIPT) {
+    if (this.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
         const secondLevelPrompts = [
             {
                 type: 'confirm',
