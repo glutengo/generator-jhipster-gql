@@ -51,7 +51,6 @@ module.exports = class extends BaseGenerator {
                 this.baseName = this.jhipsterAppConfig.baseName;
                 this.packageName = this.jhipsterAppConfig.packageName;
                 this.packageFolder = this.jhipsterAppConfig.packageFolder;
-                this.clientFramework = this.jhipsterAppConfig.clientFramework;
                 this.clientPackageManager = this.jhipsterAppConfig.clientPackageManager;
                 this.buildTool = this.jhipsterAppConfig.buildTool;
 

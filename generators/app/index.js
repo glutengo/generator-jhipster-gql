@@ -4,23 +4,16 @@ const BaseGenerator = require('generator-jhipster/generators/generator-base');
 const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
 const packagejs = require('../../package.json');
 const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
-
+const utils = require('../util');
 
 module.exports = class extends BaseGenerator {
     get initializing() {
         return {
-            init(args) {
-                if (args === 'default') {
-                    // do something when argument is 'default'
-                    this.message = 'default message';
-                }
-            },
             readConfig() {
                 this.jhipsterAppConfig = this.getJhipsterConfig();
                 if (!this.jhipsterAppConfig) {
                     this.error('Cannot read .yo-rc.json');
                 }
-                this.clientFramework = this.jhipsterAppConfig.get(OptionNames.CLIENT_FRAMEWORK);
                 this.clientPackageManager = this.jhipsterAppConfig.get(OptionNames.CLIENT_PACKAGE_MANAGER);
             },
             displayLogo() {
@@ -43,7 +36,8 @@ module.exports = class extends BaseGenerator {
         };
     }
 
-    composing() {
+    get composing() {
+        console.log('COMPOSING');
         const subGenerators = ['../client', '../server'];
         subGenerators.forEach(gen => this.composeWith(require.resolve(gen), {
            context: this.context,
@@ -54,7 +48,7 @@ module.exports = class extends BaseGenerator {
         }));
     }
 
-    prompting() {
+    get prompting() {
         const done = this.async();
         const prompts = [];
         this.prompt(prompts).then(answers => {
@@ -64,45 +58,20 @@ module.exports = class extends BaseGenerator {
         });
     }
 
-    writing() {
-
-
-
-        // use constants from generator-constants.js
-        const javaDir = `${jhipsterConstants.SERVER_MAIN_SRC_DIR + this.packageFolder}/`;
-        const resourceDir = jhipsterConstants.SERVER_MAIN_RES_DIR;
-        const webappDir = jhipsterConstants.CLIENT_MAIN_SRC_DIR;
-
-        // variable from questions
-        if (typeof this.message === 'undefined') {
-            this.message = this.promptAnswers.message;
-        }
-
-        // show all variables
-        this.log('\n--- some config read from config ---');
-        this.log(`clientPackageManager=${this.clientPackageManager}`);
-
-        try {
-            this.registerModule('generator-jhipster-gql', 'entity', 'post', 'entity', 'GraphQL integration for JHipster');
-        } catch (err) {
-            this.log(`${chalk.red.bold('WARN!')} Could not register as a jhipster entity post creation hook...\n`);
-        }
-    }
-
     install() {
         const logMsg = `To install your dependencies manually, run: ${chalk.yellow.bold(`${this.clientPackageManager} install`)}`;
-        const isNodeJSBlueprint = !! this.jhipsterAppConfig.get('blueprints').find(b => b.name === 'generator-jhipster-nodejs');
         if (this.options['skip-install']) {
             this.log(logMsg);
         } else {
             this.spawnCommandSync(this.clientPackageManager, ['install']);
-            if (isNodeJSBlueprint) {
+            if (utils.isNodeJSBlueprint(this)) {
                 this.spawnCommandSync(this.clientPackageManager, ['install'], { cwd: `${process.cwd()}/server` });
+                this.spawnCommandSync(this.clientPackageManager, ['run', 'build:schema-gql'], { cwd: `${process.cwd()}/server` });
             }
         }
     }
 
-    end() {
+    get end() {
         this.log('End of gql generator');
     }
 };

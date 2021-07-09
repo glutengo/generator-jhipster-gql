@@ -46,7 +46,6 @@ const clientFiles = {
 function writeFiles() {
     return {
         graphQLEntityFiles () {
-            this.clientFramework = this.getJhipsterConfig().get('clientFramework');
             this.writeFilesToDisk(clientFiles, this, false);
         }
     }

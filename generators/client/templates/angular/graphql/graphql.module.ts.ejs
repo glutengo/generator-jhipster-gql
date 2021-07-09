@@ -16,7 +16,7 @@ const defaultOptions: DefaultOptions = {
   },
 }
 
-const uri = '/graphql';
+const uri = '<%= endpoint %>';
 export function createApollo(httpLink: HttpBatchLink): ApolloClientOptions<any> {
   return {
     link: httpLink.create({ uri }),

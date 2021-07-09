@@ -34,7 +34,35 @@ async function askForTypeDefinition() {
     }
 }
 
+async function askForEndpoint() {
+    const prompts = [
+        {
+            type: 'input',
+            name: 'endpoint',
+            message: 'Which is the endpoint of your GraphQL API?',
+            default: '/graphql'
+        }
+    ]
+    const props = await this.prompt(prompts);
+    this.endpoint = props.endpoint;
+}
+
+async function askForSchemaLocation() {
+const prompts = [
+        {
+            type: 'input',
+            name: 'schemaLocation',
+            message: 'Where is your GraphQL schema located',
+            default: 'server/src/schema.gql'
+        }
+    ]
+    const props = await this.prompt(prompts);
+    this.schemaLocation = props.schemaLocation;
+}
+
 module.exports = {
     askForTypeDefinition,
+    askForEndpoint,
+    askForSchemaLocation,
     constants
 }

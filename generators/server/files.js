@@ -1,5 +1,6 @@
 const nodejsConstants = require('generator-jhipster-nodejs/generators/generator-nodejs-constants');
 const utils = require('../util');
+const constants = require('../generator-gql-constants');
 
 module.exports = {
     writeFiles
@@ -12,7 +13,8 @@ const serverFiles = {
                 'server/src/service/graphql/paginated.object-type.ts',
                 'server/src/service/graphql/user.object-type.ts',
                 'server/src/web/graphql/pagination-util.ts',
-                'server/src/web/graphql/user.resolver.ts'
+                'server/src/web/graphql/user.resolver.ts',
+                'server/scripts/build-schema.ts'
             ]
         }
     ]
@@ -105,12 +107,52 @@ function adjustUserDTO(tsProject) {
     dto.saveSync();
 }
 
+function adjustPackageJSON(generator) {
+    // TODO: check if nodejs and add other implementations for other frameworks
+    const packageJSONStorage = generator.createStorage('server/package.json');
+    const dependenciesStorage = packageJSONStorage.createStorage('dependencies');
+    // TODO: versions?
+    dependenciesStorage.set('@nestjs/graphql', '7.10.6');
+    dependenciesStorage.set('graphql', '15.5.0');
+    dependenciesStorage.set('graphql-tools', '7.0.5');
+    dependenciesStorage.set('apollo-server-express', '2.24.0');
+    const scriptsStorage = packageJSONStorage.createStorage('scripts');
+    scriptsStorage.set('start:dev', 'npm run copy-resources && nest start -w');
+    scriptsStorage.set('build:schema-gql', 'ts-node scripts/build-schema.ts');
+    packageJSONStorage.save();
+}
+function adjustNestCLIJSON(generator) {
+    const nestCLIJSONStorage = generator.createStorage('server/nest-cli.json');
+    const compilerOptions = nestCLIJSONStorage.get('compilerOptions') || {};
+    if (!compilerOptions.plugins) {
+        compilerOptions.plugins = [];
+    }
+    if (!compilerOptions.plugins.find(p => p.name === constants.NESTJS_GRAPHQL_PLUGIN)) {
+        const nestCLIPlugin = {
+            name: constants.NESTJS_GRAPHQL_PLUGIN,
+            options: {
+                typeFileNameSuffix: [
+                    '.dto.ts',
+                    '.entity.ts'
+                ]
+            }
+        };
+        compilerOptions.plugins.push(nestCLIPlugin);
+        nestCLIJSONStorage.set('compilerOptions', compilerOptions);
+        nestCLIJSONStorage.save();
+    }
+}
+
 function writeFiles() {
     return {
+        adjustConfigFiles() {
+            adjustPackageJSON(this);
+            adjustNestCLIJSON(this);
+        },
         writeGraphQLFiles() {
             this.writeFilesToDisk(serverFiles, this, false);
         },
-        adjustFiles() {
+        adjustTypeScriptFiles() {
             const tsProject = utils.getTsProject(true);
             adjustAppModule(tsProject);
             adjustUserModule(tsProject);
