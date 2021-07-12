@@ -5,12 +5,42 @@ const fs = require('fs');
 const path = require('path');
 const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
 const constants = require('../generator-gql-constants');
-const { isAngular, isReact } = require('../util');
-const AngularNeedleClient = require('generator-jhipster/generators/client/needle-api/needle-client-angular');
+const { isAngular, isReact, getClientBaseDir } = require('../util');
+const { adjustAngularFiles } = require('./files-angular');
+const { adjustReactFiles } = require('./files-react');
 
 const ANGULAR_DIR = jhipsterConstants.ANGULAR_DIR;
 
 const clientFiles = {
+    common: [
+        {
+            templates: [
+                {
+                    file: 'common/codegen.yml',
+                    renameTo: () => 'codegen.yml'
+                }
+            ]
+        },
+        {
+            condition: generator => generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT,
+            templates: [
+                {
+                    file: 'common/entities/user/user.gql.ts',
+                    renameTo: generator => `${getClientBaseDir(generator)}/entities/user/user.gql.ts`
+                }
+            ]
+        },
+        {
+            condition: generator => generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL,
+            templates: [
+                {
+                    file: 'common/entities/user/user.graphql',
+                    renameTo: generator => `${getClientBaseDir(generator)}/entities/user/user.graphql`
+                }
+            ]
+        }
+
+    ],
     angular: [
         {
             condition: generator => isAngular(generator),
@@ -28,118 +58,20 @@ const clientFiles = {
                     renameTo: () => `${ANGULAR_DIR}/entities/user/user.gql.service.ts`
                 }
             ]
-        },
+        }
+    ],
+    react: [
         {
-            condition: generator => isAngular(generator) && generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT,
+            condition: generator => isReact(generator) && generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL,
             templates: [
                 {
-                    file: 'angular/entities/user/user.gql.ts',
-                    renameTo: () => `${ANGULAR_DIR}/entities/user/user.gql.ts`
-                },
-                {
-                    file: 'angular/codegen-typescript.yml',
-                    renameTo: () => 'codegen.yml'
-                }
-            ]
-        },
-        {
-            condition: generator => isAngular(generator) && generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL,
-            templates: [
-                {
-                    file: 'angular/entities/user/user.graphql',
-                    renameTo: () => `${ANGULAR_DIR}/entities/user/user.graphql`
-                },
-                {
-                    file: 'angular/codegen-graphql.yml',
-                    renameTo: () => 'codegen.yml'
+                    file: 'react/webpack/graphql.transformer.js',
+                    renameTo: () => 'webpack/graphql.transformer.js'
                 }
             ]
         }
     ]
 };
-
-function adjustProxyConf(generator) {
-    // read and parse the proxy configuration file
-    const filePath = path.join('webpack', 'proxy.conf.js');
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
-    const ast = babel.parseSync(fileContent);
-    // find the conf assignment in the function declaration
-    const fun = ast.program.body.find(p => p.type === 'FunctionDeclaration' && p.id && p.id.name === 'setupProxy');
-    const confAssignment = fun.body.body.find(s => s.type === 'VariableDeclaration' && s.declarations.find(d => d.type === 'VariableDeclarator' && d.id && d.id.name === 'conf'));
-    const confDeclarator = confAssignment.declarations.find(d => d.type === 'VariableDeclarator' && d.id && d.id.name === 'conf')
-    const initNode = confDeclarator.init.elements[0];
-    const propertyNode = initNode.properties.find(p => p.key && p.key.name === 'context');
-    // check if there already is an entry for the graphql endpoint
-    const existingGraphQLEntry = propertyNode.value.elements.find(e => e.value === generator.endpoint);
-    if (!existingGraphQLEntry) {
-        // if none is found, add it and write the manipulated file
-        propertyNode.value.elements.push(t.stringLiteral(generator.endpoint));
-        const generatedFileContent = babelGenerator(ast, { quotes: 'single' });
-        fs.writeFileSync(filePath, generatedFileContent.code);
-    }
-}
-
-function adjustWebpackConfig() {
-    const filePath = path.join('webpack', 'webpack.custom.js');
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
-    const ast = babel.parseSync(fileContent);
-    // stop if there already is an import statement for GraphQLTransformer
-    const existingGraphQLTransformerImportStatement = ast.program.body.find(
-        e => e.type === 'VariableDeclaration' && e.declarations && e.declarations.find(d => d.type === 'VariableDeclarator' && d.id && d.id.name === 'GraphQLTransformer'));
-    if (existingGraphQLTransformerImportStatement) {
-        return;
-    }
-    const expressionStatementIndex = ast.program.body.findIndex(e => e.type === 'ExpressionStatement' && e.expression.left && e.expression.left.property && e.expression.left.property.name === 'exports');
-    const expressionStatement = ast.program.body[expressionStatementIndex];
-    if (expressionStatement) {
-        const functionDeclaration = babel.parseSync(`
-function addGraphQLTransformer(config) {
-  const awp = config.plugins.find(p => !!p.pluginOptions);
-  const oldFunction = awp.createFileEmitter;
-  awp.createFileEmitter = (program, transformers, getExtraDependencies, onAfterEmit) => {
-    const factory = GraphQLTransformer.default.create(program.getProgram());
-    transformers.before = [factory, ...transformers.before];
-    return oldFunction.call(awp, program, transformers, getExtraDependencies, onAfterEmit);
-  }
-}`).program.body[0];
-        const requireExpression = t.callExpression(t.identifier('require'), [t.stringLiteral('graphql-typeop/transformers/graphql.transformer')]);
-        const VariableDeclaration = t.variableDeclaration('const', [t.variableDeclarator(t.identifier('GraphQLTransformer'), requireExpression)]);
-        ast.program.body.splice(expressionStatementIndex - 1, 0, functionDeclaration);
-        ast.program.body.splice(expressionStatementIndex - 1, 0, VariableDeclaration);
-        const arrowFunction = expressionStatement.expression.right;
-        if (arrowFunction) {
-            const functionCall = t.callExpression(t.identifier('addGraphQLTransformer'), [t.identifier('config')]);
-            arrowFunction.body.body.unshift(functionCall);
-            const generatedFileContent = babelGenerator(ast, { quotes: 'single' });
-            fs.writeFileSync(filePath, generatedFileContent.code);
-        }
-    }
-}
-
-function adjustTSConfig(generator) {
-    const tsConfigJsonStorage = generator.createStorage('tsconfig.json');
-    const compilerOptionsStorage = tsConfigJsonStorage.createStorage('compilerOptions');
-    const libs = compilerOptionsStorage.get('lib');
-    compilerOptionsStorage.set('lib', [...libs, 'esnext.asynciterable']);
-    if (generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
-        compilerOptionsStorage.set('emitDecoratorMetadata', true);
-    }
-    tsConfigJsonStorage.save();
-}
-
-function addGraphQLModuleToAppModule(generator) {
-    const needleClient = new AngularNeedleClient(generator);
-    needleClient.addModule('', 'GraphQL', 'graphql', 'graphql', false, null);
-}
-
-function adjustAngularFiles(generator) {
-    addGraphQLModuleToAppModule(generator);
-    adjustProxyConf(generator);
-    if (generator.experimentalTransformer) {
-        adjustWebpackConfig();
-    }
-    adjustTSConfig(generator);
-}
 
 function adjustPackageJSON(generator) {
     const packageJsonStorage = generator.createStorage('package.json');
@@ -165,6 +97,11 @@ function adjustPackageJSON(generator) {
         }
         scriptsStorage.set('webapp:dev', 'concurrently "npm run codegen:watch" "ng serve"');
     }
+    if (isReact(generator)) {
+        if (generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL) {
+            devDependenciesStorage.set('@graphql-codegen/typescript-react-apollo', '2.3.0');
+        }
+    }
     scriptsStorage.set('codegen', 'graphql-codegen --config codegen.yml');
     scriptsStorage.set('codegen:watch', 'graphql-codegen --config codegen.yml --watch');
     packageJsonStorage.save();
@@ -178,6 +115,9 @@ function writeFiles() {
         adjustFiles() {
             if (isAngular(this)) {
                 adjustAngularFiles(this);
+            }
+            if (isReact(this)) {
+                adjustReactFiles(this);
             }
             adjustPackageJSON(this);
         }

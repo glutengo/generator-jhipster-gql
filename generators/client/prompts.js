@@ -1,4 +1,5 @@
 const constants = require('../generator-gql-constants');
+const utils = require('../util');
 
 async function askForTypeDefinition() {
     const prompts = [
@@ -20,7 +21,7 @@ async function askForTypeDefinition() {
     ]
     const props = await this.prompt(prompts);
     this.typeDefinition = props.typeDefinition;
-    if (this.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
+    if (utils.isAngular(this) && this.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
         const secondLevelPrompts = [
             {
                 type: 'confirm',

@@ -33,12 +33,22 @@ function isReact(generator) {
     return generator.getJhipsterConfig().get(OptionNames.CLIENT_FRAMEWORK) === jHipsterConstants.SUPPORTED_CLIENT_FRAMEWORKS.REACT;
 }
 
+function getClientBaseDir(generator) {
+    if (isAngular(generator)) {
+        return jHipsterConstants.ANGULAR_DIR;
+    }
+    if (isReact(generator)) {
+        return jHipsterConstants.REACT_DIR;
+    }
+}
+
 function isNodeJSBlueprint(generator) {
     return !! generator.getJhipsterConfig().get('blueprints').find(b => b.name === 'generator-jhipster-nodejs');
 }
 
 module.exports = {
     addImportIfMissing,
+    getClientBaseDir,
     getTsProject,
     getSourceFile,
     isAngular,

@@ -68,6 +68,7 @@ module.exports = class extends BaseGenerator {
                 this.spawnCommandSync(this.clientPackageManager, ['install'], { cwd: `${process.cwd()}/server` });
                 this.spawnCommandSync(this.clientPackageManager, ['run', 'build:schema-gql'], { cwd: `${process.cwd()}/server` });
             }
+            this.spawnCommandSync(this.clientPackageManager, ['run', 'codegen']);
         }
     }
 

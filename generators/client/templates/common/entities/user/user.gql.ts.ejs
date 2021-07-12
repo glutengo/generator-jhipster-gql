@@ -1,7 +1,13 @@
-import { Injectable } from '@angular/core';
+
 import { ArgsType, Field, ObjectType, buildQuery, buildMutation } from 'graphql-typeop';
-import { CreateUserArgsImpl, Mutation, PaginatedUser, Query, QueryGetUserArgs, QueryGetUsersArgs, UpdateUserArgsImpl, User, UserEdge } from 'src/main/webapp/graphql';
+import { CreateUserArgsImpl, Mutation, PaginatedUser, Query, QueryGetUserArgs, QueryGetUsersArgs, UpdateUserArgsImpl, User, UserEdge } from 'src/main/webapp/app/graphql';
+<%_ if (clientFramework === 'angularX') {  %>
+import { Injectable } from '@angular/core';
 import * as Apollo from 'apollo-angular';
+<%_ } %>
+<%_ if (clientFramework === 'react') {  %>
+import * as Apollo from '@apollo/client';
+<%_ } %>
 
 @ObjectType()
 export class BaseUser implements Partial<User> {
@@ -91,6 +97,12 @@ class DeleteUserMutation {
 }
 
 const GetUsersDocument = buildQuery(GetUsersQuery, GetUsersVars);
+const GetUserDocument = buildQuery(GetUserQuery, GetUserVars);
+const CreateUserDocument = buildMutation(CreateUserMutation, CreateUserVars);
+const DeleteUserDocument = buildMutation(DeleteUserMutation, DeleteUserVars);
+const UpdateUserDocument = buildMutation(UpdateUserMutation, UpdateUserVars);
+
+<%_ if (clientFramework === 'angularX') {  %>
 @Injectable({providedIn: 'root'})
 export class GetUsersGQL extends Apollo.Query<GetUsersQuery, GetUsersVars> {
   document = GetUsersDocument;
@@ -100,7 +112,6 @@ export class GetUsersGQL extends Apollo.Query<GetUsersQuery, GetUsersVars> {
   }
 }
 
-const GetUserDocument = buildQuery(GetUserQuery, GetUserVars);
 @Injectable({providedIn: 'root'})
 export class GetUserGQL extends Apollo.Query<GetUserQuery, GetUserVars> {
   document = GetUserDocument;
@@ -110,7 +121,6 @@ export class GetUserGQL extends Apollo.Query<GetUserQuery, GetUserVars> {
   }
 }
 
-const CreateUserDocument = buildMutation(CreateUserMutation, CreateUserVars);
 @Injectable({providedIn: 'root'})
 export class CreateUserGQL extends Apollo.Mutation<CreateUserMutation, CreateUserVars> {
   document = CreateUserDocument;
@@ -120,7 +130,6 @@ export class CreateUserGQL extends Apollo.Mutation<CreateUserMutation, CreateUse
   }
 }
 
-const UpdateUserDocument = buildMutation(UpdateUserMutation, UpdateUserVars);
 @Injectable({providedIn: 'root'})
 export class UpdateUserGQL extends Apollo.Mutation<UpdateUserMutation, UpdateUserVars> {
   document = UpdateUserDocument;
@@ -130,7 +139,6 @@ export class UpdateUserGQL extends Apollo.Mutation<UpdateUserMutation, UpdateUse
   }
 }
 
-const DeleteUserDocument = buildMutation(DeleteUserMutation, DeleteUserVars);
 @Injectable({providedIn: 'root'})
 export class DeleteUserGQL extends Apollo.Mutation<DeleteUserMutation, DeleteUserVars> {
   document = DeleteUserDocument;
@@ -139,3 +147,26 @@ export class DeleteUserGQL extends Apollo.Mutation<DeleteUserMutation, DeleteUse
     super(apollo);
   }
 }
+<%_ } %>
+
+<%_ if (clientFramework === 'react') {  %>
+export function useGetUsersQuery(options?: Apollo.QueryHookOptions<GetUsersQuery, GetUsersVars>) {
+  return Apollo.useQuery<GetUsersQuery, GetUsersVars>(GetUsersDocument, options);
+}
+
+export function useGetUserQuery(options?: Apollo.QueryHookOptions<GetUserQuery, GetUserVars>) {
+  return Apollo.useQuery<GetUserQuery, GetUserVars>(GetUserDocument, options);
+}
+
+export function useCreateUserMutation(options?: Apollo.MutationHookOptions<CreateUserMutation, CreateUserVars>) {
+  return Apollo.useMutation<CreateUserMutation, CreateUserVars>(CreateUserDocument, options);
+}
+
+export function useUpdateUserMutation(options?: Apollo.MutationHookOptions<UpdateUserMutation, UpdateUserVars>) {
+  return Apollo.useMutation<UpdateUserMutation, UpdateUserVars>(UpdateUserDocument, options);
+}
+
+export function useDeleteUserMutation(options?: Apollo.MutationHookOptions<DeleteUserMutation, DeleteUserVars>) {
+  return Apollo.useMutation<DeleteUserMutation, DeleteUserVars>(DeleteUserDocument, options);
+}
+<%_ } %>

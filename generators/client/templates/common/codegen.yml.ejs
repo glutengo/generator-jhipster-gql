@@ -1,0 +1,24 @@
+overwrite: true
+schema: '<%= schemaLocation %>'
+<%_ if (typeDefinition === 'GraphQL') {  %>
+documents: 'src/**/*.graphql'
+<%_ } %>
+generates:
+  src/main/webapp/app/graphql.ts:
+    plugins:
+      - 'typescript'
+<%_ if (typeDefinition === 'GraphQL') {  %>
+      - 'typescript-operations'
+<%_ } %>
+<%_ if (typeDefinition === 'GraphQL' && clientFramework === 'angularX') {  %>
+      - 'typescript-apollo-angular'
+<%_ } %>
+<%_ if (typeDefinition === 'GraphQL' && clientFramework === 'react') {  %>
+      - 'typescript-react-apollo'
+<%_ } %>
+<%_ if (typeDefinition === 'TypeScript') {  %>
+      - 'graphql-typeop/plugins'
+<%_ } %>
+    config:
+      skipTypename: true
+      maybeValue: T | undefined
