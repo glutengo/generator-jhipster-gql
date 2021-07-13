@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const constants = require('../generator-gql-constants');
 
-function adjustWebpackConfig() {
+function adjustWebpackConfig(generator) {
     const filePath = path.join('webpack', 'webpack.common.js');
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const ast = babel.parseSync(fileContent);
@@ -47,7 +47,7 @@ function adjustProxyConfig(generator) {
 function adjustReactFiles(generator) {
     adjustProxyConfig(generator);
     if (generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
-        adjustWebpackConfig();
+        adjustWebpackConfig(generator);
     }
 }
 

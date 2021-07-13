@@ -37,7 +37,6 @@ module.exports = class extends BaseGenerator {
     }
 
     get composing() {
-        console.log('COMPOSING');
         const subGenerators = ['../client', '../server'];
         subGenerators.forEach(gen => this.composeWith(require.resolve(gen), {
            context: this.context,
@@ -70,9 +69,5 @@ module.exports = class extends BaseGenerator {
             }
             this.spawnCommandSync(this.clientPackageManager, ['run', 'codegen']);
         }
-    }
-
-    get end() {
-        this.log('End of gql generator');
     }
 };

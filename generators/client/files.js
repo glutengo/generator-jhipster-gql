@@ -1,8 +1,3 @@
-const babel = require('@babel/core');
-const t = require('@babel/types');
-const babelGenerator = require('@babel/generator').default;
-const fs = require('fs');
-const path = require('path');
 const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
 const constants = require('../generator-gql-constants');
 const { isAngular, isReact, getClientBaseDir } = require('../util');

@@ -56,8 +56,7 @@ function writeFiles() {
             this.writeFilesToDisk(serverFiles, this, false);
         },
         adjustEntityFiles() {
-            console.log('ADJUST ENTITY FILES');
-            this.tsProject = utils.getTsProject(true);
+            this.tsProject = utils.getTsProject(this, true);
             adjustEntityModule(this);
             adjustEntityDTO(this);
         }

@@ -3,6 +3,7 @@ const jHipsterConstants = require('generator-jhipster/generators/generator-const
 const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
 const path = require('path');
 const { Project } = require('ts-morph');
+const { YeomanFileSystem } = require('./yeoman-file-system');
 
 function getSourceFile(tsProject, filePath, server = false) {
     return tsProject.getSourceFile(server ? path.join(nodejsConstants.SERVER_NODEJS_SRC_DIR, filePath) : filePath);
@@ -20,9 +21,12 @@ function addImportIfMissing(sourceFile, importDeclationOptions) {
     }
 }
 
-function getTsProject(server = false) {
+function getTsProject(generator, server = false) {
     const tsConfigFilePath = server ? `${nodejsConstants.SERVER_NODEJS_SRC_DIR}/tsconfig.json` : 'tsconfig.json';
-    return new Project({tsConfigFilePath});
+    return new Project({
+        tsConfigFilePath,
+        fileSystem: new YeomanFileSystem(generator)
+    });
 }
 
 function isAngular(generator) {

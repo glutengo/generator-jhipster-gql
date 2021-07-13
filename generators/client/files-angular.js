@@ -27,7 +27,7 @@ function adjustProxyConfig(generator) {
     }
 }
 
-function adjustWebpackConfig() {
+function adjustWebpackConfig(generator) {
     const filePath = path.join('webpack', 'webpack.custom.js');
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const ast = babel.parseSync(fileContent);
@@ -84,7 +84,7 @@ function adjustAngularFiles(generator) {
     addGraphQLModuleToAppModule(generator);
     adjustProxyConfig(generator);
     if (generator.experimentalTransformer) {
-        adjustWebpackConfig();
+        adjustWebpackConfig(generator);
     }
     adjustTSConfig(generator);
 }

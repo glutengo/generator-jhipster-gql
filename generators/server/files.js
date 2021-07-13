@@ -153,7 +153,7 @@ function writeFiles() {
             this.writeFilesToDisk(serverFiles, this, false);
         },
         adjustTypeScriptFiles() {
-            const tsProject = utils.getTsProject(true);
+            const tsProject = utils.getTsProject(this, true);
             adjustAppModule(tsProject);
             adjustUserModule(tsProject);
             adjustBaseDTO(tsProject);
