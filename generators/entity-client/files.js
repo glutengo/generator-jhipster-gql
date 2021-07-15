@@ -1,52 +1,50 @@
 const constants = require('../generator-gql-constants');
-const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
-const { isAngular } = require('../util');
+const { isAngular, getClientBaseDir, isReact } = require('../util');
+const { angularFiles } = require('./files-angular');
+const { reactFiles } = require('./files-react');
 
 module.exports = {
     writeFiles
 };
 
 const clientFiles = {
-    angular: [
+    common: [
         {
-            condition: generator => isAngular(generator),
+            condition: generator => generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL,
             templates: [
                 {
-                    file: `angular/entities/service/entity.gql.service.ts`,
+                    file: `common/entities/entity.graphql`,
                     renameTo: generator =>
-                        `${jhipsterConstants.ANGULAR_DIR}entities/${generator.entityFolderName}/service/${generator.entityFileName}.gql.service.ts`
+                        `${getClientBaseDir(generator)}entities/${generator.entityFolderName}/${generator.entityFileName}.graphql`
                 }
             ]
         },
         {
-            condition: generator => isAngular(generator) && generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT,
+            condition: generator => generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT,
             templates: [
                 {
-                    file: `angular/entities/entity.gql.ts`,
+                    file: `common/entities/entity.gql.ts`,
                     renameTo: generator =>
-                        `${jhipsterConstants.ANGULAR_DIR}entities/${generator.entityFolderName}/${generator.entityFileName}.gql.ts`
+                        `${getClientBaseDir(generator)}/entities/${generator.entityFolderName}/${generator.entityFileName}.gql.ts`
                 }
             ]
-        },
-        {
-            condition: generator => isAngular(generator) && generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL,
-            templates: [
-                {
-                    file: `angular/entities/entity.graphql`,
-                    renameTo: generator =>
-                        `${jhipsterConstants.ANGULAR_DIR}entities/${generator.entityFolderName}/${generator.entityFileName}.graphql`
-                }
-            ]
+
         }
-
     ]
-
 }
 
 function writeFiles() {
     return {
-        graphQLEntityFiles () {
-            this.writeFilesToDisk(clientFiles, this, false);
+        graphQLEntityFiles() {
+            const files = { ...clientFiles };
+            if (isAngular(this)) {
+                files.angular = angularFiles;
+            }
+            if (isReact(this)) {
+                files.react = reactFiles;
+            }
+            console.log(files);
+            this.writeFilesToDisk(files, this, false);
         }
     }
 }

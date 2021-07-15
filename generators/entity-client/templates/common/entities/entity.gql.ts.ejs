@@ -1,10 +1,16 @@
 <%_
 const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'boolean';
+const usedClasses = [ `Create${entityClass}Impl`, `Update${entityClass}Impl`, ...relationships.map(r => Base`${r.otherEntityNameCapitalized}`)];
 _%>
+<%_ if (clientFramework === 'angularX') {  %>
 import { Injectable } from '@angular/core';
+import * as Apollo from 'apollo-angular';
+<%_ } %>
+<%_ if (clientFramework === 'react') {  %>
+import * as Apollo from '@apollo/client';
+<%_ } %>
 import { ArgsType, Field, ObjectType, buildQuery, buildMutation } from 'graphql-typeop';
 import { Create<%= entityClass %>ArgsImpl, Mutation, MutationCreate<%= entityClass %>Args, MutationUpdate<%= entityClass %>Args, Paginated<%= entityClass %>, <%= entityClass %>, <%= entityClass %>Edge, Query, QueryGet<%= entityClass %>Args, Update<%= entityClass %>ArgsImpl } from 'src/main/webapp/graphql';
-import * as Apollo from 'apollo-angular';
 <%_ for (const r of relationships) { _%>
 import { Base<%= r.otherEntityNameCapitalized %> } from '../<%= r.otherEntity.entityFolderName %>/<%= r.otherEntity.entityFileName %>.gql' %>
 <%_ } _%>
@@ -83,7 +89,15 @@ class Delete<%= entityClass %>Mutation {
   result!: number;
 }
 
-const Get<%= entityClass %>Document = buildQuery(Get<%= entityClass %>Query, Get<%= entityClass %>Vars);
+const usedClasses = [ Create<%= entityClass %>ArgsImpl, Update<%= entityClass %>ArgsImpl, <%= relatedEntityClasses.join(', ')%> ];
+
+export const Get<%= entityClass %>Document = buildQuery(Get<%= entityClass %>Query, Get<%= entityClass %>Vars);
+export const Get<%= entityClass %>sDocument = buildQuery(Get<%= entityClass %>sQuery, Get<%= entityClass %>sQuery);
+export const Create<%= entityClass %>Document = buildMutation(Create<%= entityClass %>Mutation, Create<%= entityClass %>Vars)
+export const Update<%= entityClass %>Document = buildMutation(Update<%= entityClass %>Mutation, Update<%= entityClass %>Vars)
+export const Delete<%= entityClass %>Document = buildMutation(Delete<%= entityClass %>Mutation, Get<%= entityClass %>Vars)
+
+<%_ if (clientFramework === 'angularX') {  %>
 @Injectable({ providedIn: 'root'})
 export class Get<%= entityClass %>GQL extends Apollo.Query<Get<%= entityClass %>Query, Get<%= entityClass %>Vars> {
   document = Get<%= entityClass %>Document;
@@ -93,7 +107,6 @@ export class Get<%= entityClass %>GQL extends Apollo.Query<Get<%= entityClass %>
   }
 }
 
-const Get<%= entityClass %>sDocument = buildQuery(Get<%= entityClass %>sQuery, Get<%= entityClass %>sQuery);
 @Injectable({ providedIn: 'root'})
 export class Get<%= entityClass %>sGQL extends Apollo.Query<Get<%= entityClass %>sQuery, Get<%= entityClass %>sVars> {
   document = Get<%= entityClass %>sDocument;
@@ -103,7 +116,6 @@ export class Get<%= entityClass %>sGQL extends Apollo.Query<Get<%= entityClass %
   }
 }
 
-const Create<%= entityClass %>Document = buildMutation(Create<%= entityClass %>Mutation, Create<%= entityClass %>Vars)
 @Injectable({ providedIn: 'root'})
 export class Create<%= entityClass %>GQL extends Apollo.Mutation<Create<%= entityClass %>Mutation, Create<%= entityClass %>Vars> {
   document = Create<%= entityClass %>Document;
@@ -113,7 +125,6 @@ export class Create<%= entityClass %>GQL extends Apollo.Mutation<Create<%= entit
   }
 }
 
-const Update<%= entityClass %>Document = buildMutation(Update<%= entityClass %>Mutation, Update<%= entityClass %>Vars)
 @Injectable({ providedIn: 'root'})
 export class Update<%= entityClass %>GQL extends Apollo.Mutation<Update<%= entityClass %>Mutation, Update<%= entityClass %>Vars> {
   document = Update<%= entityClass %>Document;
@@ -123,7 +134,6 @@ export class Update<%= entityClass %>GQL extends Apollo.Mutation<Update<%= entit
   }
 }
 
-const Delete<%= entityClass %>Document = buildMutation(Delete<%= entityClass %>Mutation, Get<%= entityClass %>Vars)
 @Injectable({ providedIn: 'root'})
 export class Delete<%= entityClass %>GQL extends Apollo.Mutation<Delete<%= entityClass %>Mutation, Get<%= entityClass %>Vars> {
   document = Delete<%= entityClass %>Document;
@@ -132,3 +142,26 @@ export class Delete<%= entityClass %>GQL extends Apollo.Mutation<Delete<%= entit
     super(apollo);
   }
 }
+<%_ } %>
+
+<%_ if (clientFramework === 'react') {  %>
+export function useGet<%= entityClass %>Query(options?: Apollo.QueryHookOptions<Get<%= entityClass %>Query, Get<%= entityClass %>Vars>) {
+  return Apollo.useQuery<Get<%= entityClass %>Query, Get<%= entityClass %>Vars>(Get<%= entityClass %>Document, options);
+}
+
+export function useGet<%= entityClass %>sQuery(options?: Apollo.QueryHookOptions<Get<%= entityClass %>sQuery, Get<%= entityClass %>sVars>) {
+  return Apollo.useQuery<Get<%= entityClass %>sQuery, Get<%= entityClass %>sVars>(Get<%= entityClass %>sDocument, options);
+}
+
+export function useCreate<%= entityClass %>Mutation(options?: Apollo.MutationHookOptions<Create<%= entityClass %>Mutation, Create<%= entityClass %>Vars>) {
+  return Apollo.useMutation<Create<%= entityClass %>Mutation, Create<%= entityClass %>Vars>(Create<%= entityClass %>Document, options);
+}
+
+export function useUpdate<%= entityClass %>Mutation(options?: Apollo.MutationHookOptions<Update<%= entityClass %>Mutation, Update<%= entityClass %>Vars>) {
+  return Apollo.useMutation<Update<%= entityClass %>Mutation, Update<%= entityClass %>Vars>(Update<%= entityClass %>Document, options);
+}
+
+export function useDelete<%= entityClass %>Mutation(options?: Apollo.MutationHookOptions<Delete<%= entityClass %>Mutation, Delete<%= entityClass %>Vars>) {
+  return Apollo.useMutation<Delete<%= entityClass %>Mutation, Delete<%= entityClass %>Vars>(Delete<%= entityClass %>Document, options);
+}
+<%_ } %>

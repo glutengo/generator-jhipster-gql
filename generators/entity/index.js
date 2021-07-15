@@ -3,6 +3,7 @@ const BaseGenerator = require('generator-jhipster/generators/generator-base');
 const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
 const packagejs = require('../../package.json');
 const constants = require('../generator-gql-constants');
+const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
 
 module.exports = class extends BaseGenerator {
     get initializing() {
@@ -14,7 +15,8 @@ module.exports = class extends BaseGenerator {
                     this.error('Cannot read .yo-rc.json');
                 }
                 this.gqlConfig = this.config.get(constants.CONFIG_KEY);
-                this.databaseType = this.config.get('databaseType');
+                this.databaseType = this.config.get(OptionNames.DATABASE_TYPE);
+                this.clientFramework = this.config.get(OptionNames.CLIENT_FRAMEWORK);
             },
             displayLogo() {
                 this.log(chalk.white(`Running ${chalk.bold('JHipster GraphQL')} Generator! ${chalk.yellow(`v${packagejs.version}\n`)}`));
@@ -40,7 +42,8 @@ module.exports = class extends BaseGenerator {
            entityConfig: this.entityConfig,
            debug: this.configOptions.isDebugEnabled,
            gqlConfig: this.gqlConfig,
-           databaseType: this.databaseType
+           databaseType: this.databaseType,
+           clientFramework: this.options.clientFramework
         }));
     }
 
@@ -84,11 +87,5 @@ module.exports = class extends BaseGenerator {
                 // TODO: store GQL settings for entity
             }
         };
-    }
-
-    end() {
-        if (this.yourOptionKey) {
-            this.log(`\n${chalk.bold.green('GraphQL enabled')}`);
-        }
     }
 };

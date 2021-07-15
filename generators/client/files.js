@@ -1,10 +1,8 @@
 const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
 const constants = require('../generator-gql-constants');
 const { isAngular, isReact, getClientBaseDir } = require('../util');
-const { adjustAngularFiles } = require('./files-angular');
-const { adjustReactFiles } = require('./files-react');
-
-const ANGULAR_DIR = jhipsterConstants.ANGULAR_DIR;
+const { adjustAngularFiles, angularFiles } = require('./files-angular');
+const { adjustReactFiles, reactFiles } = require('./files-react');
 
 const clientFiles = {
     common: [
@@ -35,36 +33,6 @@ const clientFiles = {
             ]
         }
 
-    ],
-    angular: [
-        {
-            condition: generator => isAngular(generator),
-            templates: [
-                {
-                    file: 'angular/graphql/graphql.module.ts',
-                    renameTo: () => `${ANGULAR_DIR}/graphql/graphql.module.ts`
-                },
-                {
-                    file: 'angular/core/util/graphql-util.service.ts',
-                    renameTo: () => `${ANGULAR_DIR}/core/util/graphql-util.service.ts`
-                },
-                {
-                    file: 'angular/entities/user/user.gql.service.ts',
-                    renameTo: () => `${ANGULAR_DIR}/entities/user/user.gql.service.ts`
-                }
-            ]
-        }
-    ],
-    react: [
-        {
-            condition: generator => isReact(generator) && generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL,
-            templates: [
-                {
-                    file: 'react/webpack/graphql.transformer.js',
-                    renameTo: () => 'webpack/graphql.transformer.js'
-                }
-            ]
-        }
     ]
 };
 
@@ -96,6 +64,10 @@ function adjustPackageJSON(generator) {
         if (generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL) {
             devDependenciesStorage.set('@graphql-codegen/typescript-react-apollo', '2.3.0');
         }
+        scriptsStorage.set('webapp:dev', 'concurrently "npm run codegen:watch" "npm run webpack-dev-server -- --config webpack/webpack.dev.js --inline --port=9060 --env stats=minimal"');
+        scriptsStorage.set('webapp:build:dev', 'npm run codegen && npm run webpack -- --config webpack/webpack.dev.js --env stats=minimal');
+        scriptsStorage.set('webapp:build:prod', 'npm run codegen && npm run webpack -- --config webpack/webpack.prod.js --progress=profile');
+
     }
     scriptsStorage.set('codegen', 'graphql-codegen --config codegen.yml');
     scriptsStorage.set('codegen:watch', 'graphql-codegen --config codegen.yml --watch');
@@ -105,7 +77,14 @@ function adjustPackageJSON(generator) {
 function writeFiles() {
     return {
         writeGraphQLFiles() {
-            this.writeFilesToDisk(clientFiles, this, false);
+            const files = { ...clientFiles };
+            if (isAngular(this)) {
+                files.angular = angularFiles;
+            }
+            if (isReact(this)) {
+                files.react = reactFiles;
+            }
+            this.writeFilesToDisk(files, this, false);
         },
         adjustFiles() {
             if (isAngular(this)) {

@@ -4,7 +4,31 @@ const babelGenerator = require('@babel/generator').default;
 const fs = require('fs');
 const path = require('path');
 const constants = require('../generator-gql-constants');
+const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
 const AngularNeedleClient = require('generator-jhipster/generators/client/needle-api/needle-client-angular');
+const utils = require('../util');
+
+const angularFiles = [{
+    templates: [
+        {
+            file: 'angular/graphql/graphql.module.ts',
+            renameTo: () => `${jHipsterConstants.ANGULAR_DIR}/graphql/graphql.module.ts`
+        },
+        {
+            file: 'angular/graphql/graphql.providers.ts',
+            renameTo: () => `${jHipsterConstants.ANGULAR_DIR}/graphql/graphql.providers.ts`
+        },
+        {
+            file: 'angular/core/util/graphql-util.service.ts',
+            renameTo: () => `${jHipsterConstants.ANGULAR_DIR}/core/util/graphql-util.service.ts`
+        },
+        {
+            file: 'angular/entities/user/user.gql.service.ts',
+            renameTo: () => `${jHipsterConstants.ANGULAR_DIR}/entities/user/user.gql.service.ts`
+        }
+    ]
+}];
+
 
 function adjustProxyConfig(generator) {
     // read and parse the proxy configuration file
@@ -80,7 +104,22 @@ function addGraphQLModuleToAppModule(generator) {
     needleClient.addModule('', 'GraphQL', 'graphql', 'graphql', false, null);
 }
 
+/*function addGraphQLProvidersToAppModule(tsProject) {
+    const filePath = `${jHipsterConstants.ANGULAR_DIR}/app.module.ts`;
+    const appModule = tsProject.getSourceFile(filePath);
+    const graphQLProviders = 'graphQLProviders';
+    const added = utils.addImportIfMissing(appModule, { moduleSpecifier: './graphql/graphql.providers', namedImport: graphQLProviders});
+    if (added) {
+        const _class = appModule.getClass(() => true);
+        const moduleDecorator = _class.getDecorator('NgModule');
+        const moduleProviders = moduleDecorator.getArguments()[0].getProperty('providers').getInitializer();
+        moduleProviders.insertElement(moduleProviders.getElements().length, graphQLProviders);
+        appModule.saveSync();
+    }
+}*/
+
 function adjustAngularFiles(generator) {
+    // const tsProject = utils.getTsProject(generator);
     addGraphQLModuleToAppModule(generator);
     adjustProxyConfig(generator);
     if (generator.experimentalTransformer) {
@@ -90,5 +129,6 @@ function adjustAngularFiles(generator) {
 }
 
 module.exports = {
+    angularFiles,
     adjustAngularFiles
 }

@@ -12,6 +12,7 @@ module.exports = class extends BaseGenerator {
         this.relationships = this.options.entityConfig.relationships;
         this.databaseType = this.options.databaseType;
         this.gqlConfig = this.options.gqlConfig;
+        this.clientFramework = this.options.clientFramework;
         this.typeDefinition = this.gqlConfig.typeDefinition;
         this.experimentalDecorators = this.gqlConfig.experimentalDecorators;
     }

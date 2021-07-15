@@ -1,6 +1,6 @@
 
 import { ArgsType, Field, ObjectType, buildQuery, buildMutation } from 'graphql-typeop';
-import { CreateUserArgsImpl, Mutation, PaginatedUser, Query, QueryGetUserArgs, QueryGetUsersArgs, UpdateUserArgsImpl, User, UserEdge } from 'src/main/webapp/app/graphql';
+import { CreateUserArgsImpl, Mutation, PaginatedUser, Query, QueryGetUserArgs, QueryGetUsersArgs, UpdateUserArgsImpl, User, UserEdge } from 'app/graphql';
 <%_ if (clientFramework === 'angularX') {  %>
 import { Injectable } from '@angular/core';
 import * as Apollo from 'apollo-angular';
@@ -96,11 +96,13 @@ class DeleteUserMutation {
   result!: BaseUser;
 }
 
-const GetUsersDocument = buildQuery(GetUsersQuery, GetUsersVars);
-const GetUserDocument = buildQuery(GetUserQuery, GetUserVars);
-const CreateUserDocument = buildMutation(CreateUserMutation, CreateUserVars);
-const DeleteUserDocument = buildMutation(DeleteUserMutation, DeleteUserVars);
-const UpdateUserDocument = buildMutation(UpdateUserMutation, UpdateUserVars);
+const usedClasses = [ CreateUserArgsImpl, UpdateUserArgsImpl ];
+
+export const GetUsersDocument = buildQuery(GetUsersQuery, GetUsersVars);
+export const GetUserDocument = buildQuery(GetUserQuery, GetUserVars);
+export const CreateUserDocument = buildMutation(CreateUserMutation, CreateUserVars);
+export const DeleteUserDocument = buildMutation(DeleteUserMutation, DeleteUserVars);
+export const UpdateUserDocument = buildMutation(UpdateUserMutation, UpdateUserVars);
 
 <%_ if (clientFramework === 'angularX') {  %>
 @Injectable({providedIn: 'root'})

@@ -4,6 +4,31 @@ const babelGenerator = require('@babel/generator').default;
 const fs = require('fs');
 const path = require('path');
 const constants = require('../generator-gql-constants');
+const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
+
+const reactFiles = [
+    {
+        templates: [
+            {
+                file: 'react/modules/administration/user-management/user-management.gql-actions.ts',
+                renameTo: () => `${jHipsterConstants.REACT_DIR}/modules/administration/user-management/user-management.gql-actions.ts`
+            },
+            {
+                file: 'react/config/apollo-client.ts',
+                renameTo:() => `${jHipsterConstants.REACT_DIR}/config/apollo-client.ts`
+            }
+        ]
+    },
+    {
+        condition: generator => generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL,
+        templates: [
+            {
+                file: 'react/webpack/graphql.transformer.js',
+                renameTo: () => 'webpack/graphql.transformer.js'
+            }
+        ]
+    }
+];
 
 function adjustWebpackConfig(generator) {
     const filePath = path.join('webpack', 'webpack.common.js');
@@ -52,5 +77,6 @@ function adjustReactFiles(generator) {
 }
 
 module.exports = {
+    reactFiles,
     adjustReactFiles
 }

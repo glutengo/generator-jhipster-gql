@@ -42,8 +42,8 @@ function adjustAppModule(tsProject) {
     }
 })`;
         moduleImports.insertElement(moduleImports.getElements().length - 1, graphQLimportAssignment);
+        appModule.saveSync();
     }
-    appModule.saveSync();
 }
 
 function adjustUserModule(tsProject) {
