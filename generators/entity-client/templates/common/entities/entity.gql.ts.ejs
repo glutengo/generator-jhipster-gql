@@ -1,6 +1,6 @@
 <%_
-const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'boolean';
-const usedClasses = [ `Create${entityClass}Impl`, `Update${entityClass}Impl`, ...relationships.map(r => Base`${r.otherEntityNameCapitalized}`)];
+const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string';
+const usedClasses = [ `Create${entityClass}ArgsImpl`, `Update${entityClass}ArgsImpl`, ...relationships.map(r => `Base${r.otherEntityNameCapitalized}`)];
 _%>
 <%_ if (clientFramework === 'angularX') {  %>
 import { Injectable } from '@angular/core';
@@ -10,7 +10,7 @@ import * as Apollo from 'apollo-angular';
 import * as Apollo from '@apollo/client';
 <%_ } %>
 import { ArgsType, Field, ObjectType, buildQuery, buildMutation } from 'graphql-typeop';
-import { Create<%= entityClass %>ArgsImpl, Mutation, MutationCreate<%= entityClass %>Args, MutationUpdate<%= entityClass %>Args, Paginated<%= entityClass %>, <%= entityClass %>, <%= entityClass %>Edge, Query, QueryGet<%= entityClass %>Args, Update<%= entityClass %>ArgsImpl } from 'src/main/webapp/graphql';
+import { Create<%= entityClass %>ArgsImpl, Mutation, MutationCreate<%= entityClass %>Args, MutationUpdate<%= entityClass %>Args, Paginated<%= entityClass %>, <%= entityClass %>, <%= entityClass %>Edge, Query, QueryGet<%= entityClass %>Args, Update<%= entityClass %>ArgsImpl } from 'app/graphql';
 <%_ for (const r of relationships) { _%>
 import { Base<%= r.otherEntityNameCapitalized %> } from '../<%= r.otherEntity.entityFolderName %>/<%= r.otherEntity.entityFileName %>.gql' %>
 <%_ } _%>
@@ -67,13 +67,13 @@ class Create<%= entityClass %>Vars implements MutationCreate<%= entityClass %>Ar
 }
 
 @ObjectType()
-class Create<%= entityClass %>Mutation {
+export class Create<%= entityClass %>Mutation {
   @Field<Mutation, Create<%= entityClass %>Vars>({aliasFor: 'create<%= entityClass %>'})
   result!: Detail<%= entityClass %>;
 }
 
 @ArgsType()
-class Update<%= entityClass %>Vars implements MutationUpdate<%= entityClass %>Args {
+export class Update<%= entityClass %>Vars implements MutationUpdate<%= entityClass %>Args {
   <%= entityInstance %>!: Update<%= entityClass %>ArgsImpl;
 }
 
@@ -89,7 +89,7 @@ class Delete<%= entityClass %>Mutation {
   result!: number;
 }
 
-const usedClasses = [ Create<%= entityClass %>ArgsImpl, Update<%= entityClass %>ArgsImpl, <%= relatedEntityClasses.join(', ')%> ];
+const usedClasses = [ <%= usedClasses.join(', ')%> ];
 
 export const Get<%= entityClass %>Document = buildQuery(Get<%= entityClass %>Query, Get<%= entityClass %>Vars);
 export const Get<%= entityClass %>sDocument = buildQuery(Get<%= entityClass %>sQuery, Get<%= entityClass %>sQuery);

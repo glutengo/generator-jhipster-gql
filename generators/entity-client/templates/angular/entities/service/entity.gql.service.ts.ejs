@@ -1,3 +1,6 @@
+<%_
+const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string';
+_%>
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
@@ -5,7 +8,7 @@ import { Pagination } from 'app/core/request/request.model';
 import { map } from 'rxjs/operators';
 import { I<%= entityClass %> } from 'app/entities/<%= entityFileName %>/<%= entityFileName %>.model';
 import { GraphQLUtils } from 'app/core/util/graphql-util.service';
-import { Create<%= entityClass %>Args, Create<%= entityClass %>GQL, Get<%= entityClass %>sGQL, Get<%= entityClass %>GQL, Delete<%= entityClass %>GQL, Update<%= entityClass %>Args, Update<%= entityClass %>GQL } from '<%= typeDefinition === 'TypeScript' ? `./${entityFileName}.gql` : '../../../../graphql' %>';
+import { Create<%= entityClass %>Vars, Create<%= entityClass %>GQL, Get<%= entityClass %>sGQL, Get<%= entityClass %>GQL, Delete<%= entityClass %>GQL, Update<%= entityClass %>Vars, Update<%= entityClass %>GQL } from '<%= typeDefinition === 'TypeScript' ? `../${entityFileName}.gql` : '../../../../graphql' %>';
 
 export type EntityResponseType = HttpResponse<I<%= entityClass %>>;
 export type EntityArrayResponseType = HttpResponse<I<%= entityClass %>[]>;
@@ -27,15 +30,17 @@ export class <%= entityClass %>GraphQLService {
 
   create(<%= entityInstance %>: I<%= entityClass %>): Observable<EntityResponseType> {
     return this.create<%= entityClass %>GQL
-        .mutate({<%= entityInstance %>: <%= entityInstance %> as Create<%= entityClass %>Args})
+        .mutate({<%= entityInstance %>} as Create<%= entityClass %>Vars)
         .pipe(map(result => this.graphQLUtils.toHttpResponse(result)));
   }
 
-  delete(id: number): Observable<HttpResponse<{}>> {
+  delete(_id: string): Observable<HttpResponse<{}>> {
+    const id = this.getId(_id);
     return this.delete<%= entityClass %>GQL.mutate({id}).pipe(map(result => this.graphQLUtils.toHttpResponse(result)));
   }
 
-  find(id: number): Observable<EntityResponseType> {
+  find(_id: string): Observable<EntityResponseType> {
+    const id = this.getId(_id);
     return this.get<%= entityClass %>GQL.fetch({ id }).pipe(map(result => this.graphQLUtils.toHttpResponse(result)));
   }
 
@@ -45,7 +50,15 @@ export class <%= entityClass %>GraphQLService {
 
   update(<%= entityInstance %>: I<%= entityClass %>): Observable<EntityResponseType> {
     return this.update<%= entityClass %>GQL
-        .mutate({<%= entityInstance %>: <%= entityInstance %> as Update<%= entityClass %>Args})
+        .mutate({<%= entityInstance %> } as Update<%= entityClass %>Vars)
         .pipe(map(result => this.graphQLUtils.toHttpResponse(result)));
+  }
+
+  private getId(id: string): <%= pkType %> {
+    <%_ if(pkType === 'number') { _%>
+    return parseInt(id, 10);
+    <%_ } else { _%>
+    return id;
+    <% } _%>
   }
 }

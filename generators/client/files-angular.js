@@ -92,7 +92,10 @@ function adjustTSConfig(generator) {
     const tsConfigJsonStorage = generator.createStorage('tsconfig.json');
     const compilerOptionsStorage = tsConfigJsonStorage.createStorage('compilerOptions');
     const libs = compilerOptionsStorage.get('lib');
-    compilerOptionsStorage.set('lib', [...libs, 'esnext.asynciterable']);
+    const requiredLib = 'esnext.asynciterable';
+    if (libs.indexOf(requiredLib) < 0 ) {
+        compilerOptionsStorage.set('lib', [...libs, requiredLib]);
+    }
     if (generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
         compilerOptionsStorage.set('emitDecoratorMetadata', true);
     }
@@ -119,7 +122,6 @@ function addGraphQLModuleToAppModule(generator) {
 }*/
 
 function adjustAngularFiles(generator) {
-    // const tsProject = utils.getTsProject(generator);
     addGraphQLModuleToAppModule(generator);
     adjustProxyConfig(generator);
     if (generator.experimentalTransformer) {

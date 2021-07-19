@@ -57,6 +57,14 @@ module.exports = class extends BaseGenerator {
         });
     }
 
+    get writing() {
+        try {
+            this.registerModule('generator-jhipster-gql', 'entity', 'post', 'entity', 'GraphQL integration for JHipster');
+        } catch (err) {
+            this.log(`${chalk.red.bold('WARN!')} Could not register as a jhipster entity post creation hook...\n`);
+        }
+    }
+
     install() {
         const logMsg = `To install your dependencies manually, run: ${chalk.yellow.bold(`${this.clientPackageManager} install`)}`;
         if (this.options['skip-install']) {

@@ -1,6 +1,7 @@
+const { adjustReactFiles } = require('../client/files-react');
 const constants = require('../generator-gql-constants');
 const { isAngular, getClientBaseDir, isReact } = require('../util');
-const { angularFiles } = require('./files-angular');
+const { angularFiles, adjustAngularFiles } = require('./files-angular');
 const { reactFiles } = require('./files-react');
 
 module.exports = {
@@ -43,8 +44,12 @@ function writeFiles() {
             if (isReact(this)) {
                 files.react = reactFiles;
             }
-            console.log(files);
             this.writeFilesToDisk(files, this, false);
+        },
+        adjustReactFiles() {
+            if (isAngular(this)) {
+                adjustAngularFiles(this);
+            }
         }
     }
 }

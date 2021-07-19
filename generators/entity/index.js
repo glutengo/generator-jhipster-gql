@@ -43,7 +43,7 @@ module.exports = class extends BaseGenerator {
            debug: this.configOptions.isDebugEnabled,
            gqlConfig: this.gqlConfig,
            databaseType: this.databaseType,
-           clientFramework: this.options.clientFramework
+           clientFramework: this.clientFramework
         }));
     }
 
