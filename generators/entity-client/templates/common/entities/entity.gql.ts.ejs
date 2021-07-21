@@ -62,12 +62,12 @@ class Get<%= entityClass %>sQuery {
 }
 
 @ArgsType()
-class Create<%= entityClass %>Vars implements MutationCreate<%= entityClass %>Args {
+export class Create<%= entityClass %>Vars implements MutationCreate<%= entityClass %>Args {
   <%= entityInstance %>!: Create<%= entityClass %>ArgsImpl;
 }
 
 @ObjectType()
-export class Create<%= entityClass %>Mutation {
+class Create<%= entityClass %>Mutation {
   @Field<Mutation, Create<%= entityClass %>Vars>({aliasFor: 'create<%= entityClass %>'})
   result!: Detail<%= entityClass %>;
 }

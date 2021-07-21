@@ -4,6 +4,7 @@ import { UserDTO } from '../dto/user.dto';
 import { InputType, Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
+@InputType('UserInput')
 export class User extends UserDTO {
   @Field({nullable: true})
   login: string;

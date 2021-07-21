@@ -48,7 +48,7 @@ class GetUsersVars implements QueryGetUsersArgs {
 
 @ObjectType()
 class UserEdgeResult implements Partial<UserEdge> {
-  node!: BaseUser
+  node!: DetailUser;
 }
 
 @ObjectType()

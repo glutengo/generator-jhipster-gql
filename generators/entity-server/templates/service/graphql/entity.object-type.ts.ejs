@@ -18,10 +18,19 @@ export class <%= entityClass %> extends <%= entityClass %>DTO {
 }
 
 @InputType()
-export class Create<%= entityClass %>Args extends <%= entityClass %> {}
+export class Create<%= entityClass %>Args extends <%= entityClass %> {
+<%_ for (const r of relationships) { _%>
+  @Field()
+  <%= r.relationshipName %>: <%= r.otherEntity.entityClass %>;
+<%_ } _%>
+}
 
 @InputType()
 export class Update<%= entityClass %>Args extends <%= entityClass %> {
+<%_ for (const r of relationships) { _%>
+  @Field()
+  <%= r.relationshipName %>: <%= r.otherEntity.entityClass %>;
+<%_ } _%>
   @Field()
   id: <%= pkType %>;
 }

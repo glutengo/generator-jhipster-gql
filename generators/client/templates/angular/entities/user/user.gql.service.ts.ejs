@@ -7,18 +7,23 @@ import { GraphQLUtils } from 'app/core/util/graphql-util.service';
 import { GetUserGQL, GetUsersGQL, CreateUserGQL, DeleteUserGQL } from '<%= typeDefinition === 'TypeScript' ? './user.gql' : '../../../graphql' %>';
 import { IUser } from 'app/admin/user-management/user-management.model';
 import { from } from 'rxjs';
-
+import { isPresent } from 'app/core/util/operators';
+import { getUserIdentifier } from './user.model';
 
 export type EntityResponseType = HttpResponse<IUser>;
 export type EntityArrayResponseType = HttpResponse<IUser[]>;
 
 @Injectable({ providedIn: 'root' })
 export class UserGraphQLService {
-  constructor(private graphQLUtils: GraphQLUtils,
-              private getUsersGQL: GetUsersGQL,
-              private getUserGQL: GetUserGQL,
-              private createUserGQL: CreateUserGQL,
-              private deleteUserGQL: DeleteUserGQL) {}
+
+  constructor(
+    private graphQLUtils: GraphQLUtils,
+    private getUsersGQL: GetUsersGQL,
+    private getUserGQL: GetUserGQL,
+    private createUserGQL: CreateUserGQL,
+    private deleteUserGQL: DeleteUserGQL
+  ) {
+  }
 
   query(req?: Pagination): Observable<EntityArrayResponseType> {
     return this.getUsersGQL
@@ -28,13 +33,12 @@ export class UserGraphQLService {
 
   create(user: IUser): Observable<EntityResponseType> {
     return this.createUserGQL
-      .mutate({user: {email: user.email ??'', login: user.login ??''}})
+      .mutate({ user: { email: user.email ?? '', login: user.login ?? '' } })
       .pipe(map(res => this.graphQLUtils.toHttpResponse(res)));
   }
 
   delete(login: string): Observable<HttpResponse<{}>> {
-    return this.deleteUserGQL
-      .mutate({login}).pipe(map(res => this.graphQLUtils.toHttpResponse(res)));
+    return this.deleteUserGQL.mutate({ login }).pipe(map(res => this.graphQLUtils.toHttpResponse(res)));
   }
 
   find(login: string): Observable<IUser> {
@@ -51,5 +55,22 @@ export class UserGraphQLService {
 
   authorities(): Observable<string[]> {
     return from([]);
+  }
+
+  addUserToCollectionIfMissing(userCollection: IUser[], ...usersToCheck: (IUser | null | undefined)[]): IUser[] {
+    const users: IUser[] = usersToCheck.filter(isPresent);
+    if (users.length > 0) {
+      const userCollectionIdentifiers = userCollection.map(userItem => getUserIdentifier(userItem)!);
+      const usersToAdd = users.filter(userItem => {
+        const userIdentifier = getUserIdentifier(userItem);
+        if (userIdentifier == null || userCollectionIdentifiers.includes(userIdentifier)) {
+          return false;
+        }
+        userCollectionIdentifiers.push(userIdentifier);
+        return true;
+      });
+      return [...usersToAdd, ...userCollection];
+    }
+    return userCollection;
   }
 }

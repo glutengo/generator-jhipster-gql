@@ -6,52 +6,70 @@ import { HttpResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { Pagination } from 'app/core/request/request.model';
 import { map } from 'rxjs/operators';
-import { I<%= entityClass %> } from 'app/entities/<%= entityFileName %>/<%= entityFileName %>.model';
+import { I<%= entityAngularName %>, get<%= entityAngularName %>Identifier } from 'app/entities/<%= entityFileName %>/<%= entityFileName %>.model';
 import { GraphQLUtils } from 'app/core/util/graphql-util.service';
-import { Create<%= entityClass %>Vars, Create<%= entityClass %>GQL, Get<%= entityClass %>sGQL, Get<%= entityClass %>GQL, Delete<%= entityClass %>GQL, Update<%= entityClass %>Vars, Update<%= entityClass %>GQL } from '<%= typeDefinition === 'TypeScript' ? `../${entityFileName}.gql` : '../../../../graphql' %>';
+import { Create<%= entityAngularName %>Vars, Create<%= entityAngularName %>GQL, Get<%= entityAngularName %>sGQL, Get<%= entityAngularName %>GQL, Delete<%= entityAngularName %>GQL, Update<%= entityAngularName %>Vars, Update<%= entityAngularName %>GQL } from '<%= typeDefinition === 'TypeScript' ? `../${entityFileName}.gql` : '../../../../graphql' %>';
+import { isPresent } from 'app/core/util/operators';
 
-export type EntityResponseType = HttpResponse<I<%= entityClass %>>;
-export type EntityArrayResponseType = HttpResponse<I<%= entityClass %>[]>;
+export type EntityResponseType = HttpResponse<I<%= entityAngularName %>>;
+export type EntityArrayResponseType = HttpResponse<I<%= entityAngularName %>[]>;
 
 @Injectable({ providedIn: 'root' })
-export class <%= entityClass %>GraphQLService {
+export class <%= entityAngularName %>GraphQLService {
 
   constructor(private graphQLUtils: GraphQLUtils,
-              private create<%= entityClass %>GQL: Create<%= entityClass %>GQL,
-              private update<%= entityClass %>GQL: Update<%= entityClass %>GQL,
-              private get<%= entityClass %>sGQL: Get<%= entityClass %>sGQL,
-              private get<%= entityClass %>GQL: Get<%= entityClass %>GQL,
-              private delete<%= entityClass %>GQL: Delete<%= entityClass %>GQL) {}
+              private create<%= entityAngularName %>GQL: Create<%= entityAngularName %>GQL,
+              private update<%= entityAngularName %>GQL: Update<%= entityAngularName %>GQL,
+              private get<%= entityAngularName %>sGQL: Get<%= entityAngularName %>sGQL,
+              private get<%= entityAngularName %>GQL: Get<%= entityAngularName %>GQL,
+              private delete<%= entityAngularName %>GQL: Delete<%= entityAngularName %>GQL) {}
 
   query(req?: Pagination): Observable<EntityArrayResponseType> {
-    return this.get<%= entityClass %>sGQL.fetch(this.graphQLUtils.createGraphQlOption(req)).pipe(
+    return this.get<%= entityAngularName %>sGQL.fetch(this.graphQLUtils.createGraphQlOption(req)).pipe(
       map(result => this.graphQLUtils.toPagedHttpResponse(result.data.result)));
   }
 
-  create(<%= entityInstance %>: I<%= entityClass %>): Observable<EntityResponseType> {
-    return this.create<%= entityClass %>GQL
-        .mutate({<%= entityInstance %>} as Create<%= entityClass %>Vars)
+  create(<%= entityInstance %>: I<%= entityAngularName %>): Observable<EntityResponseType> {
+    return this.create<%= entityAngularName %>GQL
+        .mutate({<%= entityInstance %>} as Create<%= entityAngularName %>Vars)
         .pipe(map(result => this.graphQLUtils.toHttpResponse(result)));
   }
 
   delete(_id: string): Observable<HttpResponse<{}>> {
     const id = this.getId(_id);
-    return this.delete<%= entityClass %>GQL.mutate({id}).pipe(map(result => this.graphQLUtils.toHttpResponse(result)));
+    return this.delete<%= entityAngularName %>GQL.mutate({id}).pipe(map(result => this.graphQLUtils.toHttpResponse(result)));
   }
 
   find(_id: string): Observable<EntityResponseType> {
     const id = this.getId(_id);
-    return this.get<%= entityClass %>GQL.fetch({ id }).pipe(map(result => this.graphQLUtils.toHttpResponse(result)));
+    return this.get<%= entityAngularName %>GQL.fetch({ id }).pipe(map(result => this.graphQLUtils.toHttpResponse(result)));
   }
 
-  partialUpdate(<%= entityInstance %>: I<%= entityClass %>): Observable<EntityResponseType> {
+  partialUpdate(<%= entityInstance %>: I<%= entityAngularName %>): Observable<EntityResponseType> {
     return of(new HttpResponse());
   }
 
-  update(<%= entityInstance %>: I<%= entityClass %>): Observable<EntityResponseType> {
-    return this.update<%= entityClass %>GQL
-        .mutate({<%= entityInstance %> } as Update<%= entityClass %>Vars)
+  update(<%= entityInstance %>: I<%= entityAngularName %>): Observable<EntityResponseType> {
+    return this.update<%= entityAngularName %>GQL
+        .mutate({<%= entityInstance %> } as Update<%= entityAngularName %>Vars)
         .pipe(map(result => this.graphQLUtils.toHttpResponse(result)));
+  }
+
+  add<%= entityAngularName %>ToCollectionIfMissing(<%= entityInstance %>Collection: I<%= entityAngularName %>[], ...<%= entityInstancePlural %>ToCheck: (I<%= entityAngularName %> | null | undefined)[]): I<%= entityAngularName %>[] {
+    const <%= entityInstancePlural %>: I<%= entityAngularName %>[] = <%= entityInstancePlural %>ToCheck.filter(isPresent);
+    if (<%= entityInstancePlural %>.length > 0) {
+        const <%= entityInstance %>CollectionIdentifiers = <%= entityInstance %>Collection.map(<%= entityInstance %>Item => get<%= entityAngularName %>Identifier(<%= entityInstance %>Item)!);
+        const <%= entityInstancePlural %>ToAdd = <%= entityInstancePlural %>.filter(<%= entityInstance %>Item => {
+            const <%= entityInstance %>Identifier = get<%= entityAngularName %>Identifier(<%= entityInstance %>Item);
+            if (<%= entityInstance %>Identifier == null || <%= entityInstance %>CollectionIdentifiers.includes(<%= entityInstance %>Identifier)) {
+                return false;
+            }
+            <%= entityInstance %>CollectionIdentifiers.push(<%= entityInstance %>Identifier);
+            return true;
+        });
+        return [...<%= entityInstancePlural %>ToAdd, ...<%= entityInstance %>Collection];
+    }
+    return <%= entityInstance %>Collection;
   }
 
   private getId(id: string): <%= pkType %> {
