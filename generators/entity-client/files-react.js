@@ -1,4 +1,3 @@
-const constants = require('../generator-gql-constants');
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
 
 const reactFiles = [

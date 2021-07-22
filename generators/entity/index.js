@@ -2,7 +2,7 @@ const chalk = require('chalk');
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
 const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
 const packagejs = require('../../package.json');
-const constants = require('../generator-gql-constants');
+const constants = require('../../utils/constants');
 const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
 
 module.exports = class extends BaseGenerator {

@@ -1,5 +1,5 @@
-const constants = require('../generator-gql-constants');
-const utils = require('../util');
+const constants = require('./constants');
+const utils = require('./commons');
 
 async function askForTypeDefinition() {
     const prompts = [

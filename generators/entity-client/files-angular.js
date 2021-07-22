@@ -1,6 +1,5 @@
 const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
-const constants = require('../generator-gql-constants');
-const utils = require('../util');
+const utils = require('../../utils/commons');
 
 const angularFiles = [
     {

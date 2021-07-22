@@ -3,10 +3,9 @@ const t = require('@babel/types');
 const babelGenerator = require('@babel/generator').default;
 const fs = require('fs');
 const path = require('path');
-const constants = require('../generator-gql-constants');
+const constants = require('../../utils/constants');
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
 const AngularNeedleClient = require('generator-jhipster/generators/client/needle-api/needle-client-angular');
-const utils = require('../util');
 
 const angularFiles = [{
     templates: [

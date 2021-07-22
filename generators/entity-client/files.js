@@ -1,6 +1,5 @@
-const { adjustReactFiles } = require('../client/files-react');
-const constants = require('../generator-gql-constants');
-const { isAngular, getClientBaseDir, isReact } = require('../util');
+const constants = require('../../utils/constants');
+const { isAngular, getClientBaseDir, isReact } = require('../../utils/commons');
 const { angularFiles, adjustAngularFiles } = require('./files-angular');
 const { reactFiles } = require('./files-react');
 

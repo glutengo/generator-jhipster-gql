@@ -1,6 +1,6 @@
 const nodejsConstants = require('generator-jhipster-nodejs/generators/generator-nodejs-constants');
-const utils = require('../util');
-const constants = require('../generator-gql-constants');
+const utils = require('../../utils/commons');
+const constants = require('../../utils/constants');
 
 module.exports = {
     writeFiles

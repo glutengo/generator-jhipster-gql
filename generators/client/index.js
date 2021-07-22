@@ -1,6 +1,6 @@
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
 const { writeFiles } = require('./files');
-const { askForTypeDefinition, askForEndpoint, askForSchemaLocation } = require('./prompts');
+const { askForTypeDefinition, askForEndpoint, askForSchemaLocation } = require('../../utils/prompts');
 const { OptionNames } =  require('generator-jhipster/jdl/jhipster/application-options') // require('../jdl/jhipster/application-options');
 
 module.exports = class extends BaseGenerator {
