@@ -36,6 +36,7 @@ module.exports = class extends BaseGenerator {
         const subGenerators = ['../entity-client', '../entity-server'];
         subGenerators.forEach(gen => this.composeWith(require.resolve(gen), {
            context: this.context,
+           entityConfig: this.options.entityConfig,
            skipInstall: this.options.skipInstall,
            fromCli: true,
            force: this.options.force,

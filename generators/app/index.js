@@ -5,6 +5,9 @@ const jhipsterConstants = require('generator-jhipster/generators/generator-const
 const packagejs = require('../../package.json');
 const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
 const utils = require('../util');
+const { prepareEntityForTemplates, prepareEntityPrimaryKeyForTemplates } = require('generator-jhipster/utils/entity');
+const { prepareRelationshipForTemplates } = require('generator-jhipster/utils/relationship');
+const { prepareFieldForTemplates } = require('generator-jhipster/utils/field');
 
 module.exports = class extends BaseGenerator {
     get initializing() {
@@ -39,11 +42,11 @@ module.exports = class extends BaseGenerator {
     get composing() {
         const subGenerators = ['../client', '../server'];
         subGenerators.forEach(gen => this.composeWith(require.resolve(gen), {
-           context: this.context,
-           skipInstall: this.options.skipInstall,
-           fromCli: true,
-           force: this.options.force,
-           debug: this.configOptions.isDebugEnabled
+            context: this.context,
+            skipInstall: this.options.skipInstall,
+            fromCli: true,
+            force: this.options.force,
+            debug: this.configOptions.isDebugEnabled
         }));
     }
 
@@ -65,6 +68,31 @@ module.exports = class extends BaseGenerator {
         }
     }
 
+    end() {
+        this.getJhipsterConfig().get('entities').forEach(e => {
+            const entityConfig = this.getEntityConfig(e).getAll();
+            entityConfig[OptionNames.PROD_DATABASE_TYPE] = this.config.get(OptionNames.PROD_DATABASE_TYPE);
+
+            prepareEntityForTemplates(entityConfig, this);
+            prepareEntityPrimaryKeyForTemplates(entityConfig, this);
+            entityConfig.fields.forEach(f => prepareFieldForTemplates(entityConfig, f, this));
+            entityConfig.relationships.forEach(r => {
+                const otherEntityName = this._.upperFirst(r.otherEntityName);
+                const otherEntity = this.configOptions.sharedEntities[otherEntityName];
+                r.otherEntity = otherEntity;
+                prepareRelationshipForTemplates(entityConfig, r, this);
+            });
+            this.composeWith(require.resolve('../entity'), {
+                context: { ...this.context },
+                entityConfig,
+                skipInstall: this.options.skipInstall,
+                fromCli: true,
+                force: this.options.force,
+                debug: this.configOptions.isDebugEnabled
+            });
+        });
+    }
+
     install() {
         const logMsg = `To install your dependencies manually, run: ${chalk.yellow.bold(`${this.clientPackageManager} install`)}`;
         if (this.options['skip-install']) {
@@ -78,4 +106,5 @@ module.exports = class extends BaseGenerator {
             this.spawnCommandSync(this.clientPackageManager, ['run', 'codegen']);
         }
     }
+
 };
