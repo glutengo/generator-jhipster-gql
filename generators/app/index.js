@@ -1,13 +1,14 @@
 const chalk = require('chalk');
 const semver = require('semver');
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
-const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
 const packagejs = require('../../package.json');
 const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
 const utils = require('../../utils/commons');
 const { prepareEntityForTemplates, prepareEntityPrimaryKeyForTemplates } = require('generator-jhipster/utils/entity');
 const { prepareRelationshipForTemplates } = require('generator-jhipster/utils/relationship');
 const { prepareFieldForTemplates } = require('generator-jhipster/utils/field');
+const { askForEndpoint, askForSchemaLocation } = require('../../utils/prompts');
+const constants = require('../../utils/constants');
 
 module.exports = class extends BaseGenerator {
     get initializing() {
@@ -39,10 +40,12 @@ module.exports = class extends BaseGenerator {
         };
     }
 
-    get composing() {
-        const subGenerators = ['../client', '../server'];
+    composing() {
+        const subGenerators = ['../server', '../client'];
+        const context = { ...this.context };
+        utils.copyConfig(this, context, [constants.CONFIG_KEY_ENDPOINT, constants.CONFIG_KEY_SCHEMA_LOCATION]);
         subGenerators.forEach(gen => this.composeWith(require.resolve(gen), {
-            context: this.context,
+            context,
             skipInstall: this.options.skipInstall,
             fromCli: true,
             force: this.options.force,
@@ -50,17 +53,13 @@ module.exports = class extends BaseGenerator {
         }));
     }
 
-    get prompting() {
-        const done = this.async();
-        const prompts = [];
-        this.prompt(prompts).then(answers => {
-            this.promptAnswers = answers;
-            // To access props answers use this.promptAnswers.someOption;
-            done();
-        });
+    async prompting() {
+        await askForEndpoint.call(this);
+        await askForSchemaLocation.call(this);
+        utils.saveConfig(this);
     }
 
-    get writing() {
+    writing() {
         try {
             this.registerModule('generator-jhipster-gql', 'entity', 'post', 'entity', 'GraphQL integration for JHipster');
         } catch (err) {

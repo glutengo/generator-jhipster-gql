@@ -20,7 +20,7 @@ const serverFiles = {
     ]
 };
 
-function adjustAppModule(tsProject) {
+function adjustAppModule(generator, tsProject) {
     const filePath = `${nodejsConstants.SERVER_NODEJS_SRC_DIR}/src/app.module.ts`;
     const appModule = tsProject.getSourceFile(filePath);
 
@@ -36,7 +36,7 @@ function adjustAppModule(tsProject) {
         const graphQLimportAssignment =
             `GraphQLModule.forRoot({
     installSubscriptionHandlers: true,
-    autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    autoSchemaFile: join(process.cwd(), '${generator[constants.CONFIG_KEY_SCHEMA_LOCATION]}'),
     buildSchemaOptions: {
         numberScalarMode: 'integer'
     }
@@ -108,7 +108,6 @@ function adjustUserDTO(tsProject) {
 }
 
 function adjustPackageJSON(generator) {
-    // TODO: check if nodejs and add other implementations for other frameworks
     const packageJSONStorage = generator.createStorage('server/package.json');
     const dependenciesStorage = packageJSONStorage.createStorage('dependencies');
     // TODO: versions?
@@ -154,7 +153,7 @@ function writeFiles() {
         },
         adjustTypeScriptFiles() {
             const tsProject = utils.getTsProject(this, true);
-            adjustAppModule(tsProject);
+            adjustAppModule(this, tsProject);
             adjustUserModule(tsProject);
             adjustBaseDTO(tsProject);
             adjustUserDTO(tsProject);

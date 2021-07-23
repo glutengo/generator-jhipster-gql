@@ -64,6 +64,5 @@ const prompts = [
 module.exports = {
     askForTypeDefinition,
     askForEndpoint,
-    askForSchemaLocation,
-    constants
+    askForSchemaLocation
 }

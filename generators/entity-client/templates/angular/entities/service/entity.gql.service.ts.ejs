@@ -8,7 +8,7 @@ import { Pagination } from 'app/core/request/request.model';
 import { map } from 'rxjs/operators';
 import { I<%= entityAngularName %>, get<%= entityAngularName %>Identifier } from 'app/entities/<%= entityFileName %>/<%= entityFileName %>.model';
 import { GraphQLUtils } from 'app/core/util/graphql-util.service';
-import { Create<%= entityAngularName %>Vars, Create<%= entityAngularName %>GQL, Get<%= entityAngularName %>sGQL, Get<%= entityAngularName %>GQL, Delete<%= entityAngularName %>GQL, Update<%= entityAngularName %>Vars, Update<%= entityAngularName %>GQL } from '<%= typeDefinition === 'TypeScript' ? `../${entityFileName}.gql` : '../../../../graphql' %>';
+import { Create<%= entityAngularName %>Vars, Create<%= entityAngularName %>GQL, Get<%= entityAngularName %>sGQL, Get<%= entityAngularName %>GQL, Delete<%= entityAngularName %>GQL, Update<%= entityAngularName %>Vars, Update<%= entityAngularName %>GQL } from '<%= typeDefinition === 'TypeScript' ? `../${entityFileName}.gql` : '../../../graphql' %>';
 import { isPresent } from 'app/core/util/operators';
 
 export type EntityResponseType = HttpResponse<I<%= entityAngularName %>>;
