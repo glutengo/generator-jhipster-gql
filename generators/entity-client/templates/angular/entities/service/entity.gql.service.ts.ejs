@@ -1,5 +1,25 @@
 <%_
 const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string';
+const namedImports = [
+    `Create${entityAngularName}GQL`,
+    `Get${entityAngularName}sGQL`,
+    `Get${entityAngularName}GQL`,
+    `Delete${entityAngularName}GQL`,
+    `Update${entityAngularName}GQL`
+];
+let importSpecifier;
+let createVars, updateVars;
+if (typeDefinition === 'TypeScript') {
+    createVars = `Create${entityAngularName}Vars`;
+    updateVars = `Update${entityAngularName}Vars`;
+    importSpecifier = `../${entityFileName}.gql`;
+} else {
+    createVars = `MutationCreate${entityAngularName}Args`;
+    updateVars = `MutationUpdate${entityAngularName}Args`;
+    importSpecifier = '../../../graphql';
+}
+namedImports.push(createVars);
+namedImports.push(updateVars);
 _%>
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
@@ -8,7 +28,7 @@ import { Pagination } from 'app/core/request/request.model';
 import { map } from 'rxjs/operators';
 import { I<%= entityAngularName %>, get<%= entityAngularName %>Identifier } from 'app/entities/<%= entityFileName %>/<%= entityFileName %>.model';
 import { GraphQLUtils } from 'app/core/util/graphql-util.service';
-import { Create<%= entityAngularName %>Vars, Create<%= entityAngularName %>GQL, Get<%= entityAngularName %>sGQL, Get<%= entityAngularName %>GQL, Delete<%= entityAngularName %>GQL, Update<%= entityAngularName %>Vars, Update<%= entityAngularName %>GQL } from '<%= typeDefinition === 'TypeScript' ? `../${entityFileName}.gql` : '../../../graphql' %>';
+import { <%= namedImports.join(', ') %> } from '<%= importSpecifier %>';
 import { isPresent } from 'app/core/util/operators';
 
 export type EntityResponseType = HttpResponse<I<%= entityAngularName %>>;
@@ -31,7 +51,7 @@ export class <%= entityAngularName %>GraphQLService {
 
   create(<%= entityInstance %>: I<%= entityAngularName %>): Observable<EntityResponseType> {
     return this.create<%= entityAngularName %>GQL
-        .mutate({<%= entityInstance %>} as Create<%= entityAngularName %>Vars)
+        .mutate({<%= entityInstance %>} as <%= createVars %>)
         .pipe(map(result => this.graphQLUtils.toHttpResponse(result)));
   }
 
@@ -51,7 +71,7 @@ export class <%= entityAngularName %>GraphQLService {
 
   update(<%= entityInstance %>: I<%= entityAngularName %>): Observable<EntityResponseType> {
     return this.update<%= entityAngularName %>GQL
-        .mutate({<%= entityInstance %> } as Update<%= entityAngularName %>Vars)
+        .mutate({<%= entityInstance %> } as <%= updateVars %>)
         .pipe(map(result => this.graphQLUtils.toHttpResponse(result)));
   }
 

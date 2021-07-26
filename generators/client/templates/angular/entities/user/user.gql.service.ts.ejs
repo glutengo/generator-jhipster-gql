@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { Pagination } from 'app/core/request/request.model';
 import { map } from 'rxjs/operators';
 import { GraphQLUtils } from 'app/core/util/graphql-util.service';
-import { GetUserGQL, GetUsersGQL, CreateUserGQL, DeleteUserGQL } from '<%= typeDefinition === 'TypeScript' ? './user.gql' : '../../../graphql' %>';
+import { GetUserGQL, GetUsersGQL, CreateUserGQL, DeleteUserGQL } from '<%= typeDefinition === 'TypeScript' ? './user.gql' : '../../graphql' %>';
 import { IUser } from 'app/admin/user-management/user-management.model';
 import { from } from 'rxjs';
 import { isPresent } from 'app/core/util/operators';

@@ -34,9 +34,9 @@ function adjustAppModule(generator, tsProject) {
         const moduleDecorator = _class.getDecorator('Module');
         const moduleImports = moduleDecorator.getArguments()[0].getProperty('imports').getInitializer();
         const graphQLimportAssignment =
-            `GraphQLModule.forRoot({
+`GraphQLModule.forRoot({
     installSubscriptionHandlers: true,
-    autoSchemaFile: join(process.cwd(), '${generator[constants.CONFIG_KEY_SCHEMA_LOCATION]}'),
+    autoSchemaFile: join(process.cwd(), '..', '${generator[constants.CONFIG_KEY_SCHEMA_LOCATION]}'),
     buildSchemaOptions: {
         numberScalarMode: 'integer'
     }
@@ -117,6 +117,7 @@ function adjustPackageJSON(generator) {
     dependenciesStorage.set('apollo-server-express', '2.24.0');
     const scriptsStorage = packageJSONStorage.createStorage('scripts');
     scriptsStorage.set('start:dev', 'npm run copy-resources && nest start -w');
+    scriptsStorage.set('start:nest', 'npm run copy-resources && nest start');
     scriptsStorage.set('build:schema-gql', 'ts-node scripts/build-schema.ts');
     packageJSONStorage.save();
 }

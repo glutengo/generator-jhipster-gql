@@ -24,8 +24,8 @@ export function Paginated<T extends BaseDTO>(classRef: Type<T>): IPaginated<T, I
     @Field(() => String, { nullable: true })
     cursor?: string;
 
-    @Field(() => classRef, { nullable: true })
-    node?: T;
+    @Field(() => classRef)
+    node: T;
   }
 
   @ObjectType({ isAbstract: true })
@@ -37,8 +37,8 @@ export function Paginated<T extends BaseDTO>(classRef: Type<T>): IPaginated<T, I
       this.hasNextPage = hasNextPage;
     }
 
-    @Field(() => [EdgeType], { nullable: true })
-    edges?: EdgeType[];
+    @Field(() => [EdgeType])
+    edges: EdgeType[];
 
     @Field(() => Int, { nullable: true })
     totalCount?: number;

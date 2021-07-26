@@ -1,11 +1,11 @@
 process.env.BACKEND_ENV = 'dev';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../src/app.module';
+import child_process from 'child_process';
 
 async function startAndStopApplication() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(0);
-  process.exit();
+    const proc = child_process.spawn('npm',  ['start']);
+    await new Promise(res => setTimeout(res, 20000));
+    proc.kill();
+    process.exit();
 }
 
 startAndStopApplication();
