@@ -74,9 +74,9 @@ function addGraphQLTransformer(config) {
   }
 }`).program.body[0];
         const requireExpression = t.callExpression(t.identifier('require'), [t.stringLiteral('graphql-typeop/transformers/graphql.transformer')]);
-        const VariableDeclaration = t.variableDeclaration('const', [t.variableDeclarator(t.identifier('GraphQLTransformer'), requireExpression)]);
+        const requireDeclaration = t.variableDeclaration('const', [t.variableDeclarator(t.identifier('GraphQLTransformer'), requireExpression)]);
         ast.program.body.splice(expressionStatementIndex - 1, 0, functionDeclaration);
-        ast.program.body.splice(expressionStatementIndex - 1, 0, VariableDeclaration);
+        ast.program.body.splice(expressionStatementIndex - 1, 0, requireDeclaration);
         const arrowFunction = expressionStatement.expression.right;
         if (arrowFunction) {
             const functionCall = t.callExpression(t.identifier('addGraphQLTransformer'), [t.identifier('config')]);

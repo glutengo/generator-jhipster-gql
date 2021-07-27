@@ -1,7 +1,8 @@
 const constants = require('../../utils/constants');
-const { isAngular, isReact, getClientBaseDir } = require('../../utils/commons');
+const { isAngular, isReact, isVue, getClientBaseDir } = require('../../utils/commons');
 const { adjustAngularFiles, angularFiles } = require('./files-angular');
 const { adjustReactFiles, reactFiles } = require('./files-react');
+const { vueFiles, adjustVueFiles } = require('./files-vue');
 
 const clientFiles = {
     common: [
@@ -47,7 +48,7 @@ function adjustPackageJSON(generator) {
     devDependenciesStorage.set('@graphql-codegen/typescript', '1.22.0');
 
     if (generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
-        dependenciesStorage.set('graphql-typeop', '0.1.0-SNAPSHOTC');
+        dependenciesStorage.set('graphql-typeop', '0.1.0-SNAPSHOTD');
     } else {
         devDependenciesStorage.set('@graphql-codegen/typescript-operations', '1.17.16');
     }
@@ -63,10 +64,11 @@ function adjustPackageJSON(generator) {
         if (generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL) {
             devDependenciesStorage.set('@graphql-codegen/typescript-react-apollo', '2.3.0');
         }
+    }
+    if (isReact(generator) || isVue(generator)) {
         scriptsStorage.set('webapp:dev', 'concurrently "npm run codegen:watch" "npm run webpack-dev-server -- --config webpack/webpack.dev.js --inline --port=9060 --env stats=minimal"');
         scriptsStorage.set('webapp:build:dev', 'npm run codegen && npm run webpack -- --config webpack/webpack.dev.js --env stats=minimal');
         scriptsStorage.set('webapp:build:prod', 'npm run codegen && npm run webpack -- --config webpack/webpack.prod.js --progress=profile');
-
     }
     scriptsStorage.set('codegen', 'graphql-codegen --config codegen.yml');
     scriptsStorage.set('codegen:watch', 'graphql-codegen --config codegen.yml --watch');
@@ -83,6 +85,9 @@ function writeFiles() {
             if (isReact(this)) {
                 files.react = reactFiles;
             }
+            if (isVue(this)) {
+                files.vue = vueFiles;
+            }
             this.writeFilesToDisk(files, this, false);
         },
         adjustFiles() {
@@ -91,6 +96,9 @@ function writeFiles() {
             }
             if (isReact(this)) {
                 adjustReactFiles(this);
+            }
+            if (isVue(this)) {
+                adjustVueFiles(this);
             }
             adjustPackageJSON(this);
         }

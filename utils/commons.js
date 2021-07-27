@@ -38,12 +38,19 @@ function isReact(generator) {
     return generator.getJhipsterConfig().get(OptionNames.CLIENT_FRAMEWORK) === jHipsterConstants.SUPPORTED_CLIENT_FRAMEWORKS.REACT;
 }
 
+function isVue(generator) {
+    return generator.getJhipsterConfig().get(OptionNames.CLIENT_FRAMEWORK) === jHipsterConstants.SUPPORTED_CLIENT_FRAMEWORKS.VUE;
+}
+
 function getClientBaseDir(generator) {
     if (isAngular(generator)) {
         return jHipsterConstants.ANGULAR_DIR;
     }
     if (isReact(generator)) {
         return jHipsterConstants.REACT_DIR;
+    }
+    if (isVue(generator)) {
+        return jHipsterConstants.VUE_DIR;
     }
 }
 
@@ -87,6 +94,7 @@ module.exports = {
     getSourceFile,
     isAngular,
     isReact,
+    isVue,
     isNodeJSBlueprint,
     saveConfig,
     loadConfig,

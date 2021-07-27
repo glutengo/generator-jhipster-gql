@@ -78,5 +78,6 @@ function adjustReactFiles(generator) {
 
 module.exports = {
     reactFiles,
-    adjustReactFiles
+    adjustReactFiles,
+    adjustProxyConfig
 }
