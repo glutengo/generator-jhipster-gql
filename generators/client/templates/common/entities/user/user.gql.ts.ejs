@@ -1,6 +1,6 @@
 
 import { ArgsType, Field, ObjectType, buildQuery, buildMutation } from 'graphql-typeop';
-import { CreateUserArgsImpl, Mutation, PaginatedUser, Query, QueryGetUserArgs, QueryGetUsersArgs, UpdateUserArgsImpl, User, UserEdge } from 'app/graphql';
+import { CreateUserArgsImpl, Mutation, PaginatedUser, Query, QueryGetUserArgs, QueryGetUsersArgs, UpdateUserArgsImpl, User, UserEdge } from '<%= clientFramework === 'vue' ? '@' : 'app'%>/graphql';
 <%_ if (clientFramework === 'angularX') {  %>
 import { Injectable } from '@angular/core';
 import * as Apollo from 'apollo-angular';

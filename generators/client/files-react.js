@@ -52,14 +52,22 @@ const rules = [
     }
 }
 
-function adjustProxyConfig(generator) {
+function adjustProxyConfig(generator, vue = false) {
     const filePath = path.join('webpack', 'webpack.dev.js');
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const ast = babel.parseSync(fileContent);
-    const expressionStatementIndex = ast.program.body.findIndex(e => e.type === 'ExpressionStatement' && e.expression.left && e.expression.left.property && e.expression.left.property.name === 'exports');
+    const expressionStatementIndex = ast.program.body.findIndex(
+        e =>
+            e.type === 'ExpressionStatement' &&
+            e.expression.left &&
+            e.expression.left.property &&
+            e.expression.left.property.name === 'exports'
+    );
     const expressionStatement = ast.program.body[expressionStatementIndex];
     if (expressionStatement) {
-        const arg = expressionStatement.expression.right.body.arguments.find(a => a.type === 'ObjectExpression');
+        console.log('GOT THE EXPReSSION STATEMENT', vue);
+        const args = vue ? expressionStatement.expression.right.arguments : expressionStatement.expression.right.body.arguments
+        const arg = args.find(a => a.type === 'ObjectExpression');
         const devServer = arg.properties.find(p => p.key.name === 'devServer');
         const proxy = devServer.value.properties.find(p => p.key.name === 'proxy');
         const context = proxy.value.elements[0].properties.find(p => p.key.name === 'context');

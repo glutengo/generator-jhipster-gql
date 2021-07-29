@@ -68,7 +68,9 @@ module.exports = class extends BaseGenerator {
     }
 
     end() {
-        this.getJhipsterConfig().get('entities').forEach(e => {
+        const entities = this.getJhipsterConfig().get('entities');
+        if (entities) {
+            entities.forEach(e => {
             const entityConfig = this.getEntityConfig(e).getAll();
             entityConfig[OptionNames.PROD_DATABASE_TYPE] = this.config.get(OptionNames.PROD_DATABASE_TYPE);
 
@@ -90,6 +92,7 @@ module.exports = class extends BaseGenerator {
                 debug: this.configOptions.isDebugEnabled
             });
         });
+        }
     }
 
     install() {
