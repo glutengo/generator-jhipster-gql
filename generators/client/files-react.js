@@ -65,7 +65,6 @@ function adjustProxyConfig(generator, vue = false) {
     );
     const expressionStatement = ast.program.body[expressionStatementIndex];
     if (expressionStatement) {
-        console.log('GOT THE EXPReSSION STATEMENT', vue);
         const args = vue ? expressionStatement.expression.right.arguments : expressionStatement.expression.right.body.arguments
         const arg = args.find(a => a.type === 'ObjectExpression');
         const devServer = arg.properties.find(p => p.key.name === 'devServer');

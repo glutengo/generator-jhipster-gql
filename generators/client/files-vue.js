@@ -1,3 +1,4 @@
+const { Node } = require('ts-morph');
 const babel = require('@babel/core');
 const t = require('@babel/types');
 const babelGenerator = require('@babel/generator').default;
@@ -6,15 +7,15 @@ const path = require('path');
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
 const constants = require('../../utils/constants');
 const { adjustProxyConfig } = require('./files-react');
+const utils = require('../../utils/commons');
 
 const vueFiles = [
     {
         templates: [
-            // TODO: user service for vue gql
-            /* {
-                file: 'react/modules/administration/user-management/user-management.gql-actions.ts',
-                renameTo: () => `${jHipsterConstants.REACT_DIR}/modules/administration/user-management/user-management.gql-actions.ts`
-            }, */
+            {
+                file: 'vue/entities/user/user.gql.service.ts',
+                renameTo: () => `${jHipsterConstants.REACT_DIR}/entities/user/user.gql.service.ts`
+            },
             {
                 file: 'react/config/apollo-client.ts',
                 renameTo: () => `${jHipsterConstants.VUE_DIR}/shared/config/apollo-client.ts`
@@ -90,9 +91,36 @@ function adjustWebpackConfig(generator) {
     }
 }
 
+function adjustMainTs(tsProject, generator) {
+    const filePath = `${jHipsterConstants.VUE_DIR}/main.ts`;
+    const content = tsProject.getSourceFile(filePath);
+    const serviceName = 'UserGraphQLService'
+    const addedImport = utils.addImportIfMissing(content, {
+        moduleSpecifier: '@/entities/user/user.gql.service',
+        namedImport: serviceName
+    }, true);
+    if (addedImport) {
+        const expressionStatement = content.getStatement(statement => {
+            if(Node.isExpressionStatement(statement)) {
+                const expression = statement.getExpression();
+                return Node.isNewExpression(expression);
+            }
+        });
+        console.log('GOT STH');
+        expressionStatement.getExpression()
+            .getArguments()[0]
+            .getProperty('provide')
+            .getInitializer()
+            .getProperty('userService')
+            .setInitializer(`() => new ${serviceName}()`);
+        content.saveSync();
+    }
+}
+
 function adjustVueFiles(generator) {
-    // TODO: find out why this not working. Cannot read property arguments of undefined
     adjustProxyConfig(generator, true);
+    const tsProject = utils.getTsProject(generator);
+    adjustMainTs(tsProject, generator);
     if (generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
         adjustWebpackConfig(generator);
     }

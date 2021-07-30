@@ -1,0 +1,22 @@
+export function toHttpResponse(response) {
+    const { __typename, ...data } = response.data.result;
+    return { data }
+}
+
+export function toPagedHttpResponse(response) {
+    console.log(String(response.data.result.totalCount));
+    const headers = {'x-total-count': String(response.data.result.totalCount)};
+    return {
+        data: response.data.result.edges.map(edge => edge.node), headers
+    };
+}
+
+export function buildPaginationOptions(req) {
+    if (req) {
+        return {
+            page: req.page,
+            size: req.size,
+            sort: req.sort[0],
+        };
+    }
+}

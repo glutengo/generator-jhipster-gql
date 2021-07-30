@@ -19,8 +19,14 @@ function adjustAngularFiles(generator) {
     const providers = tsProject.getSourceFile(filePath);
     const providedClass = `${generator.entityClass}Service`;
     const usedClass = `${generator.entityClass}GraphQLService`;
-    const addedEntityServiceImport = utils.addImportIfMissing(providers, { moduleSpecifier: `app/entities/${generator.entityFolderName}/service/${generator.entityFileName}.service`, namedImport: providedClass});
-    const addedEntityGqlServiceImport = utils.addImportIfMissing(providers, { moduleSpecifier: `app/entities/${generator.entityFolderName}/service/${generator.entityFileName}.gql.service`, namedImport: usedClass});
+    const addedEntityServiceImport = utils.addImportIfMissing(providers, {
+        moduleSpecifier: `app/entities/${generator.entityFolderName}/service/${generator.entityFileName}.service`,
+        namedImport: providedClass
+    });
+    const addedEntityGqlServiceImport = utils.addImportIfMissing(providers, {
+        moduleSpecifier: `app/entities/${generator.entityFolderName}/service/${generator.entityFileName}.gql.service`,
+        namedImport: usedClass
+    });
 
     if (addedEntityServiceImport || addedEntityGqlServiceImport) {
         const variableDeclaration = providers.getVariableDeclaration(() => true);
@@ -34,4 +40,4 @@ function adjustAngularFiles(generator) {
 module.exports = {
     angularFiles,
     adjustAngularFiles
-}
+};

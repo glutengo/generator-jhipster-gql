@@ -10,15 +10,22 @@ function getSourceFile(tsProject, filePath, server = false) {
     return tsProject.getSourceFile(server ? path.join(nodejsConstants.SERVER_NODEJS_SRC_DIR, filePath) : filePath);
 }
 
-function addImportIfMissing(sourceFile, importDeclationOptions) {
-    const { namedImport, moduleSpecifier } = importDeclationOptions;
+function addImportIfMissing(sourceFile, importDeclarationOptions, defaultImport = false) {
+    const { namedImport, moduleSpecifier } = importDeclarationOptions;
     let existingImport = sourceFile.getImportDeclaration(dec => dec.getModuleSpecifierValue() === moduleSpecifier);
     if (!existingImport) {
         existingImport = sourceFile.addImportDeclaration({ moduleSpecifier: moduleSpecifier });
     }
-    if (!existingImport.getNamedImports().find(i => i.getName() === namedImport)) {
-        existingImport.addNamedImport({name: namedImport});
-        return true;
+    if (defaultImport) {
+        if (!existingImport.getDefaultImport()) {
+            existingImport.setDefaultImport(namedImport);
+            return true;
+        }
+    } else {
+        if (!existingImport.getNamedImports().find(i => i.getName() === namedImport)) {
+            existingImport.addNamedImport({name: namedImport});
+            return true;
+        }
     }
 }
 
