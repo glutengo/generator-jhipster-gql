@@ -94,6 +94,8 @@ function copyConfig(from, to, keys) {
     );
 }
 
+const capitalize = s => s && s[0].toUpperCase() + s.slice(1)
+
 module.exports = {
     addImportIfMissing,
     getClientBaseDir,
@@ -105,5 +107,6 @@ module.exports = {
     isNodeJSBlueprint,
     saveConfig,
     loadConfig,
-    copyConfig
+    copyConfig,
+    capitalize
 }

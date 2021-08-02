@@ -106,20 +106,6 @@ function addGraphQLModuleToAppModule(generator) {
     needleClient.addModule('', 'GraphQL', 'graphql', 'graphql', false, null);
 }
 
-/*function addGraphQLProvidersToAppModule(tsProject) {
-    const filePath = `${jHipsterConstants.ANGULAR_DIR}/app.module.ts`;
-    const appModule = tsProject.getSourceFile(filePath);
-    const graphQLProviders = 'graphQLProviders';
-    const added = utils.addImportIfMissing(appModule, { moduleSpecifier: './graphql/graphql.providers', namedImport: graphQLProviders});
-    if (added) {
-        const _class = appModule.getClass(() => true);
-        const moduleDecorator = _class.getDecorator('NgModule');
-        const moduleProviders = moduleDecorator.getArguments()[0].getProperty('providers').getInitializer();
-        moduleProviders.insertElement(moduleProviders.getElements().length, graphQLProviders);
-        appModule.saveSync();
-    }
-}*/
-
 function adjustAngularFiles(generator) {
     addGraphQLModuleToAppModule(generator);
     adjustProxyConfig(generator);

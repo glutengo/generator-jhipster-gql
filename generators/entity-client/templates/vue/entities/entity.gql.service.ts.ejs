@@ -1,0 +1,48 @@
+<%_
+const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string';
+const CreateDocument = `Create${entityAngularName}Document`;
+const FindDocument = `Get${entityAngularName}Document`;
+const GetDocument = `Get${entityAngularName}sDocument`;
+const DeleteDocument = `Delete${entityAngularName}Document`;
+const UpdateDocument = `Update${entityAngularName}Document`;
+const namedImports = [ CreateDocument, FindDocument, GetDocument, DeleteDocument, UpdateDocument ];
+let importSpecifier;
+let createVars, updateVars;
+if (typeDefinition === 'TypeScript') {
+    importSpecifier = `../${entityFileName}.gql`;
+} else {
+    importSpecifier = '../../../graphql';
+}
+_%>
+
+import { client } from '@/shared/config/apollo-client';
+import { buildPaginationOptions, toHttpResponse, toPagedHttpResponse } from '@/shared/graphql/graphql.util';
+import { I<%= entityAngularName %> } from '@/shared/model/<%= entityModelFileName %>.model';
+import { <%= namedImports.join(', ') %> } from '<%= importSpecifier %>';
+
+export default class <%= entityAngularName %>Service {
+
+  public find(id: <%= pkType %>) : Promise<I<%= entityAngularName %>> {
+    return client.query({ query: <%= FindDocument %>, variables: { id } }).then(res => toHttpResponse(res));
+  }
+
+  public retrieve(req?: any): Promise<any> {
+    return client.query({ query: <%= GetDocument%>, variables: buildPaginationOptions(req) }).then(res => toPagedHttpResponse(res));
+  }
+
+  public delete(id: <%= pkType %>) : Promise<any> {
+    return client.mutate({ mutation: <%= DeleteDocument %>, variables: { id } }).then(res => toHttpResponse(res));
+  }
+
+  public create(<%= entityInstance %>: I<%= entityAngularName %>): Promise<I<%= entityAngularName %>> {
+    return client.mutate({ mutation: CreateDocument, variables: { <%= entityInstance %> } }).then(res => toHttpResponse(res));
+  }
+
+  public update(<%= entityInstance %>: I<%= entityAngularName %>): Promise<I<%= entityAngularName %>> {
+    return client.mutate({ mutation: UpdateDocument, variables: { <%= entityInstance %> } }).then(res => toHttpResponse(res));
+  }
+
+  public partialUpdate(<%= entityInstance %>: I<%= entityAngularName %>): Promise<I<%= entityAngularName %>> {
+    return client.mutate({ mutation: UpdateDocument, variables: { <%= entityInstance %> } }).then(res => toHttpResponse(res));
+  }
+}

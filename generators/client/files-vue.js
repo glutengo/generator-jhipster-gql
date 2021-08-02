@@ -1,4 +1,3 @@
-const { Node } = require('ts-morph');
 const babel = require('@babel/core');
 const t = require('@babel/types');
 const babelGenerator = require('@babel/generator').default;
@@ -8,6 +7,7 @@ const jHipsterConstants = require('generator-jhipster/generators/generator-const
 const constants = require('../../utils/constants');
 const { adjustProxyConfig } = require('./files-react');
 const utils = require('../../utils/commons');
+const { replaceServiceProvider } = require('../../utils/vue');
 
 const vueFiles = [
     {
@@ -91,36 +91,14 @@ function adjustWebpackConfig(generator) {
     }
 }
 
-function adjustMainTs(tsProject, generator) {
-    const filePath = `${jHipsterConstants.VUE_DIR}/main.ts`;
-    const content = tsProject.getSourceFile(filePath);
-    const serviceName = 'UserGraphQLService'
-    const addedImport = utils.addImportIfMissing(content, {
-        moduleSpecifier: '@/entities/user/user.gql.service',
-        namedImport: serviceName
-    }, true);
-    if (addedImport) {
-        const expressionStatement = content.getStatement(statement => {
-            if(Node.isExpressionStatement(statement)) {
-                const expression = statement.getExpression();
-                return Node.isNewExpression(expression);
-            }
-        });
-        console.log('GOT STH');
-        expressionStatement.getExpression()
-            .getArguments()[0]
-            .getProperty('provide')
-            .getInitializer()
-            .getProperty('userService')
-            .setInitializer(`() => new ${serviceName}()`);
-        content.saveSync();
-    }
+function adjustMainTs(tsProject) {
+    replaceServiceProvider(tsProject, 'user');
 }
 
 function adjustVueFiles(generator) {
     adjustProxyConfig(generator, true);
     const tsProject = utils.getTsProject(generator);
-    adjustMainTs(tsProject, generator);
+    adjustMainTs(tsProject);
     if (generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
         adjustWebpackConfig(generator);
     }

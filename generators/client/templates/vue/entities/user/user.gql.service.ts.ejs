@@ -1,10 +1,13 @@
+<%_
+const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string';
+%>
 import axios from 'axios';
 import { client } from '@/shared/config/apollo-client';
 import { CreateUserDocument, DeleteUserDocument, GetUserDocument, GetUsersDocument } from '@/entities/user/user.gql';
 import { buildPaginationOptions, toHttpResponse, toPagedHttpResponse } from '@/shared/graphql/graphql.util';
 
 export default class UserGraphQLService {
-  public get(userId: number): Promise<any> {
+  public get(userId: <%= pkType %>): Promise<any> {
     return client.query({ query: GetUserDocument, variables: { login: userId } }).then(res => toHttpResponse(res));
   }
 
