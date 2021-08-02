@@ -9,6 +9,7 @@ module.exports = class extends BaseGenerator {
 
     get initializing() {
         this.clientFramework = this.config.get(OptionNames.CLIENT_FRAMEWORK);
+        this.databaseType = this.config.get(OptionNames.DATABASE_TYPE);
         loadConfig(this);
         loadConfig(this, this.options.context);
     }

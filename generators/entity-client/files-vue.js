@@ -1,7 +1,7 @@
-import { replaceServiceProvider } from '../../utils/vue';
-const { replaceServiceProvider } = require('../../utils/vue');
-
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
+const { replaceServiceProvider } = require('../../utils/vue');
+const utils = require('../../utils/commons');
+
 
 const vueFiles = [
     {

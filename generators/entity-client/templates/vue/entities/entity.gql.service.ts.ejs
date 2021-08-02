@@ -9,7 +9,7 @@ const namedImports = [ CreateDocument, FindDocument, GetDocument, DeleteDocument
 let importSpecifier;
 let createVars, updateVars;
 if (typeDefinition === 'TypeScript') {
-    importSpecifier = `../${entityFileName}.gql`;
+    importSpecifier = `./${entityFileName}.gql`;
 } else {
     importSpecifier = '../../../graphql';
 }
@@ -23,7 +23,7 @@ import { <%= namedImports.join(', ') %> } from '<%= importSpecifier %>';
 export default class <%= entityAngularName %>Service {
 
   public find(id: <%= pkType %>) : Promise<I<%= entityAngularName %>> {
-    return client.query({ query: <%= FindDocument %>, variables: { id } }).then(res => toHttpResponse(res));
+    return client.query({ query: <%= FindDocument %>, variables: { id } }).then(res => toHttpResponse(res).data);
   }
 
   public retrieve(req?: any): Promise<any> {
@@ -31,18 +31,18 @@ export default class <%= entityAngularName %>Service {
   }
 
   public delete(id: <%= pkType %>) : Promise<any> {
-    return client.mutate({ mutation: <%= DeleteDocument %>, variables: { id } }).then(res => toHttpResponse(res));
+    return client.mutate({ mutation: <%= DeleteDocument %>, variables: { id } }).then(res => toHttpResponse(res).data);
   }
 
   public create(<%= entityInstance %>: I<%= entityAngularName %>): Promise<I<%= entityAngularName %>> {
-    return client.mutate({ mutation: CreateDocument, variables: { <%= entityInstance %> } }).then(res => toHttpResponse(res));
+    return client.mutate({ mutation: <%= CreateDocument %>, variables: { <%= entityInstance %> } }).then(res => toHttpResponse(res).data);
   }
 
   public update(<%= entityInstance %>: I<%= entityAngularName %>): Promise<I<%= entityAngularName %>> {
-    return client.mutate({ mutation: UpdateDocument, variables: { <%= entityInstance %> } }).then(res => toHttpResponse(res));
+    return client.mutate({ mutation: <%= UpdateDocument %>, variables: { <%= entityInstance %> } }).then(res => toHttpResponse(res).data);
   }
 
   public partialUpdate(<%= entityInstance %>: I<%= entityAngularName %>): Promise<I<%= entityAngularName %>> {
-    return client.mutate({ mutation: UpdateDocument, variables: { <%= entityInstance %> } }).then(res => toHttpResponse(res));
+    return client.mutate({ mutation: <%= UpdateDocument %>, variables: { <%= entityInstance %> } }).then(res => toHttpResponse(res).data);
   }
 }

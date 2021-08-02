@@ -1,5 +1,4 @@
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
-const { requiredDefaultConfig } = require('generator-jhipster/generators/generator-defaults');
 const { writeFiles } = require('./files');
 
 module.exports = class extends BaseGenerator {

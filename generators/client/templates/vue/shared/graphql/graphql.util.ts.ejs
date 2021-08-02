@@ -4,7 +4,6 @@ export function toHttpResponse(response) {
 }
 
 export function toPagedHttpResponse(response) {
-    console.log(String(response.data.result.totalCount));
     const headers = {'x-total-count': String(response.data.result.totalCount)};
     return {
         data: response.data.result.edges.map(edge => edge.node), headers

@@ -9,6 +9,7 @@ module.exports = class extends BaseGenerator {
         this.entityFileName = this.options.entityConfig.entityFileName;
         this.entityInstance = this.options.entityConfig.entityInstance;
         this.entityFolderName = this.options.entityConfig.entityFolderName;
+        this.entityModelFileName = this.options.entityConfig.entityModelFileName;
         this.entityName = this.options.entityConfig.name
         this.entityNamePlural = pluralize(this.entityName);
         this.entityInstancePlural = pluralize(this.entityInstance);

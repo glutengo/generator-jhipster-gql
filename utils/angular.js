@@ -1,5 +1,5 @@
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
-const utils = require('../../utils/commons');
+const utils = require('./commons');
 
 function addServiceProvider(generator) {
     const tsProject = utils.getTsProject(generator);

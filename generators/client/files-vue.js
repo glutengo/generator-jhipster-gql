@@ -19,6 +19,10 @@ const vueFiles = [
             {
                 file: 'react/config/apollo-client.ts',
                 renameTo: () => `${jHipsterConstants.VUE_DIR}/shared/config/apollo-client.ts`
+            },
+            {
+                file: 'vue/shared/graphql/graphql.util.ts',
+                renameTo: () => `${jHipsterConstants.VUE_DIR}/shared/graphql/graphql.util.ts`
             }
         ]
     },

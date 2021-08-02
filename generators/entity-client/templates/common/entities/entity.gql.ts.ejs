@@ -1,6 +1,7 @@
 <%_
 const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string';
-const usedClasses = [ `Create${entityClass}ArgsImpl`, `Update${entityClass}ArgsImpl`, ...relationships.map(r => `Base${r.otherEntityNameCapitalized}`)];
+const usedClasses = [`Create${entityClass}ArgsImpl`, `Update${entityClass}ArgsImpl`, ...relationships.map(r => `Base${r.otherEntityNameCapitalized}`)];
+const graphQLImport = clientFramework === 'vue' ? '@/graphql' : 'app/graphql';
 _%>
 <%_ if (clientFramework === 'angularX') {  %>
 import { Injectable } from '@angular/core';
@@ -10,13 +11,13 @@ import * as Apollo from 'apollo-angular';
 import * as Apollo from '@apollo/client';
 <%_ } %>
 import { ArgsType, Field, ObjectType, buildQuery, buildMutation } from 'graphql-typeop';
-import { Create<%= entityClass %>ArgsImpl, Mutation, MutationCreate<%= entityClass %>Args, MutationUpdate<%= entityClass %>Args, Paginated<%= entityClass %>, <%= entityClass %>, <%= entityClass %>Edge, Query, QueryGet<%= entityClass %>Args, Update<%= entityClass %>ArgsImpl } from 'app/graphql';
+import { Create<%= entityClass %>ArgsImpl, Mutation, MutationCreate<%= entityClass %>Args, MutationUpdate<%= entityClass %>Args, Paginated<%= entityClass %>, <%= entityClass %>, <%= entityClass %>Edge, Query, QueryGet<%= entityClass %>Args, Update<%= entityClass %>ArgsImpl } from '<%= graphQLImport %>';
 <%_ for (const r of relationships) { _%>
 import { Base<%= r.otherEntityNameCapitalized %> } from '../<%= r.otherEntity.entityFolderName %>/<%= r.otherEntity.entityFileName %>.gql' %>
 <%_ } _%>
 
 @ObjectType()
-class Base<%= entityClass %> implements Partial<<%= entityClass %>> {
+export class Base<%= entityClass %> implements Partial<<%= entityClass %>> {
 <%_ for (const field of fields) { _%>
   <%= field.fieldName%>!: <%= field.tsType %>
 <%_ } _%>

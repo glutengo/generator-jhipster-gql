@@ -67,34 +67,6 @@ module.exports = class extends BaseGenerator {
         }
     }
 
-    end() {
-        const entities = this.getJhipsterConfig().get('entities');
-        if (entities) {
-            entities.forEach(e => {
-            const entityConfig = this.getEntityConfig(e).getAll();
-            entityConfig[OptionNames.PROD_DATABASE_TYPE] = this.config.get(OptionNames.PROD_DATABASE_TYPE);
-
-            prepareEntityForTemplates(entityConfig, this);
-            prepareEntityPrimaryKeyForTemplates(entityConfig, this);
-            entityConfig.fields.forEach(f => prepareFieldForTemplates(entityConfig, f, this));
-            entityConfig.relationships.forEach(r => {
-                const otherEntityName = this._.upperFirst(r.otherEntityName);
-                const otherEntity = this.configOptions.sharedEntities[otherEntityName];
-                r.otherEntity = otherEntity;
-                prepareRelationshipForTemplates(entityConfig, r, this);
-            });
-            this.composeWith(require.resolve('../entity'), {
-                context: { ...this.context },
-                entityConfig,
-                skipInstall: this.options.skipInstall,
-                fromCli: true,
-                force: this.options.force,
-                debug: this.configOptions.isDebugEnabled
-            });
-        });
-        }
-    }
-
     install() {
         const logMsg = `To install your dependencies manually, run: ${chalk.yellow.bold(`${this.clientPackageManager} install`)}`;
         if (this.options['skip-install']) {
@@ -106,6 +78,46 @@ module.exports = class extends BaseGenerator {
                 this.spawnCommandSync(this.clientPackageManager, ['run', 'build:schema-gql'], { cwd: `${process.cwd()}/server` });
             }
             this.spawnCommandSync(this.clientPackageManager, ['run', 'codegen']);
+        }
+    }
+
+
+    end() {
+        const entities = this.getJhipsterConfig().get('entities');
+        console.log(entities);
+        if (entities) {
+            // first: prepare all entities with their fields. Add all entities to shared entities
+            entities.forEach(e => {
+                const entityConfig = this.getEntityConfig(e).getAll();
+                entityConfig[OptionNames.PROD_DATABASE_TYPE] = this.config.get(OptionNames.PROD_DATABASE_TYPE);
+
+                prepareEntityForTemplates(entityConfig, this);
+                prepareEntityPrimaryKeyForTemplates(entityConfig, this);
+                entityConfig.fields.forEach(f => prepareFieldForTemplates(entityConfig, f, this));
+                this.configOptions.sharedEntities[e] = entityConfig;
+            });
+
+            // after that: loop over entities, prepare the relationships (using shared entities)
+            // and run the entity generator for each entity
+            entities.forEach(e => {
+                const entityConfig = this.configOptions.sharedEntities[e];
+                entityConfig.relationships.forEach(r => {
+                    const otherEntityName = this._.upperFirst(r.otherEntityName);
+                    const otherEntity = this.configOptions.sharedEntities[otherEntityName];
+                    r.otherEntity = otherEntity;
+                    prepareRelationshipForTemplates(entityConfig, r, this);
+                });
+                this.composeWith(require.resolve('../entity'), {
+                    context: { ...this.context },
+                    entityConfig,
+                    skipInstall: this.options.skipInstall,
+                    fromCli: true,
+                    force: this.options.force,
+                    debug: this.configOptions.isDebugEnabled
+                });
+            });
+
+
         }
     }
 

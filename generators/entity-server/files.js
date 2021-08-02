@@ -44,7 +44,7 @@ function adjustEntityDTO(generator) {
         // add class decorators
         const _class = dto.getClass(() => true);
         _class.addDecorator({ name: 'ObjectType', arguments: [] });
-        _class.addDecorator({ name: 'InputType', arguments: [ `'${generator.entityInstance}'` ] });
+        _class.addDecorator({ name: 'InputType', arguments: [ `'_${generator.entityClass}'` ] });
     }
     dto.saveSync();
 }

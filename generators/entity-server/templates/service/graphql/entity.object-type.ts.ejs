@@ -11,6 +11,7 @@ const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string';
 _%>
 
 @ObjectType()
+@InputType('<%= entityClass %>Input')
 export class <%= entityClass %> extends <%= entityClass %>DTO {
 <%_ for (const r of relationships) { _%>
   @Field()
