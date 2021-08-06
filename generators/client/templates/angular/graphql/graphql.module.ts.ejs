@@ -1,32 +1,27 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, InjectionToken, NgModule } from '@angular/core';
 import { APOLLO_OPTIONS } from 'apollo-angular';
-import { ApolloClientOptions, DefaultOptions, InMemoryCache } from '@apollo/client/core';
-import { HttpBatchLink } from 'apollo-angular/http';
+import { from, InMemoryCache } from '@apollo/client/core';
+import { HttpBatchLink, HttpLink } from 'apollo-angular/http';
 import { graphQLProviders } from './graphql.providers';
+import { cache, createNetworkLink, createRegisterQueryLink, httpUrl, omitTypenameLink } from 'app/config/apollo-client';
+import { PubSub } from 'app/core/util/pub-sub';
+import { GraphQLCacheService } from './graphql.cache.service';
 
-// fragments, addTypename: false and caching do not work well together: https://github.com/apollographql/apollo-client/issues/7006
+const sub = new PubSub<string>();
 
-const defaultOptions: DefaultOptions = {
-  watchQuery: {
-    fetchPolicy: 'no-cache',
-    errorPolicy: 'ignore',
-  },
-  query: {
-    fetchPolicy: 'no-cache',
-    errorPolicy: 'all',
-  },
-}
+const registerQueryLink = createRegisterQueryLink(sub);
 
-const uri = '<%= endpoint %>';
-export function createApollo(httpLink: HttpBatchLink): ApolloClientOptions<any> {
+export function createApollo(httpLink: HttpLink): any {
+  const networkLink = createNetworkLink(httpLink.create({ uri: httpUrl }));
   return {
-    link: httpLink.create({ uri }),
-    cache: new InMemoryCache({
-      addTypename: false
-    }),
-    defaultOptions,
+    link: from([omitTypenameLink, registerQueryLink, networkLink]),
+    cache,
+    defaultOptions: {},
   };
 }
+
+export const CACHE_TOKEN = new InjectionToken<InMemoryCache>('CACHE');
+export const KNOWN_QUERIES_TOKEN = new InjectionToken<PubSub<string>>('KNOWN_QUERIES');
 
 @NgModule({
   providers: [
@@ -35,7 +30,19 @@ export function createApollo(httpLink: HttpBatchLink): ApolloClientOptions<any> 
       useFactory: createApollo,
       deps: [HttpBatchLink],
     },
-    graphQLProviders
+    {
+      provide: CACHE_TOKEN,
+      useValue: cache,
+    },
+    {
+      provide: KNOWN_QUERIES_TOKEN,
+      useValue: sub,
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (graphQLCacheService: GraphQLCacheService) => () => graphQLCacheService.connect(), deps: [GraphQLCacheService], multi: true
+    },
+    graphQLProviders,
   ],
 })
-export class GraphQLModule {}
+export class GraphQLModule { }

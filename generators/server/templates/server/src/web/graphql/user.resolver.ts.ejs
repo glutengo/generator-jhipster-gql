@@ -1,13 +1,15 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+/* eslint-disable id-blacklist */
+import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
 import { UserService } from '../../service/user.service';
 import { PaginationArgs } from './pagination-util';
 import { PageRequest } from '../../domain/base/pagination.entity';
 import { PaginatedUser, User, CreateUserArgs, UpdateUserArgs } from '../../service/graphql/user.object-type';
 import { pageRequestToFindManyOptions } from './pagination-util';
+import { PubSubAction, PubSubService } from 'src/service/graphql/pub-sub.service';
 
 @Resolver()
 export class UserResolver {
-    constructor(private readonly userService: UserService) {}
+    constructor(private readonly userService: UserService, private pubSub: PubSubService) {}
 
     @Query(() => PaginatedUser)
     async getUsers(@Args() options: PaginationArgs): Promise<PaginatedUser> {
@@ -40,5 +42,20 @@ export class UserResolver {
     async deleteUser(@Args('login') login: string): Promise<User> {
         const userToDelete = await this.userService.find({ where: { login } });
         return await this.userService.delete(userToDelete);
+    }
+
+    @Subscription(() => User)
+    userAdded(): AsyncIterator<User> {
+        return this.pubSub.asyncIterator('user', PubSubAction.ADD);
+    }
+
+    @Subscription(() => User)
+    userUpdated(): AsyncIterator<User> {
+        return this.pubSub.asyncIterator('user', PubSubAction.UPDATE);
+    }
+
+    @Subscription(() => String)
+    userDeleted(): AsyncIterator<String> {
+        return this.pubSub.asyncIterator('user', PubSubAction.DELETE);
     }
 }

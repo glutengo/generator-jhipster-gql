@@ -1,0 +1,53 @@
+import { InMemoryCache, ApolloLink, HttpLink, split, ApolloClient, from } from '@apollo/client';
+import { WebSocketLink } from '@apollo/client/link/ws';
+import { getMainDefinition } from '@apollo/client/utilities';
+import { PubSub } from 'app/core/util/pub-sub';
+
+export const httpUrl = '/graphql';
+// TODO: build this dynamically
+export const wsUrl = 'ws://localhost:8081/graphql';
+
+// remove accidentally passed __typename property from variables
+export const omitTypenameLink = new ApolloLink((operation, forward) => {
+  operation.variables = JSON.parse(JSON.stringify(operation.variables), (key: string, value: string) =>
+    key === '__typename' ? undefined : value
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return forward(operation);
+});
+
+// track all queries for caching
+export function createRegisterQueryLink(pubsub: PubSub<string> = new PubSub<string>()): ApolloLink {
+  return new ApolloLink((op, forward) => {
+    const { kind, operation, selectionSet } = getMainDefinition(op.query) as any;
+    if (operation === 'query') {
+      pubsub.publish(selectionSet.selections[0].name.value);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return forward(op);
+  });
+}
+
+// split network layer: use webSocket for subscriptions and http for anything else
+export function createNetworkLink(httpLink: ApolloLink): ApolloLink {
+  return split(
+    ({ query }: { query: any }) => {
+      const { kind, operation } = getMainDefinition(query) as any;
+      return kind === 'OperationDefinition' && operation === 'subscription';
+    },
+    new WebSocketLink({
+      uri: wsUrl,
+      options: {
+        reconnect: true,
+      },
+    }),
+    httpLink
+  );
+}
+
+export const cache = new InMemoryCache();
+
+/** REACT BELOW */
+const httpLink = new HttpLink({ uri: httpUrl });
+const networkLink = createNetworkLink(httpLink);
+const client = new ApolloClient({ cache, link: from([omitTypenameLink, networkLink]) });

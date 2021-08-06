@@ -10,8 +10,10 @@ const serverFiles = {
     graphQL: [
         {
             templates: [
+                'server/src/module/graphql.module.ts',
                 'server/src/service/graphql/paginated.object-type.ts',
                 'server/src/service/graphql/user.object-type.ts',
+                'server/src/service/graphql/pub-sub.service.ts',
                 'server/src/web/graphql/pagination-util.ts',
                 'server/src/web/graphql/user.resolver.ts',
                 'server/scripts/build-schema.ts'
@@ -23,25 +25,17 @@ const serverFiles = {
 function adjustAppModule(generator, tsProject) {
     const filePath = `${nodejsConstants.SERVER_NODEJS_SRC_DIR}/src/app.module.ts`;
     const appModule = tsProject.getSourceFile(filePath);
+    const graphQLModuleIdentifier = 'GraphQLModule';
 
     // add TypeScript module imports
-    const added = utils.addImportIfMissing(appModule, { moduleSpecifier: '@nestjs/graphql', namedImport: 'GraphQLModule' })
-    utils.addImportIfMissing(appModule, { moduleSpecifier: 'path', namedImport: 'join' });
+    const added = utils.addImportIfMissing(appModule, { moduleSpecifier: './module/graphql.module', namedImport: graphQLModuleIdentifier });
 
     if (added) {
         // add NestJS module import
         const _class = appModule.getClass(() => true);
         const moduleDecorator = _class.getDecorator('Module');
         const moduleImports = moduleDecorator.getArguments()[0].getProperty('imports').getInitializer();
-        const graphQLimportAssignment =
-`GraphQLModule.forRoot({
-    installSubscriptionHandlers: true,
-    autoSchemaFile: join(process.cwd(), '..', '${generator[constants.CONFIG_KEY_SCHEMA_LOCATION]}'),
-    buildSchemaOptions: {
-        numberScalarMode: 'integer'
-    }
-})`;
-        moduleImports.insertElement(moduleImports.getElements().length - 1, graphQLimportAssignment);
+        moduleImports.insertElement(moduleImports.getElements().length - 1, graphQLModuleIdentifier);
         appModule.saveSync();
     }
 }
@@ -61,6 +55,39 @@ function adjustUserModule(tsProject) {
         moduleProviders.addElement('UserResolver');
     }
     userModule.saveSync();
+}
+
+function adjustUserService(tsProject) {
+    const filePath = `${nodejsConstants.SERVER_NODEJS_SRC_DIR}/src/service/user.service.ts`;
+    const userService = tsProject.getSourceFile(filePath);
+
+    // add TypeScript module imports
+    const added = utils.addImportIfMissing(userService, { moduleSpecifier: './graphql/pub-sub.service', namedImport: 'PubSubService' });
+    utils.addImportIfMissing(userService, { moduleSpecifier: './graphql/pub-sub.service', namedImport: 'PubSubAction' });
+
+    if (added) {
+        const _class = userService.getClass(() => true);
+        // add pubSub to constructor
+        const constructor = _class.getConstructors()[0];
+        constructor.addParameter({ name: 'private pubSub', type: 'PubSubService' });
+        // use pub sub in save, update and delete
+        const _save = _class.getMethod('save');
+        const _update = _class.getMethod('update');
+        const _delete = _class.getMethod('delete');
+        _save.insertStatements(
+            _save.getChildSyntaxList().getChildCount() - 1,
+            `this.pubSub.publish('user', PubSubAction.ADD, result)`
+        );
+        _update.insertStatements(
+            _update.getChildSyntaxList().getChildCount() - 1,
+            `this.pubSub.publish('user', PubSubAction.UPDATE, userDTO)`
+        );
+        _delete.insertStatements(
+            _delete.getChildSyntaxList().getChildCount() - 1,
+            `this.pubSub.publish('user', PubSubAction.DELETE, user.login)`
+        );
+        userService.saveSync();
+    }
 }
 
 function adjustBaseDTO(tsProject) {
@@ -114,6 +141,7 @@ function adjustPackageJSON(generator) {
     dependenciesStorage.set('@nestjs/graphql', '7.10.6');
     dependenciesStorage.set('graphql', '15.5.0');
     dependenciesStorage.set('graphql-tools', '7.0.5');
+    dependenciesStorage.set('graphql-subscriptions', '1.2.1');
     dependenciesStorage.set('apollo-server-express', '2.24.0');
     const scriptsStorage = packageJSONStorage.createStorage('scripts');
     scriptsStorage.set('start:dev', 'npm run copy-resources && nest start -w');
@@ -156,6 +184,7 @@ function writeFiles() {
             const tsProject = utils.getTsProject(this, true);
             adjustAppModule(this, tsProject);
             adjustUserModule(tsProject);
+            adjustUserService(tsProject);
             adjustBaseDTO(tsProject);
             adjustUserDTO(tsProject);
         }

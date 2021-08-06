@@ -27,7 +27,7 @@ module.exports = class extends BaseGenerator {
             saveConfig() {
                 utils.saveConfig(this);
             }
-        }
+        };
     }
 
     get writing() {
