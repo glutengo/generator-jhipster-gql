@@ -1,11 +1,10 @@
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
-const { addServiceProvider } = require('../../utils/angular');
 
 const angularFiles = [
     {
         templates: [
             {
-                file: `angular/entities/service/entity.gql.service.ts`,
+                file: 'angular/entities/service/entity.gql.service.ts',
                 renameTo: generator =>
                     `${jHipsterConstants.ANGULAR_DIR}/entities/${generator.entityFolderName}/service/${generator.entityFileName}.gql.service.ts`
             }
@@ -13,11 +12,6 @@ const angularFiles = [
     }
 ];
 
-function adjustAngularFiles(generator) {
-    addServiceProvider(generator);
-}
-
 module.exports = {
-    angularFiles,
-    adjustAngularFiles
+    angularFiles
 };

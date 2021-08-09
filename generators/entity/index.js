@@ -1,10 +1,11 @@
 const chalk = require('chalk');
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
+const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
 const packagejs = require('../../package.json');
 const constants = require('../../utils/constants');
-const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
 
 module.exports = class extends BaseGenerator {
+
     get initializing() {
         return {
             readConfig() {
@@ -32,16 +33,18 @@ module.exports = class extends BaseGenerator {
     }
 
     composing() {
-        ['../entity-server', '../entity-client'].forEach(gen => this.composeWith(require.resolve(gen), {
-           context: this.context,
-           skipInstall: this.options.skipInstall,
-           fromCli: true,
-           force: this.options.force,
-           entityConfig: this.entityConfig,
-           debug: this.configOptions.isDebugEnabled,
-           gqlConfig: this.gqlConfig,
-           databaseType: this.databaseType,
-           clientFramework: this.clientFramework
-        }));
+        ['../entity-server', '../entity-client'].forEach(gen =>
+            this.composeWith(require.resolve(gen), {
+                context: this.context,
+                skipInstall: this.options.skipInstall,
+                fromCli: true,
+                force: this.options.force,
+                entityConfig: this.entityConfig,
+                debug: this.configOptions.isDebugEnabled,
+                gqlConfig: this.gqlConfig,
+                databaseType: this.databaseType,
+                clientFramework: this.clientFramework
+            })
+        );
     }
 };

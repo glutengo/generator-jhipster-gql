@@ -1,15 +1,4 @@
 import { Provider } from '@angular/core';
-import { UserService } from 'app/entities/user/user.service';
-import { UserGraphQLService } from 'app/entities/user/user.gql.service';
-import { UserManagementService } from 'app/admin/user-management/service/user-management.service';
 
 export const graphQLProviders: Provider[] = [
-  {
-    provide: UserService,
-    useClass: UserGraphQLService
-  },
-  {
-    provide: UserManagementService,
-    useClass: UserGraphQLService
-  }
 ]

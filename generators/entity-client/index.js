@@ -1,6 +1,6 @@
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
-const { writeFiles } = require('./files');
 const pluralize = require('pluralize');
+const { writeFiles } = require('./files');
 
 module.exports = class extends BaseGenerator {
 
@@ -10,7 +10,7 @@ module.exports = class extends BaseGenerator {
         this.entityInstance = this.options.entityConfig.entityInstance;
         this.entityFolderName = this.options.entityConfig.entityFolderName;
         this.entityModelFileName = this.options.entityConfig.entityModelFileName;
-        this.entityName = this.options.entityConfig.name
+        this.entityName = this.options.entityConfig.name;
         this.entityNamePlural = pluralize(this.entityName);
         this.entityInstancePlural = pluralize(this.entityInstance);
 
@@ -30,6 +30,10 @@ module.exports = class extends BaseGenerator {
     get writing() {
         return {
             ...writeFiles()
-        }
+        };
     }
-}
+
+    end() {
+        this.composeWith(require.resolve('../entity-client-enable'), { arguments: [this.entityName], name: this.entityName });
+    }
+};

@@ -1,9 +1,9 @@
 const nodejsConstants = require('generator-jhipster-nodejs/generators/generator-nodejs-constants');
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
 const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
-const constants = require('./constants');
 const path = require('path');
 const { Project } = require('ts-morph');
+const constants = require('./constants');
 const { YeomanFileSystem } = require('./yeoman-file-system');
 
 function getSourceFile(tsProject, filePath, server = false) {
@@ -14,19 +14,18 @@ function addImportIfMissing(sourceFile, importDeclarationOptions, defaultImport 
     const { namedImport, moduleSpecifier } = importDeclarationOptions;
     let existingImport = sourceFile.getImportDeclaration(dec => dec.getModuleSpecifierValue() === moduleSpecifier);
     if (!existingImport) {
-        existingImport = sourceFile.addImportDeclaration({ moduleSpecifier: moduleSpecifier });
+        existingImport = sourceFile.addImportDeclaration({ moduleSpecifier });
     }
     if (defaultImport) {
         if (!existingImport.getDefaultImport()) {
             existingImport.setDefaultImport(namedImport);
             return true;
         }
-    } else {
-        if (!existingImport.getNamedImports().find(i => i.getName() === namedImport)) {
-            existingImport.addNamedImport({name: namedImport});
-            return true;
-        }
+    } else if (!existingImport.getNamedImports().find(i => i.getName() === namedImport)) {
+        existingImport.addNamedImport({ name: namedImport });
+        return true;
     }
+    return false;
 }
 
 function getTsProject(generator, server = false) {
@@ -62,7 +61,10 @@ function getClientBaseDir(generator) {
 }
 
 function isNodeJSBlueprint(generator) {
-    return !! generator.getJhipsterConfig().get('blueprints').find(b => b.name === 'generator-jhipster-nodejs');
+    return !!generator
+        .getJhipsterConfig()
+        .get('blueprints')
+        .find(b => b.name === 'generator-jhipster-nodejs');
 }
 
 function saveConfig(generator) {
@@ -89,12 +91,12 @@ function loadConfig(generator, config) {
 function copyConfig(from, to, keys) {
     keys.forEach(c => {
         if (c in from) {
-            to[c] = from[c]}
+            to[c] = from[c];
         }
-    );
+    });
 }
 
-const capitalize = s => s && s[0].toUpperCase() + s.slice(1)
+const capitalize = s => s && s[0].toUpperCase() + s.slice(1);
 
 module.exports = {
     addImportIfMissing,
@@ -109,4 +111,4 @@ module.exports = {
     loadConfig,
     copyConfig,
     capitalize
-}
+};

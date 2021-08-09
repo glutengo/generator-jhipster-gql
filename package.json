@@ -29,6 +29,7 @@
     "generator-jhipster": "7.0.1",
     "generator-jhipster-nodejs": "^2.0.0-beta.1",
     "mkdirp": "0.5.1",
+    "pluralize": "^8.0.0",
     "semver": "7.1.1",
     "shelljs": "0.8.3",
     "ts-morph": "^11.0.0",

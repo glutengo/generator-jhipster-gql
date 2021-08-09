@@ -1,12 +1,12 @@
 const chalk = require('chalk');
 const semver = require('semver');
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
-const packagejs = require('../../package.json');
 const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
-const utils = require('../../utils/commons');
 const { prepareEntityForTemplates, prepareEntityPrimaryKeyForTemplates } = require('generator-jhipster/utils/entity');
 const { prepareRelationshipForTemplates } = require('generator-jhipster/utils/relationship');
 const { prepareFieldForTemplates } = require('generator-jhipster/utils/field');
+const utils = require('../../utils/commons');
+const packagejs = require('../../package.json');
 const { askForEndpoint, askForSchemaLocation } = require('../../utils/prompts');
 const constants = require('../../utils/constants');
 
@@ -81,10 +81,8 @@ module.exports = class extends BaseGenerator {
         }
     }
 
-
     end() {
         const entities = this.getJhipsterConfig().get('entities');
-        console.log(entities);
         if (entities) {
             // first: prepare all entities with their fields. Add all entities to shared entities
             entities.forEach(e => {

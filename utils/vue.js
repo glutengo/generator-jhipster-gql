@@ -2,15 +2,15 @@ const { Node } = require('ts-morph');
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
 const utils = require('./commons');
 
-function replaceServiceProvider(tsProject, entityName) {
+function replaceServiceProvider(tsProject, entityName, disable = false) {
     const filePath = `${jHipsterConstants.VUE_DIR}/main.ts`;
     const content = tsProject.getSourceFile(filePath);
-    const serviceName = `${utils.capitalize(entityName)}GraphQLService`;
+    const serviceName = `${utils.capitalize(entityName)}${disable ? '' : 'GraphQL'}Service`;
     const providerKey = `${entityName.toLowerCase()}Service`;
     const addedImport = utils.addImportIfMissing(
         content,
         {
-            moduleSpecifier: `@/entities/${entityName}/${entityName}.gql.service`,
+            moduleSpecifier: `@/entities/${entityName}/${entityName}${disable ? '' : '.gql'}.service`,
             namedImport: serviceName
         },
         true
@@ -24,6 +24,7 @@ function replaceServiceProvider(tsProject, entityName) {
             .getInitializer()
             .getProperty(providerKey)
             .setInitializer(`() => new ${serviceName}()`);
+        content.fixUnusedIdentifiers();
         content.saveSync();
     }
 }
@@ -42,6 +43,7 @@ function connectCacheWatcherOnCreated(tsProject) {
             .getExpression()
             .getArguments()[0]
             .addPropertyAssignment({ name: 'created', initializer: 'function() { connectGraphQLCacheWatcher(this); }' });
+        content.fixUnusedIdentifiers();
         content.saveSync();
     }
 }
