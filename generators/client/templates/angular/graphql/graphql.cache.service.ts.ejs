@@ -4,9 +4,11 @@ import { Apollo } from 'apollo-angular';
 import { Subscribable } from 'app/core/util/pub-sub';
 import { AlertService } from 'app/core/util/alert.service';
 import { CACHE_TOKEN, KNOWN_QUERIES_TOKEN } from './graphql.module';
+import { GraphQLCacheWatcher } from 'app/core/util/graphql-cache-watcher';
 
 @Injectable({ providedIn: 'root' })
 export class GraphQLCacheService {
+  private cacheWatcher: GraphQLCacheWatcher;
   private subscriptions: Set<string> = new Set<string>();
 
   constructor(
@@ -16,28 +18,14 @@ export class GraphQLCacheService {
     private cache: InMemoryCache,
     private apollo: Apollo,
     private alert: AlertService
-  ) {}
-
-  connect(): void {
-    this.knownQueries.subscribe(name => {
-      this.watchQuery(name, 'Added', '{ id }');
-      this.watchQuery(name, 'Updated', '{ id }');
-      this.watchQuery(name, 'Deleted');
-    });
+  ) {
+    this.cacheWatcher = new GraphQLCacheWatcher(this.apollo.client,
+                                                this.cache,
+                                                this.knownQueries,
+                                                entity => this.alert.addAlert({ type: 'info', message: `Data for ${entity} has changed. Please Refresh to see the changes.` }));
   }
 
-  private watchQuery(queryName: string, operation: string, selection?: string): void {
-    // TODO: improve entity extraction
-    const entity = queryName.substring(3, queryName.endsWith('s') ? queryName.length - 1 : queryName.length).toLowerCase();
-    const q = `${entity}${operation}`;
-    if (!this.subscriptions.has(q)) {
-      this.subscriptions.add(q);
-      const query = selection ? gql`subscription {${q} ${selection}}` : gql`subscription {${q}}`;
-      this.apollo.subscribe({ query }).subscribe(() => {
-        this.cache.evict({ id: 'ROOT_QUERY', fieldName: queryName });
-        // TODO: do not show alert for self-caused updates
-        this.alert.addAlert({ type: 'info', message: `Data for ${entity} has changed. Please Refresh to see the changes.` });
-      });
-    }
+  connect(): void {
+    this.cacheWatcher.connect();
   }
 }

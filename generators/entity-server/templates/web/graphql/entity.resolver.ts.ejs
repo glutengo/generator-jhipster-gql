@@ -5,7 +5,7 @@ import { PaginationArgs } from './pagination-util';
 import { <%= entityClass %>, Paginated<%= entityClass %>, Create<%= entityClass %>Args, Update<%= entityClass %>Args } from '../../service/graphql/<%= entityFileName %>.object-type';
 import { PageRequest } from '../../domain/base/pagination.entity';
 import { pageRequestToFindManyOptions } from './pagination-util';
-import { PubSubAction, PubSubService } from 'src/service/graphql/pub-sub.service';
+import { PubSubAction, PubSubService } from '../../service/graphql/pub-sub.service';
 
 <%_
 const pkTypeInterface = getPkType(databaseType) === 'Long' ? 'Number' : 'String';

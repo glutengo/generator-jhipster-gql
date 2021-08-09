@@ -19,6 +19,10 @@ const angularFiles = [
                 renameTo: () => `${jHipsterConstants.ANGULAR_DIR}/core/util/pub-sub.ts`
             },
             {
+                file: 'common/core/util/graphql-cache-watcher.ts',
+                renameTo: () => `${jHipsterConstants.ANGULAR_DIR}/core/util/graphql-cache-watcher.ts`
+            },
+            {
                 file: 'angular/graphql/graphql.module.ts',
                 renameTo: () => `${jHipsterConstants.ANGULAR_DIR}/graphql/graphql.module.ts`
             },

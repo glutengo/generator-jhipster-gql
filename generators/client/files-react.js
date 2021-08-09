@@ -3,8 +3,8 @@ const t = require('@babel/types');
 const babelGenerator = require('@babel/generator').default;
 const fs = require('fs');
 const path = require('path');
-const constants = require('../../utils/constants');
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
+const constants = require('../../utils/constants');
 
 const reactFiles = [
     {
@@ -14,13 +14,21 @@ const reactFiles = [
                 renameTo: () => `${jHipsterConstants.REACT_DIR}/modules/administration/user-management/user-management.gql-actions.ts`
             },
             {
-                file: 'react/config/apollo-client.ts',
-                renameTo:() => `${jHipsterConstants.REACT_DIR}/config/apollo-client.ts`
+                file: 'common/config/apollo-client.ts',
+                renameTo: () => `${jHipsterConstants.REACT_DIR}/config/apollo-client.ts`
+            },
+            {
+                file: 'common/core/util/pub-sub.ts',
+                renameTo: () => `${jHipsterConstants.REACT_DIR}/shared/util/pub-sub.ts`
+            },
+            {
+                file: 'common/core/util/graphql-cache-watcher.ts',
+                renameTo: () => `${jHipsterConstants.ANGULAR_DIR}/shared/util/graphql-cache-watcher.ts`
             }
         ]
     },
     {
-        condition: generator => generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL,
+        condition: generator => generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT,
         templates: [
             {
                 file: 'react/webpack/graphql.transformer.js',
@@ -34,7 +42,10 @@ function adjustWebpackConfig(generator) {
     const filePath = path.join('webpack', 'webpack.common.js');
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const ast = babel.parseSync(fileContent);
-    const getTsLoaderRuleDeclarationIndex = ast.program.body.findIndex(e => e.type === 'VariableDeclaration' && e.declarations[0] && e.declarations[0].id && e.declarations[0].id.name === 'getTsLoaderRule');
+    const getTsLoaderRuleDeclarationIndex = ast.program.body.findIndex(
+        e =>
+            e.type === 'VariableDeclaration' && e.declarations[0] && e.declarations[0].id && e.declarations[0].id.name === 'getTsLoaderRule'
+    );
     const getTsLoaderRuleDeclaration = ast.program.body[getTsLoaderRuleDeclarationIndex];
     if (getTsLoaderRuleDeclaration) {
         const rulesDeclaration = babel.parseSync(`
@@ -65,7 +76,7 @@ function adjustProxyConfig(generator, vue = false) {
     );
     const expressionStatement = ast.program.body[expressionStatementIndex];
     if (expressionStatement) {
-        const args = vue ? expressionStatement.expression.right.arguments : expressionStatement.expression.right.body.arguments
+        const args = vue ? expressionStatement.expression.right.arguments : expressionStatement.expression.right.body.arguments;
         const arg = args.find(a => a.type === 'ObjectExpression');
         const devServer = arg.properties.find(p => p.key.name === 'devServer');
         const proxy = devServer.value.properties.find(p => p.key.name === 'proxy');
@@ -87,4 +98,4 @@ module.exports = {
     reactFiles,
     adjustReactFiles,
     adjustProxyConfig
-}
+};

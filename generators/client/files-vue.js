@@ -7,7 +7,7 @@ const jHipsterConstants = require('generator-jhipster/generators/generator-const
 const constants = require('../../utils/constants');
 const { adjustProxyConfig } = require('./files-react');
 const utils = require('../../utils/commons');
-const { replaceServiceProvider } = require('../../utils/vue');
+const { connectCacheWatcherOnCreated, replaceServiceProvider } = require('../../utils/vue');
 
 const vueFiles = [
     {
@@ -17,8 +17,16 @@ const vueFiles = [
                 renameTo: () => `${jHipsterConstants.REACT_DIR}/entities/user/user.gql.service.ts`
             },
             {
-                file: 'react/config/apollo-client.ts',
+                file: 'common/config/apollo-client.ts',
                 renameTo: () => `${jHipsterConstants.VUE_DIR}/shared/config/apollo-client.ts`
+            },
+            {
+                file: 'common/core/util/pub-sub.ts',
+                renameTo: () => `${jHipsterConstants.VUE_DIR}/core/util/pub-sub.ts`
+            },
+            {
+                file: 'common/core/util/graphql-cache-watcher.ts',
+                renameTo: () => `${jHipsterConstants.VUE_DIR}/core/util/graphql-cache-watcher.ts`
             },
             {
                 file: 'vue/shared/graphql/graphql.util.ts',
@@ -55,7 +63,8 @@ function adjustWebpackConfig(generator) {
     const exportDeclaration = ast.program.body[exportDeclarationIndex];
     if (exportDeclaration) {
         const optionKey = 'getCustomTransformers';
-        const optionValue = babel.parseSync('program => ({ before: [ GraphQLTransformer.default.create(program) ] })').program.body[0].expression;
+        const optionValue = babel.parseSync('program => ({ before: [ GraphQLTransformer.default.create(program) ] })')
+            .program.body[0].expression;
         const moduleProperty = exportDeclaration.expression.right.arguments[0].properties.find(p => p.key && p.key.name === 'module');
         if (moduleProperty) {
             const tsLoaderRule = moduleProperty.value.properties[0].value.elements.find(
@@ -97,6 +106,7 @@ function adjustWebpackConfig(generator) {
 
 function adjustMainTs(tsProject) {
     replaceServiceProvider(tsProject, 'user');
+    connectCacheWatcherOnCreated(tsProject);
 }
 
 function adjustVueFiles(generator) {

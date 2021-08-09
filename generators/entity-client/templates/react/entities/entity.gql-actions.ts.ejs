@@ -1,3 +1,6 @@
+<%_
+const ENTITY_CLASS_UPPERCASE = entityClass.toUpperCase();
+%>
 import { client } from 'app/config/apollo-client';
 import { Create<%= entityClass %>Document, Delete<%= entityClass %>Document, Get<%= entityClass %>Document, Get<%= entityClass %>sDocument, Update<%= entityClass %>Document } from 'app/entities/<%= entityFolderName %>/<%= entityFileName %>.gql';
 import { I<%= entityClass %> } from 'app/shared/model/<%= entityFileName %>.model';
@@ -8,7 +11,7 @@ export const getEntities = (page?, size?, sort?) => {
   const payload = client.query({ query: Get<%= entityClass %>sDocument, variables: { page, size, sort } })
     .then(res => ({ data: res.data.result.edges.map(e => e.node), headers: {} }));
   return {
-    type: ACTION_TYPES.FETCH_<%= entityClass %>_LIST,
+    type: ACTION_TYPES.FETCH_<%= ENTITY_CLASS_UPPERCASE %>_LIST,
     payload
   }
 }
@@ -17,7 +20,7 @@ export const getEntity = id => {
   const payload = client.query({ query: Get<%= entityClass %>Document, variables: { id } })
     .then(res => ({data: res.data.result}));
   return {
-    type: ACTION_TYPES.FETCH_<%= entityClass %>,
+    type: ACTION_TYPES.FETCH_<%= ENTITY_CLASS_UPPERCASE %>,
     payload
   }
 }
@@ -25,7 +28,7 @@ export const getEntity = id => {
 export const createEntity: ICrudPutAction<I<%= entityClass %>> = <%= entityInstance %> => async dispatch => {
   const payload = client.mutate({ mutation: Create<%= entityClass %>Document, variables: { <%= entityInstance %> }});
   const result = await dispatch({
-    type: ACTION_TYPES.CREATE_<%= entityClass %>,
+    type: ACTION_TYPES.CREATE_<%= ENTITY_CLASS_UPPERCASE %>,
     payload
   });
   dispatch(getEntities());
@@ -35,7 +38,7 @@ export const createEntity: ICrudPutAction<I<%= entityClass %>> = <%= entityInsta
 export const updateEntity: ICrudPutAction<I<%= entityClass %>> = <%= entityInstance %> => async dispatch => {
   const payload = client.mutate({ mutation: Update<%= entityClass %>Document, variables: { <%= entityInstance %> }});
   const result = await dispatch({
-    type: ACTION_TYPES.UPDATE_<%= entityClass %>,
+    type: ACTION_TYPES.UPDATE_<%= ENTITY_CLASS_UPPERCASE %>,
     payload
   });
   dispatch(getEntities());
@@ -45,7 +48,7 @@ export const updateEntity: ICrudPutAction<I<%= entityClass %>> = <%= entityInsta
 export const deleteEntity: ICrudDeleteAction<I<%= entityClass %>> = login => async dispatch => {
   const payload = client.mutate({ mutation: Delete<%= entityClass %>Document, variables: { login }});
   const result = await dispatch({
-    type: ACTION_TYPES.DELETE_<%= entityClass %>,
+    type: ACTION_TYPES.DELETE_<%= ENTITY_CLASS_UPPERCASE %>,
     payload
   });
   dispatch(getEntities());

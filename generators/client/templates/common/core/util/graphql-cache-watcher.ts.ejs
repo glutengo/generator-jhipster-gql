@@ -1,0 +1,36 @@
+import { ApolloClient, gql, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
+import { Subscribable } from './pub-sub';
+
+export class GraphQLCacheWatcher {
+  private subscriptions: Set<string> = new Set<string>();
+
+  constructor(private client: ApolloClient<NormalizedCacheObject>,
+              private cache: InMemoryCache,
+              private knownQueries: Subscribable<string>,
+              private onEvict: (entity: string) => any = () => {}) {
+
+  }
+
+  connect(): void {
+    this.knownQueries.subscribe(name => {
+      this.watchQuery(name, 'Added', '{ id }');
+      this.watchQuery(name, 'Updated', '{ id }');
+      this.watchQuery(name, 'Deleted');
+    });
+  }
+
+  private watchQuery(queryName: string, operation: string, selection?: string): void {
+    // TODO: improve entity extraction
+    const entity = queryName.substring(3, queryName.endsWith('s') ? queryName.length - 1 : queryName.length).toLowerCase();
+    const q = `${entity}${operation}`;
+    if (!this.subscriptions.has(q)) {
+      this.subscriptions.add(q);
+      const query = selection ? gql`subscription {${q} ${selection}}` : gql`subscription {${q}}`;
+      this.client.subscribe({ query }).subscribe(() => {
+        this.cache.evict({ fieldName: queryName });
+        // TODO: ignore self-caused evictions
+        this.onEvict(entity);
+      });
+    }
+  }
+}

@@ -1,10 +1,33 @@
+<%_
+function getUtilImportPath() {
+  switch (clientFramework) {
+    case 'react':
+      return 'app/shared/util';
+    case 'vue':
+      return '@/core/util';
+    default:
+      return 'app/core/util';
+  }
+}
+const utilImportPath = getUtilImportPath();
+const onEvict = clientFramework === 'react'
+        ? 'entity => toast.info(`Data for ${entity} has changed. Please Refresh to see the changes.`)'
+        : 'entity => app.$root.$bvToast.toast(`Data for ${entity} has changed. Please Refresh to see the changes.`)';
+%>
 import { InMemoryCache, ApolloLink, HttpLink, split, ApolloClient, from } from '@apollo/client';
 import { WebSocketLink } from '@apollo/client/link/ws';
 import { getMainDefinition } from '@apollo/client/utilities';
-import { PubSub } from 'app/core/util/pub-sub';
+<% if (clientFramework === 'vue') { %>
+  import Vue from 'vue';
+<% } %>
+import { PubSub } from '<%= utilImportPath %>/pub-sub';
+import { GraphQLCacheWatcher } from '<%= utilImportPath %>/graphql-cache-watcher';
+<% if (clientFramework === 'react') { %>
+import { toast } from 'react-toastify';
+<% } %>
 
 export const httpUrl = '/graphql';
-// TODO: build this dynamically
+// TODO: build this dynamically (=> https://stackoverflow.com/a/44547904/2202290) problem: Proxy
 export const wsUrl = 'ws://localhost:8081/graphql';
 
 // remove accidentally passed __typename property from variables
@@ -19,7 +42,7 @@ export const omitTypenameLink = new ApolloLink((operation, forward) => {
 // track all queries for caching
 export function createRegisterQueryLink(pubsub: PubSub<string> = new PubSub<string>()): ApolloLink {
   return new ApolloLink((op, forward) => {
-    const { kind, operation, selectionSet } = getMainDefinition(op.query) as any;
+    const { operation, selectionSet } = getMainDefinition(op.query) as any;
     if (operation === 'query') {
       pubsub.publish(selectionSet.selections[0].name.value);
     }
@@ -47,7 +70,24 @@ export function createNetworkLink(httpLink: ApolloLink): ApolloLink {
 
 export const cache = new InMemoryCache();
 
-/** REACT BELOW */
+<% if ((clientFramework === 'react') || (clientFramework === 'vue')) { %>
 const httpLink = new HttpLink({ uri: httpUrl });
 const networkLink = createNetworkLink(httpLink);
-const client = new ApolloClient({ cache, link: from([omitTypenameLink, networkLink]) });
+const pubSub = new PubSub<string>();
+const registerQueryLink = createRegisterQueryLink(pubSub);
+
+export const client = new ApolloClient({ cache, link: from([omitTypenameLink, registerQueryLink, networkLink]) });
+<% } %>
+<% if (clientFramework === 'react') { %>
+const watcher = new GraphQLCacheWatcher(client, cache, pubSub, );
+watcher.connect();
+<% } %>
+<% if (clientFramework === 'vue') { %>
+export function connectGraphQLCacheWatcher(app: Vue): void {
+  const watcher = new GraphQLCacheWatcher(client, cache, pubSub, entity =>
+    app.$root.$bvToast.toast(`Data for ${entity} has changed. Please Refresh to see the changes.`)
+  );
+  watcher.connect();
+}
+<% } %>
+

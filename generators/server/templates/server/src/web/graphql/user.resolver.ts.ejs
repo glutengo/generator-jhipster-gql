@@ -5,7 +5,7 @@ import { PaginationArgs } from './pagination-util';
 import { PageRequest } from '../../domain/base/pagination.entity';
 import { PaginatedUser, User, CreateUserArgs, UpdateUserArgs } from '../../service/graphql/user.object-type';
 import { pageRequestToFindManyOptions } from './pagination-util';
-import { PubSubAction, PubSubService } from 'src/service/graphql/pub-sub.service';
+import { PubSubAction, PubSubService } from '../../service/graphql/pub-sub.service';
 
 @Resolver()
 export class UserResolver {

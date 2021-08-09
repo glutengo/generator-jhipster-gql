@@ -48,7 +48,7 @@ function adjustPackageJSON(generator) {
     devDependenciesStorage.set('@graphql-codegen/typescript', '1.22.0');
 
     if (generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
-        dependenciesStorage.set('graphql-typeop', '0.1.0-SNAPSHOTD');
+        dependenciesStorage.set('graphql-typeop', '0.1.0-SNAPSHOTE');
     } else {
         devDependenciesStorage.set('@graphql-codegen/typescript-operations', '1.17.16');
     }
@@ -78,7 +78,7 @@ function adjustPackageJSON(generator) {
 function writeFiles() {
     return {
         writeGraphQLFiles() {
-            const files = { ...clientFiles };
+            const files = { ...clientFiles };
             if (isAngular(this)) {
                 files.angular = angularFiles;
             }
@@ -102,7 +102,7 @@ function writeFiles() {
             }
             adjustPackageJSON(this);
         }
-    }
+    };
 }
 
 module.exports = {
