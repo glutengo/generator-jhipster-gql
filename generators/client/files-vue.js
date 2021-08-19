@@ -109,6 +109,32 @@ function adjustMainTs(tsProject) {
     connectCacheWatcherOnCreated(tsProject);
 }
 
+function adjustUserManagement(generator) {
+    const tsProject = utils.getTsProject(generator);
+    const filePath = `${jHipsterConstants.VUE_DIR}/admin/user-management/user-management.component.ts`;
+    const component = tsProject.getSourceFile(filePath);
+    const componentClass = component.getClass(() => true);
+    if (componentClass) {
+        const loadAll = componentClass.getMethod('loadAll');
+        if (loadAll && loadAll.getParameters().length === 0) {
+            loadAll.addParameter({ name: 'bypassCache', type: 'boolean', hasQuestionToken: true });
+            const call = utils.getFunctionCall(loadAll, 'retrieve');
+            const objectLiteralExpression = call.getArguments()[0];
+            if (objectLiteralExpression) {
+                objectLiteralExpression.addShorthandPropertyAssignment({ name: 'bypassCache' });
+                const handleSyncList = componentClass.getMethod('handleSyncList');
+                if (handleSyncList) {
+                    const loadAllCall = utils.getFunctionCall(handleSyncList, 'loadAll');
+                    if (loadAllCall && loadAllCall.getArguments().length === 0) {
+                        loadAllCall.addArgument('true');
+                        component.saveSync();
+                    }
+                }
+            }
+        }
+    }
+}
+
 function adjustVueFiles(generator) {
     adjustProxyConfig(generator, true);
     const tsProject = utils.getTsProject(generator);
@@ -116,6 +142,7 @@ function adjustVueFiles(generator) {
     if (generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
         adjustWebpackConfig(generator);
     }
+    adjustUserManagement(generator);
 }
 
 module.exports = {

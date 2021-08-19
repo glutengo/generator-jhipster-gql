@@ -2,7 +2,7 @@ const nodejsConstants = require('generator-jhipster-nodejs/generators/generator-
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
 const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
 const path = require('path');
-const { Project } = require('ts-morph');
+const { Node, Project } = require('ts-morph');
 const constants = require('./constants');
 const { YeomanFileSystem } = require('./yeoman-file-system');
 
@@ -58,6 +58,7 @@ function getClientBaseDir(generator) {
     if (isVue(generator)) {
         return jHipsterConstants.VUE_DIR;
     }
+    return null;
 }
 
 function isNodeJSBlueprint(generator) {
@@ -98,6 +99,48 @@ function copyConfig(from, to, keys) {
 
 const capitalize = s => s && s[0].toUpperCase() + s.slice(1);
 
+function getFunctionCall(method, functionName) {
+    const statements = method.getBody().getDescendantStatements();
+    let result;
+    for (let i = 0; i < statements.length; i++) {
+        const statement = statements[i];
+        if (Node.isExpressionStatement(statement) && Node.isCallExpression(statement.getExpression())) {
+            result = findExpressionWithName(statement, functionName);
+            if (result) {
+                return result;
+            }
+        }
+    }
+    return result;
+}
+
+function getVariableAssignment(method, variableName) {
+    const statements = method.getBody().getDescendantStatements();
+    let result;
+    for (let i = 0; i < statements.length; i++) {
+        const statement = statements[i];
+        if (Node.isVariableStatement(statement)) {
+            result = statement.getDeclarations().find(d => d.getName() === variableName);
+            if (result) {
+                return result;
+            }
+        }
+    }
+    return result;
+}
+
+function findExpressionWithName(expression, name) {
+    if (
+        expression.getExpression &&
+        expression.getExpression() &&
+        expression.getExpression().getName &&
+        expression.getExpression().getName() === name
+    ) {
+        return expression;
+    }
+    return findExpressionWithName(expression.getExpression(), name);
+}
+
 module.exports = {
     addImportIfMissing,
     getClientBaseDir,
@@ -110,5 +153,7 @@ module.exports = {
     saveConfig,
     loadConfig,
     copyConfig,
-    capitalize
+    capitalize,
+    getFunctionCall,
+    getVariableAssignment
 };

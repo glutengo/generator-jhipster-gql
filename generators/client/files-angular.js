@@ -1,14 +1,12 @@
 const babel = require('@babel/core');
 const t = require('@babel/types');
 const babelGenerator = require('@babel/generator').default;
-const { Node } = require('ts-morph');
 const fs = require('fs');
 const path = require('path');
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
 const AngularNeedleClient = require('generator-jhipster/generators/client/needle-api/needle-client-angular');
 const constants = require('../../utils/constants');
 const utils = require('../../utils/commons');
-const { getFunctionCall } = require('../../utils/angular');
 
 const angularFiles = [
     {
@@ -162,16 +160,14 @@ function adjustUserManagement(generator) {
         const loadAll = componentClass.getMethod('loadAll');
         if (loadAll) {
             loadAll.addParameter({ name: 'bypassCache', type: 'boolean', hasQuestionToken: true });
-            const call = getFunctionCall(loadAll, 'query');
-            const objectLiteralExpression = call.getArguments()[0];
-            if (objectLiteralExpression) {
-                objectLiteralExpression.addShorthandPropertyAssignment({ name: 'bypassCache' });
+            const call = utils.getFunctionCall(loadAll, 'query');
+            if (call && call.getArguments()[0]) {
+                call.getArguments()[0].addShorthandPropertyAssignment({ name: 'bypassCache' });
                 component.saveSync();
             }
         }
     }
 
-    // TODO: adjust function call in template
     const templateFilePath = `${jHipsterConstants.ANGULAR_DIR}/admin/user-management/list/user-management.component.html`;
     const template = generator.fs.read(templateFilePath);
     generator.fs.write(templateFilePath, template.replace(/loadAll\(\)/g, 'loadAll(true)'));

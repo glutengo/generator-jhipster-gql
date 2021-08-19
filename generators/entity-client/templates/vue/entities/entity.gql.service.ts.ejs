@@ -23,26 +23,32 @@ import { <%= namedImports.join(', ') %> } from '<%= importSpecifier %>';
 export default class <%= entityAngularName %>Service {
 
   public find(id: <%= pkType %>) : Promise<I<%= entityAngularName %>> {
-    return client.query({ query: <%= FindDocument %>, variables: { id } }).then(res => toHttpResponse(res).data);
+    return client.query({ query: <%= FindDocument %>, variables: { id } })
+      .then(res => toHttpResponse(res).data);
   }
 
   public retrieve(req?: any): Promise<any> {
-    return client.query({ query: <%= GetDocument%>, variables: buildPaginationOptions(req) }).then(res => toPagedHttpResponse(res));
+    return client.query({ query: <%= GetDocument%>, variables: buildPaginationOptions(req), fetchPolicy: req?.bypassCache ? 'no-cache' : 'cache-first' })
+      .then(res => toPagedHttpResponse(res));
   }
 
   public delete(id: <%= pkType %>) : Promise<any> {
-    return client.mutate({ mutation: <%= DeleteDocument %>, variables: { id } }).then(res => toHttpResponse(res).data);
+    return client.mutate({ mutation: <%= DeleteDocument %>, variables: { id } })
+      .then(res => toHttpResponse(res).data);
   }
 
   public create(<%= entityInstance %>: I<%= entityAngularName %>): Promise<I<%= entityAngularName %>> {
-    return client.mutate({ mutation: <%= CreateDocument %>, variables: { <%= entityInstance %> } }).then(res => toHttpResponse(res).data);
+    return client.mutate({ mutation: <%= CreateDocument %>, variables: { <%= entityInstance %> } })
+      .then(res => toHttpResponse(res).data);
   }
 
   public update(<%= entityInstance %>: I<%= entityAngularName %>): Promise<I<%= entityAngularName %>> {
-    return client.mutate({ mutation: <%= UpdateDocument %>, variables: { <%= entityInstance %> } }).then(res => toHttpResponse(res).data);
+    return client.mutate({ mutation: <%= UpdateDocument %>, variables: { <%= entityInstance %> } })
+      .then(res => toHttpResponse(res).data);
   }
 
   public partialUpdate(<%= entityInstance %>: I<%= entityAngularName %>): Promise<I<%= entityAngularName %>> {
-    return client.mutate({ mutation: <%= UpdateDocument %>, variables: { <%= entityInstance %> } }).then(res => toHttpResponse(res).data);
+    return client.mutate({ mutation: <%= UpdateDocument %>, variables: { <%= entityInstance %> } })
+      .then(res => toHttpResponse(res).data);
   }
 }

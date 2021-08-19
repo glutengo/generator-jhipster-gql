@@ -35,6 +35,7 @@ export class GraphQLCacheWatcher {
         this.cache.evict({ fieldName: queryName });
         setTimeout(() => {
           // update UI if data is not updated after waiting for 1 second
+          // TODO: check for paging
           if (!(this.cache as any).data.data.ROOT_QUERY[queryName]) {
             this.onEvict(entity);
           }

@@ -1,6 +1,5 @@
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
 const utils = require('../../utils/commons');
-const { getFunctionCall } = require('../../utils/angular');
 
 const angularFiles = [
     {
@@ -22,7 +21,7 @@ function adjustEntityComponent(generator) {
     if (componentClass) {
         const loadPage = componentClass.getMethod('loadPage');
         if (loadPage) {
-            const call = getFunctionCall(loadPage, 'query');
+            const call = utils.getFunctionCall(loadPage, 'query');
             const objectLiteralExpression = call.getArguments()[0];
             if (objectLiteralExpression) {
                 objectLiteralExpression.addPropertyAssignment({ name: 'bypassCache', initializer: '!dontNavigate' });
