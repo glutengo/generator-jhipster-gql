@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
 const constants = require('../../utils/constants');
+const utils = require('../../utils/commons');
 
 const reactFiles = [
     {
@@ -87,11 +88,43 @@ function adjustProxyConfig(generator, vue = false) {
     }
 }
 
+function adjustUserManagement(generator) {
+    const tsProject = utils.getTsProject(generator);
+    const filePath = `${jHipsterConstants.REACT_DIR}/modules/administration/user-management/user-management.tsx`;
+    const component = tsProject.getSourceFile(filePath);
+    const componentName = 'UserManagement';
+    const functionName = 'getUsersFromProps';
+    const reactComponentStatement = component.getVariableStatement(componentName);
+    const reactComponent = reactComponentStatement && reactComponentStatement.getDeclarations().find(d => d.getName() === componentName);
+    if (reactComponent) {
+        const getUsersFromProps = utils.getVariableAssignment(reactComponent.getInitializer(), functionName);
+        if (getUsersFromProps) {
+            const arrowFunction = getUsersFromProps.getInitializer();
+            arrowFunction.addParameter({ name: 'bypassCache', type: 'boolean', hasQuestionToken: true });
+            const handleSyncList = utils.getVariableAssignment(reactComponent.getInitializer(), 'handleSyncList');
+            if (handleSyncList) {
+                const getUsersFromPropsCall = utils.getFunctionCall(handleSyncList.getInitializer(), functionName);
+                if (getUsersFromPropsCall && getUsersFromPropsCall.getArguments().length === 0) {
+                    getUsersFromPropsCall.addArgument('true');
+
+                    // TODO: move to entity-client-enable because the default action creator only accepts three arguments
+                    const getUsersAsAdminCall = utils.getFunctionCall(getUsersFromProps.getInitializer(), 'getUsersAsAdmin');
+                    if (getUsersAsAdminCall) {
+                        getUsersAsAdminCall.addArgument('bypassCache');
+                        component.saveSync();
+                    }
+                }
+            }
+        }
+    }
+}
+
 function adjustReactFiles(generator) {
     adjustProxyConfig(generator);
     if (generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
         adjustWebpackConfig(generator);
     }
+    adjustUserManagement(generator);
 }
 
 module.exports = {

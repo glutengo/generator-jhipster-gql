@@ -130,15 +130,17 @@ function getVariableAssignment(method, variableName) {
 }
 
 function findExpressionWithName(expression, name) {
-    if (
-        expression.getExpression &&
-        expression.getExpression() &&
-        expression.getExpression().getName &&
-        expression.getExpression().getName() === name
-    ) {
+    if (expression.getText && expression.getText() === name) {
         return expression;
     }
-    return findExpressionWithName(expression.getExpression(), name);
+    const subExpression = expression.getExpression && expression.getExpression();
+    if (subExpression) {
+        if ((subExpression.getName && subExpression.getName() === name) || (subExpression.getText && subExpression.getText() === name)) {
+            return expression;
+        }
+        return findExpressionWithName(expression.getExpression(), name);
+    }
+    return null;
 }
 
 module.exports = {

@@ -4,8 +4,8 @@ import { IUser } from 'app/shared/model/user.model';
 import { ICrudDeleteAction, ICrudPutAction } from 'react-jhipster';
 import { ACTION_TYPES } from './user-management.reducer';
 
-export const getUsersAsAdmin = (page?, size?, sort?) => {
-  const payload = client.query({ query: GetUsersDocument, variables: { page, size, sort } })
+export const getUsersAsAdmin = (page?, size?, sort?, bypassCache?) => {
+  const payload = client.query({ query: GetUsersDocument, variables: { page, size, sort }, fetchPolicy: bypassCache ? 'no-cache' : 'cache-first'  })
     .then(res => ({ data: res.data.result.edges.map(e => e.node), headers: {} }));
   return {
     type: ACTION_TYPES.FETCH_USERS_AS_ADMIN,

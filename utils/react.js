@@ -1,8 +1,9 @@
 const utils = require('./commons');
 
 function replaceImportPath(generator, disable = false) {
-    let oldFileName = generator.entityName === 'user' ? 'user-management.reducer' : `${generator.entityName.toLowerCase()}.reducer`;
-    let newFileName = `${generator.entityName.toLowerCase()}.gql-actions`;
+    const fileName = generator.entityName === 'user' ? 'user-management' : generator.entityName.toLowerCase();
+    let oldFileName = `${fileName}.reducer`;
+    let newFileName = `${fileName}.gql-actions`;
     if (disable) {
         const tmp = oldFileName;
         oldFileName = newFileName;

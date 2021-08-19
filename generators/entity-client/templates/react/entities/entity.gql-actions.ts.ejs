@@ -7,8 +7,8 @@ import { I<%= entityClass %> } from 'app/shared/model/<%= entityFileName %>.mode
 import { ICrudDeleteAction, ICrudPutAction } from 'react-jhipster';
 import { ACTION_TYPES } from './<%= entityFileName %>.reducer';
 
-export const getEntities = (page?, size?, sort?) => {
-  const payload = client.query({ query: Get<%= entityClass %>sDocument, variables: { page, size, sort } })
+export const getEntities = (page?, size?, sort?, bypassCache?) => {
+  const payload = client.query({ query: Get<%= entityClass %>sDocument, variables: { page, size, sort }, fetchPolicy: bypassCache ? 'no-cache' : 'cache-first' })
     .then(res => ({ data: res.data.result.edges.map(e => e.node), headers: {} }));
   return {
     type: ACTION_TYPES.FETCH_<%= ENTITY_CLASS_UPPERCASE %>_LIST,
