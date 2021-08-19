@@ -1,6 +1,6 @@
 const constants = require('../../utils/constants');
 const { isAngular, getClientBaseDir, isReact, isVue } = require('../../utils/commons');
-const { angularFiles } = require('./files-angular');
+const { angularFiles, adjustAngularFiles } = require('./files-angular');
 const { reactFiles } = require('./files-react');
 const { vueFiles } = require('./files-vue');
 
@@ -47,6 +47,11 @@ function writeFiles() {
                 files.vue = vueFiles;
             }
             this.writeFilesToDisk(files, this, false);
+        },
+        adjustFiles() {
+            if (isAngular(this)) {
+                adjustAngularFiles(this);
+            }
         }
     };
 }

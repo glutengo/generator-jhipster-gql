@@ -1,4 +1,5 @@
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
+const { Node } = require('ts-morph');
 const utils = require('./commons');
 
 function addServiceProvider(generator) {
@@ -59,7 +60,6 @@ function removeServiceProvider(generator) {
     const usedClass = `${generator.entityClass}GraphQLService`;
     const variableDeclaration = providers.getVariableDeclaration(() => true);
     const initializer = variableDeclaration.getInitializer();
-    console.log(usedClass);
     const relevantEntries = initializer.getElements().filter(
         obj =>
             obj
@@ -67,7 +67,6 @@ function removeServiceProvider(generator) {
                 .getInitializer()
                 .getText() === usedClass
     );
-    console.log(relevantEntries.length);
     if (relevantEntries.length) {
         relevantEntries.forEach(entry => initializer.removeElement(entry));
         providers.fixUnusedIdentifiers();
@@ -75,7 +74,35 @@ function removeServiceProvider(generator) {
     }
 }
 
+function getFunctionCall(method, functionName) {
+    const statements = method.getBody().getDescendantStatements();
+    let result;
+    for (let i = 0; i < statements.length; i++) {
+        const statement = statements[i];
+        if (Node.isExpressionStatement(statement) && Node.isCallExpression(statement.getExpression())) {
+            result = findExpressionWithName(statement, functionName);
+            if (result) {
+                return result;
+            }
+        }
+    }
+    return null;
+}
+
+function findExpressionWithName(expression, name) {
+    if (
+        expression.getExpression &&
+        expression.getExpression() &&
+        expression.getExpression().getName &&
+        expression.getExpression().getName() === name
+    ) {
+        return expression;
+    }
+    return findExpressionWithName(expression.getExpression(), name);
+}
+
 module.exports = {
     addServiceProvider,
-    removeServiceProvider
+    removeServiceProvider,
+    getFunctionCall
 };

@@ -24,7 +24,6 @@ _%>
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { Pagination } from 'app/core/request/request.model';
 import { map } from 'rxjs/operators';
 import { I<%= entityAngularName %>, get<%= entityAngularName %>Identifier } from 'app/entities/<%= entityFileName %>/<%= entityFileName %>.model';
 import { GraphQLUtils } from 'app/core/util/graphql-util.service';
@@ -44,9 +43,10 @@ export class <%= entityAngularName %>GraphQLService {
               private get<%= entityAngularName %>GQL: Get<%= entityAngularName %>GQL,
               private delete<%= entityAngularName %>GQL: Delete<%= entityAngularName %>GQL) {}
 
-  query(req?: Pagination): Observable<EntityArrayResponseType> {
-    return this.get<%= entityAngularName %>sGQL.fetch(this.graphQLUtils.createGraphQlOption(req)).pipe(
-      map(result => this.graphQLUtils.toPagedHttpResponse(result.data.result)));
+  query(req?: any): Observable<EntityArrayResponseType> {
+    return this.get<%= entityAngularName %>sGQL
+        .fetch(this.graphQLUtils.createGraphQlOption(req), { fetchPolicy: req?.bypassCache ? 'no-cache' : 'cache-first' })
+        .pipe(map(result => this.graphQLUtils.toPagedHttpResponse(result.data.result)));
   }
 
   create(<%= entityInstance %>: I<%= entityAngularName %>): Observable<EntityResponseType> {

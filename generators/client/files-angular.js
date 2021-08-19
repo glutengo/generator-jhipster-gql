@@ -1,11 +1,14 @@
 const babel = require('@babel/core');
 const t = require('@babel/types');
 const babelGenerator = require('@babel/generator').default;
+const { Node } = require('ts-morph');
 const fs = require('fs');
 const path = require('path');
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
 const AngularNeedleClient = require('generator-jhipster/generators/client/needle-api/needle-client-angular');
 const constants = require('../../utils/constants');
+const utils = require('../../utils/commons');
+const { getFunctionCall } = require('../../utils/angular');
 
 const angularFiles = [
     {
@@ -139,9 +142,46 @@ function addGraphQLModuleToAppModule(generator) {
     needleClient.addModule('', 'GraphQL', 'graphql', 'graphql', false, null);
 }
 
+function adjustPagination(generator) {
+    const tsProject = utils.getTsProject(generator);
+    const filePath = `${jHipsterConstants.ANGULAR_DIR}/core/request/request.model.ts`;
+    const requestModel = tsProject.getSourceFile(filePath);
+    const pagination = requestModel.getInterface('Pagination');
+    if (pagination) {
+        pagination.addMember('bypassCache?: boolean');
+        requestModel.saveSync();
+    }
+}
+
+function adjustUserManagement(generator) {
+    const tsProject = utils.getTsProject(generator);
+    const filePath = `${jHipsterConstants.ANGULAR_DIR}/admin/user-management/list/user-management.component.ts`;
+    const component = tsProject.getSourceFile(filePath);
+    const componentClass = component.getClass(() => true);
+    if (componentClass) {
+        const loadAll = componentClass.getMethod('loadAll');
+        if (loadAll) {
+            loadAll.addParameter({ name: 'bypassCache', type: 'boolean', hasQuestionToken: true });
+            const call = getFunctionCall(loadAll, 'query');
+            const objectLiteralExpression = call.getArguments()[0];
+            if (objectLiteralExpression) {
+                objectLiteralExpression.addShorthandPropertyAssignment({ name: 'bypassCache' });
+                component.saveSync();
+            }
+        }
+    }
+
+    // TODO: adjust function call in template
+    const templateFilePath = `${jHipsterConstants.ANGULAR_DIR}/admin/user-management/list/user-management.component.html`;
+    const template = generator.fs.read(templateFilePath);
+    generator.fs.write(templateFilePath, template.replace(/loadAll\(\)/g, 'loadAll(true)'));
+}
+
 function adjustAngularFiles(generator) {
     addGraphQLModuleToAppModule(generator);
+    adjustPagination(generator);
     adjustProxyConfig(generator);
+    adjustUserManagement(generator);
     if (generator.experimentalTransformer) {
         adjustWebpackConfig(generator);
     }

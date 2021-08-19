@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { Pagination } from 'app/core/request/request.model';
+import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Pagination } from 'app/core/request/request.model';
 import { GraphQLUtils } from 'app/core/util/graphql-util.service';
-import { GetUserGQL, GetUsersGQL, CreateUserGQL, DeleteUserGQL } from '<%= typeDefinition === 'TypeScript' ? './user.gql' : '../../graphql' %>';
+import { GetUserGQL, GetUsersGQL, CreateUserGQL, DeleteUserGQL, UpdateUserGQL } from '<%= typeDefinition === 'TypeScript' ? './user.gql' : '../../graphql' %>';
 import { IUser } from 'app/admin/user-management/user-management.model';
-import { from } from 'rxjs';
 import { isPresent } from 'app/core/util/operators';
 import { getUserIdentifier } from './user.model';
+import { CreateUserArgs, UpdateUserArgs } from 'app/graphql';
 
 export type EntityResponseType = HttpResponse<IUser>;
 export type EntityArrayResponseType = HttpResponse<IUser[]>;
@@ -21,19 +21,20 @@ export class UserGraphQLService {
     private getUsersGQL: GetUsersGQL,
     private getUserGQL: GetUserGQL,
     private createUserGQL: CreateUserGQL,
+    private updateUserGQL: UpdateUserGQL,
     private deleteUserGQL: DeleteUserGQL
   ) {
   }
 
   query(req?: Pagination): Observable<EntityArrayResponseType> {
     return this.getUsersGQL
-      .fetch(this.graphQLUtils.createGraphQlOption(req))
+      .fetch(this.graphQLUtils.createGraphQlOption(req), { fetchPolicy: req?.bypassCache ? 'no-cache' : 'cache-first' })
       .pipe(map(result => this.graphQLUtils.toPagedHttpResponse(result.data.result)));
   }
 
   create(user: IUser): Observable<EntityResponseType> {
     return this.createUserGQL
-      .mutate({ user: { email: user.email ?? '', login: user.login ?? '' } })
+      .mutate({ user: user as CreateUserArgs })
       .pipe(map(res => this.graphQLUtils.toHttpResponse(res)));
   }
 
@@ -46,11 +47,11 @@ export class UserGraphQLService {
   }
 
   partialUpdate(user: IUser): Observable<EntityResponseType> {
-    return of(new HttpResponse());
+    return this.update(user);
   }
 
   update(user: IUser): Observable<EntityResponseType> {
-    return of(new HttpResponse());
+    return this.updateUserGQL.mutate({ user: user as UpdateUserArgs }).pipe(map(res => this.graphQLUtils.toHttpResponse(res)));
   }
 
   authorities(): Observable<string[]> {

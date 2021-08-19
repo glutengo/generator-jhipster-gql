@@ -150,25 +150,3 @@ export class DeleteUserGQL extends Apollo.Mutation<DeleteUserMutation, DeleteUse
   }
 }
 <%_ } %>
-
-<%_ if (clientFramework === 'react') {  %>
-export function useGetUsersQuery(options?: Apollo.QueryHookOptions<GetUsersQuery, GetUsersVars>) {
-  return Apollo.useQuery<GetUsersQuery, GetUsersVars>(GetUsersDocument, options);
-}
-
-export function useGetUserQuery(options?: Apollo.QueryHookOptions<GetUserQuery, GetUserVars>) {
-  return Apollo.useQuery<GetUserQuery, GetUserVars>(GetUserDocument, options);
-}
-
-export function useCreateUserMutation(options?: Apollo.MutationHookOptions<CreateUserMutation, CreateUserVars>) {
-  return Apollo.useMutation<CreateUserMutation, CreateUserVars>(CreateUserDocument, options);
-}
-
-export function useUpdateUserMutation(options?: Apollo.MutationHookOptions<UpdateUserMutation, UpdateUserVars>) {
-  return Apollo.useMutation<UpdateUserMutation, UpdateUserVars>(UpdateUserDocument, options);
-}
-
-export function useDeleteUserMutation(options?: Apollo.MutationHookOptions<DeleteUserMutation, DeleteUserVars>) {
-  return Apollo.useMutation<DeleteUserMutation, DeleteUserVars>(DeleteUserDocument, options);
-}
-<%_ } %>

@@ -4,12 +4,13 @@ import { Subscribable } from './pub-sub';
 export class GraphQLCacheWatcher {
   private subscriptions: Set<string> = new Set<string>();
 
-  constructor(private client: ApolloClient<NormalizedCacheObject>,
-              private cache: InMemoryCache,
-              private knownQueries: Subscribable<string>,
-              private onEvict: (entity: string) => any = () => {}) {
-
-  }
+  constructor(
+    private client: ApolloClient<NormalizedCacheObject>,
+    private cache: InMemoryCache,
+    private knownQueries: Subscribable<string>,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    private onEvict: (entity: string) => any = () => {}
+  ) {}
 
   connect(): void {
     this.knownQueries.subscribe(name => {
@@ -17,6 +18,10 @@ export class GraphQLCacheWatcher {
       this.watchQuery(name, 'Updated', '{ id }');
       this.watchQuery(name, 'Deleted');
     });
+  }
+
+  evict(fieldName: string): void {
+    this.cache.evict({fieldName});
   }
 
   private watchQuery(queryName: string, operation: string, selection?: string): void {
@@ -28,8 +33,12 @@ export class GraphQLCacheWatcher {
       const query = selection ? gql`subscription {${q} ${selection}}` : gql`subscription {${q}}`;
       this.client.subscribe({ query }).subscribe(() => {
         this.cache.evict({ fieldName: queryName });
-        // TODO: ignore self-caused evictions
-        this.onEvict(entity);
+        setTimeout(() => {
+          // update UI if data is not updated after waiting for 1 second
+          if (!(this.cache as any).data.data.ROOT_QUERY[queryName]) {
+            this.onEvict(entity);
+          }
+        }, 1000);
       });
     }
   }

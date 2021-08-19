@@ -79,7 +79,8 @@ const registerQueryLink = createRegisterQueryLink(pubSub);
 export const client = new ApolloClient({ cache, link: from([omitTypenameLink, registerQueryLink, networkLink]) });
 <% } %>
 <% if (clientFramework === 'react') { %>
-const watcher = new GraphQLCacheWatcher(client, cache, pubSub, );
+const watcher = new GraphQLCacheWatcher(client, cache, pubSub, entity =>
+  toast.info(`Data for ${entity} has changed. Please Refresh to see the changes.`));
 watcher.connect();
 <% } %>
 <% if (clientFramework === 'vue') { %>
