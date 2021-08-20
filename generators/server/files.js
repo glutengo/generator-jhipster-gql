@@ -16,6 +16,8 @@ const serverFiles = {
                 'server/src/service/graphql/pub-sub.service.ts',
                 'server/src/web/graphql/pagination-util.ts',
                 'server/src/web/graphql/user.resolver.ts',
+                'server/src/security/guards/auth.guard.ts',
+                'server/src/security/decorators/auth-user.decorator.ts',
                 'server/scripts/build-schema.ts'
             ]
         }

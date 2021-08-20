@@ -54,3 +54,7 @@ export const deleteEntity: ICrudDeleteAction<I<%= entityClass %>> = login => asy
   dispatch(getEntities());
   return result;
 }
+
+export const reset = () => ({
+  type: ACTION_TYPES.RESET,
+});

@@ -5,17 +5,17 @@ import { PubSubService } from '../service/graphql/pub-sub.service';
 
 @Global()
 @Module({
-  imports: [
-    NestJSGraphQLModule.forRoot({
-      installSubscriptionHandlers: true,
-      autoSchemaFile: join(process.cwd(), '..', 'server/src/schema.gql'),
-      buildSchemaOptions: {
-        numberScalarMode: 'integer',
-      },
-    })
-  ],
-  providers: [ PubSubService ],
-  exports: [ PubSubService ]
-},
-)
+    imports: [
+        NestJSGraphQLModule.forRoot({
+            installSubscriptionHandlers: true,
+            autoSchemaFile: join(process.cwd(), '..', 'server/src/schema.gql'),
+            buildSchemaOptions: {
+                numberScalarMode: 'integer',
+            },
+            context: (ctx) => ({ req: ctx.req || ctx.connection.context }),
+        }),
+    ],
+    providers: [PubSubService],
+    exports: [PubSubService],
+})
 export class GraphQLModule {}

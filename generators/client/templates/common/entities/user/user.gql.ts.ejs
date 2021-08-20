@@ -96,6 +96,13 @@ class DeleteUserMutation {
   result!: BaseUser;
 }
 
+
+@ObjectType()
+class GetAuthoritiesQuery {
+  @Field<Query>({aliasFor: 'getAuthorities'})
+  result: string[];
+}
+
 const usedClasses = [ CreateUserArgsImpl, UpdateUserArgsImpl ];
 
 export const GetUsersDocument = buildQuery(GetUsersQuery, GetUsersVars);
@@ -103,6 +110,7 @@ export const GetUserDocument = buildQuery(GetUserQuery, GetUserVars);
 export const CreateUserDocument = buildMutation(CreateUserMutation, CreateUserVars);
 export const DeleteUserDocument = buildMutation(DeleteUserMutation, DeleteUserVars);
 export const UpdateUserDocument = buildMutation(UpdateUserMutation, UpdateUserVars);
+export const GetAuthoritiesDocument = buildQuery(GetAuthoritiesQuery);
 
 <%_ if (clientFramework === 'angularX') {  %>
 @Injectable({providedIn: 'root'})
@@ -144,6 +152,15 @@ export class UpdateUserGQL extends Apollo.Mutation<UpdateUserMutation, UpdateUse
 @Injectable({providedIn: 'root'})
 export class DeleteUserGQL extends Apollo.Mutation<DeleteUserMutation, DeleteUserVars> {
   document = DeleteUserDocument;
+
+  constructor(apollo: Apollo.Apollo) {
+    super(apollo);
+  }
+}
+
+@Injectable({providedIn: 'root'})
+export class GetAuthoritiesGQL extends Apollo.Query<GetAuthoritiesQuery> {
+  document = GetAuthoritiesDocument;
 
   constructor(apollo: Apollo.Apollo) {
     super(apollo);

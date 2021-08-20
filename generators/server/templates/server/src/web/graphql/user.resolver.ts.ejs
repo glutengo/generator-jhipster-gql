@@ -1,12 +1,15 @@
 /* eslint-disable id-blacklist */
 import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
 import { UserService } from '../../service/user.service';
 import { PaginationArgs } from './pagination-util';
 import { PageRequest } from '../../domain/base/pagination.entity';
 import { PaginatedUser, User, CreateUserArgs, UpdateUserArgs } from '../../service/graphql/user.object-type';
 import { pageRequestToFindManyOptions } from './pagination-util';
 import { PubSubAction, PubSubService } from '../../service/graphql/pub-sub.service';
+import { AuthGuard, AuthUser, RolesGuard } from 'src/security';
 
+@UseGuards(AuthGuard, RolesGuard)
 @Resolver()
 export class UserResolver {
     constructor(private readonly userService: UserService, private pubSub: PubSubService) {}
@@ -42,6 +45,14 @@ export class UserResolver {
     async deleteUser(@Args('login') login: string): Promise<User> {
         const userToDelete = await this.userService.find({ where: { login } });
         return await this.userService.delete(userToDelete);
+    }
+
+    @Query(() => [String])
+    getAuthorities(@AuthUser() user: any): any {
+        if (!user) {
+            return [];
+        }
+        return user.authorities;
     }
 
     @Subscription(() => User)

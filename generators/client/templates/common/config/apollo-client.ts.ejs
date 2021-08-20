@@ -17,6 +17,7 @@ const onEvict = clientFramework === 'react'
 import { InMemoryCache, ApolloLink, HttpLink, split, ApolloClient, from } from '@apollo/client';
 import { WebSocketLink } from '@apollo/client/link/ws';
 import { getMainDefinition } from '@apollo/client/utilities';
+import { setContext } from '@apollo/client/link/context';
 <% if (clientFramework === 'vue') { %>
   import Vue from 'vue';
 <% } %>
@@ -29,6 +30,16 @@ import { toast } from 'react-toastify';
 export const httpUrl = '/graphql';
 // TODO: build this dynamically (=> https://stackoverflow.com/a/44547904/2202290) problem: Proxy
 export const wsUrl = 'ws://localhost:8081/graphql';
+const AUTHENTICATION_TOKEN_KEY = 'jhi-authenticationToken';
+
+function getToken() {
+  return (localStorage.getItem(AUTHENTICATION_TOKEN_KEY) || sessionStorage.getItem(AUTHENTICATION_TOKEN_KEY) || '').replace(/"/g, '');
+}
+
+function getAuthorizationHeader() {
+  const token = getToken();
+  return token ? `Bearer ${token}` : "";
+}
 
 // remove accidentally passed __typename property from variables
 export const omitTypenameLink = new ApolloLink((operation, forward) => {
@@ -51,17 +62,27 @@ export function createRegisterQueryLink(pubsub: PubSub<string> = new PubSub<stri
   });
 }
 
+// add authentication token
+export const authLink = setContext((op, { headers }) => ({
+  headers: {
+    ...headers,
+    authorization: getAuthorizationHeader(),
+  }
+}));
+
 // split network layer: use webSocket for subscriptions and http for anything else
 export function createNetworkLink(httpLink: ApolloLink): ApolloLink {
-  return split(
-    ({ query }: { query: any }) => {
-      const { kind, operation } = getMainDefinition(query) as any;
-      return kind === 'OperationDefinition' && operation === 'subscription';
-    },
+  return split(op => {
+    const { kind, operation } = getMainDefinition(op.query) as any;
+    return kind === 'OperationDefinition' && operation === 'subscription';
+  },
     new WebSocketLink({
       uri: wsUrl,
       options: {
         reconnect: true,
+        connectionParams: {
+          headers: { authorization: getAuthorizationHeader() }
+        }
       },
     }),
     httpLink
@@ -76,7 +97,7 @@ const networkLink = createNetworkLink(httpLink);
 const pubSub = new PubSub<string>();
 const registerQueryLink = createRegisterQueryLink(pubSub);
 
-export const client = new ApolloClient({ cache, link: from([omitTypenameLink, registerQueryLink, networkLink]) });
+export const client = new ApolloClient({ cache, link: from([omitTypenameLink, registerQueryLink, authLink, networkLink]) });
 <% } %>
 <% if (clientFramework === 'react') { %>
 const watcher = new GraphQLCacheWatcher(client, cache, pubSub, entity =>
