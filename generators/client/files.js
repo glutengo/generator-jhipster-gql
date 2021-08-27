@@ -69,6 +69,9 @@ function adjustPackageJSON(generator) {
             devDependenciesStorage.set('@graphql-codegen/typescript-react-apollo', '2.3.0');
         }
     }
+    if (generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL) {
+        devDependenciesStorage.set('@graphql-codegen/typescript-operations', '1.17.16');
+    }
     if (isReact(generator) || isVue(generator)) {
         scriptsStorage.set('webapp:dev', 'concurrently "npm run codegen:watch" "npm run webpack-dev-server -- --config webpack/webpack.dev.js --inline --port=9060 --env stats=minimal"');
         scriptsStorage.set('webapp:build:dev', 'npm run codegen && npm run webpack -- --config webpack/webpack.dev.js --env stats=minimal');

@@ -1,8 +1,9 @@
 <%_
 const ENTITY_CLASS_UPPERCASE = entityClass.toUpperCase();
+const importPath = typeDefinition === 'GraphQL' ? 'app/graphql' : `app/entities/${entityFolderName}/${entityFileName}.gql`;
 %>
 import { client } from 'app/config/apollo-client';
-import { Create<%= entityClass %>Document, Delete<%= entityClass %>Document, Get<%= entityClass %>Document, Get<%= entityClass %>sDocument, Update<%= entityClass %>Document } from 'app/entities/<%= entityFolderName %>/<%= entityFileName %>.gql';
+import { Create<%= entityClass %>Document, Delete<%= entityClass %>Document, Get<%= entityClass %>Document, Get<%= entityClass %>sDocument, Update<%= entityClass %>Document } from '<%= importPath %>';
 import { I<%= entityClass %> } from 'app/shared/model/<%= entityFileName %>.model';
 import { ICrudDeleteAction, ICrudPutAction } from 'react-jhipster';
 import { ACTION_TYPES } from './<%= entityFileName %>.reducer';

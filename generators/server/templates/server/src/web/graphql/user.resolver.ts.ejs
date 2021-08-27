@@ -8,7 +8,7 @@ import { PaginatedUser, User } from '../../service/graphql/user.object-type';
 import { CreateUserArgs, UpdateUserArgs } from '../../service/graphql/user.input-type';
 import { pageRequestToFindManyOptions } from './pagination-util';
 import { PubSubAction, PubSubService } from '../../service/graphql/pub-sub.service';
-import { AuthGuard, AuthUser, RolesGuard } from 'src/security';
+import { AuthGuard, AuthUser, RolesGuard } from '../../security';
 
 @UseGuards(AuthGuard, RolesGuard)
 @Resolver()

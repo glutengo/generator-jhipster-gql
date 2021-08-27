@@ -1,5 +1,6 @@
+<%_ const importPath = typeDefinition === 'GraphQL' ? 'app/graphql' : 'app/entities/user/user.gql'; _%>
 import { client } from 'app/config/apollo-client';
-import { CreateUserDocument, DeleteUserDocument, GetAuthoritiesDocument, GetUserDocument, GetUsersDocument, UpdateUserDocument } from 'app/entities/user/user.gql';
+import { CreateUserDocument, DeleteUserDocument, GetAuthoritiesDocument, GetUserDocument, GetUsersDocument, UpdateUserDocument } from '<%= importPath %>';
 import { IUser } from 'app/shared/model/user.model';
 import { ICrudDeleteAction, ICrudPutAction } from 'react-jhipster';
 import { ACTION_TYPES } from './user-management.reducer';

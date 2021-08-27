@@ -16,16 +16,19 @@ const onEvict = clientFramework === 'react'
 %>
 import { InMemoryCache, ApolloLink, HttpLink, split, ApolloClient, from } from '@apollo/client';
 import { WebSocketLink } from '@apollo/client/link/ws';
+<%_ if (clientFramework === 'vue' || clientFramework === 'react') { _%>
+import { BatchHttpLink } from '@apollo/client/link/batch-http';
+<%_ } _%>
 import { getMainDefinition } from '@apollo/client/utilities';
 import { setContext } from '@apollo/client/link/context';
-<% if (clientFramework === 'vue') { %>
+<%_ if (clientFramework === 'vue') { _%>
   import Vue from 'vue';
-<% } %>
+<%_ } _%>
 import { PubSub } from '<%= utilImportPath %>/pub-sub';
 import { GraphQLCacheWatcher } from '<%= utilImportPath %>/graphql-cache-watcher';
-<% if (clientFramework === 'react') { %>
+<%_ if (clientFramework === 'react') { _%>
 import { toast } from 'react-toastify';
-<% } %>
+<%_ } _%>
 
 export const httpUrl = '/graphql';
 // TODO: build this dynamically (=> https://stackoverflow.com/a/44547904/2202290) problem: Proxy
@@ -92,7 +95,7 @@ export function createNetworkLink(httpLink: ApolloLink): ApolloLink {
 export const cache = new InMemoryCache();
 
 <% if ((clientFramework === 'react') || (clientFramework === 'vue')) { %>
-const httpLink = new HttpLink({ uri: httpUrl });
+const httpLink = new BatchHttpLink({ uri: httpUrl });
 const networkLink = createNetworkLink(httpLink);
 const pubSub = new PubSub<string>();
 const registerQueryLink = createRegisterQueryLink(pubSub);
