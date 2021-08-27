@@ -1,0 +1,28 @@
+import { User } from 'app/graphql';
+import { ArgsType, ObjectType } from 'graphql-typeop';
+
+@ArgsType()
+export class PaginationVars {
+  page?: number;
+  size?: number;
+  sort?: string;
+}
+
+@ObjectType()
+export class BaseUser implements Partial<User> {
+  id!: number;
+  login!: string;
+}
+
+@ObjectType()
+export class DetailUser extends BaseUser implements Partial<User> {
+  email!: string;
+  langKey!: string;
+  firstName!: string;
+  lastName!: string;
+  createdDate!: Date;
+  lastModifiedDate!: Date;
+  lastModifiedBy!: string;
+  authorities!: string[];
+  activated!: boolean;
+}

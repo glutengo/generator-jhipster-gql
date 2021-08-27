@@ -3,6 +3,7 @@ const { isAngular, getClientBaseDir, isReact, isVue } = require('../../utils/com
 const { angularFiles, adjustAngularFiles } = require('./files-angular');
 const { reactFiles, adjustReactFiles } = require('./files-react');
 const { vueFiles, adjustVueFiles } = require('./files-vue');
+const { adjustCommonFiles } = require('./files-common.js');
 
 module.exports = {
     writeFiles
@@ -58,6 +59,7 @@ function writeFiles() {
             if (isVue(this)) {
                 adjustVueFiles(this);
             }
+            adjustCommonFiles(this);
         }
     };
 }

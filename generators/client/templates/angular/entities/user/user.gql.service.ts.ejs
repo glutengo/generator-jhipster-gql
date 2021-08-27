@@ -4,7 +4,7 @@ import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Pagination } from 'app/core/request/request.model';
 import { GraphQLUtils } from 'app/core/util/graphql-util.service';
-import { GetUserGQL, GetUsersGQL, CreateUserGQL, DeleteUserGQL, UpdateUserGQL } from '<%= typeDefinition === 'TypeScript' ? './user.gql' : '../../graphql' %>';
+import { GetAuthoritiesGQL, GetUserGQL, GetUsersGQL, CreateUserGQL, DeleteUserGQL, UpdateUserGQL } from '<%= typeDefinition === 'TypeScript' ? './user.gql' : '../../graphql' %>';
 import { IUser } from 'app/admin/user-management/user-management.model';
 import { isPresent } from 'app/core/util/operators';
 import { getUserIdentifier } from './user.model';
@@ -18,6 +18,7 @@ export class UserGraphQLService {
 
   constructor(
     private graphQLUtils: GraphQLUtils,
+    private getAuthoritiesGQL: GetAuthoritiesGQL,
     private getUsersGQL: GetUsersGQL,
     private getUserGQL: GetUserGQL,
     private createUserGQL: CreateUserGQL,
@@ -55,7 +56,7 @@ export class UserGraphQLService {
   }
 
   authorities(): Observable<string[]> {
-    return from([]);
+    return this.getAuthoritiesGQL.fetch().pipe(map(res => res.data.result));
   }
 
   addUserToCollectionIfMissing(userCollection: IUser[], ...usersToCheck: (IUser | null | undefined)[]): IUser[] {

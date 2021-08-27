@@ -100,7 +100,7 @@ class DeleteUserMutation {
 @ObjectType()
 class GetAuthoritiesQuery {
   @Field<Query>({aliasFor: 'getAuthorities'})
-  result: string[];
+  result!: string[];
 }
 
 const usedClasses = [ CreateUserArgsImpl, UpdateUserArgsImpl ];

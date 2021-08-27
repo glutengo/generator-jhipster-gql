@@ -1,34 +1,15 @@
 <%_
 const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string';
-const usedClasses = [`Create${entityClass}ArgsImpl`, `Update${entityClass}ArgsImpl`, ...relationships.map(r => `Base${r.otherEntityNameCapitalized}`)];
 const graphQLImport = clientFramework === 'vue' ? '@/graphql' : 'app/graphql';
+const typesImport = clientFramework === 'vue' ? '@/graphql/graphql.common-types' : 'app/graphql/graphql.common-types';
 _%>
 <%_ if (clientFramework === 'angularX') {  %>
 import { Injectable } from '@angular/core';
 import * as Apollo from 'apollo-angular';
 <%_ } %>
-<%_ if (clientFramework === 'react') {  %>
-import * as Apollo from '@apollo/client';
-<%_ } %>
 import { ArgsType, Field, ObjectType, buildQuery, buildMutation } from 'graphql-typeop';
 import { Create<%= entityClass %>ArgsImpl, Mutation, MutationCreate<%= entityClass %>Args, MutationDelete<%= entityClass %>Args, MutationUpdate<%= entityClass %>Args, Paginated<%= entityClass %>, <%= entityClass %>, <%= entityClass %>Edge, Query, QueryGet<%= entityClass %>Args, Update<%= entityClass %>ArgsImpl } from '<%= graphQLImport %>';
-<%_ for (const r of relationships) { _%>
-import { Base<%= r.otherEntityNameCapitalized %> } from '../<%= r.otherEntity.entityFolderName %>/<%= r.otherEntity.entityFileName %>.gql' %>
-<%_ } _%>
-
-@ObjectType()
-export class Base<%= entityClass %> implements Partial<<%= entityClass %>> {
-<%_ for (const field of fields) { _%>
-  <%= field.fieldName%>!: <%= field.tsType %>
-<%_ } _%>
-}
-
-@ObjectType()
-class Detail<%= entityClass %> extends Base<%= entityClass %> implements Partial<<%= entityClass %>> {
-<%_ for (const relationship of relationships) { _%>
-  <%= relationship.relationshipName %>!: Base<%= relationship.otherEntityNameCapitalized %>
-<%_ } _%>
-}
+import { Base<%= entityClass %>, Detail<%= entityClass %>, PaginationVars } from '<%= typesImport %>';
 
 @ArgsType()
 class Get<%= entityClass %>Vars implements QueryGet<%= entityClass %>Args {
@@ -42,8 +23,7 @@ class Get<%= entityClass %>Query {
 }
 
 @ArgsType()
-class Get<%= entityClass %>sVars {
-}
+class Get<%= entityClass %>sVars extends PaginationVars {}
 
 @ObjectType()
 class <%= entityClass %>EdgeResult implements Partial<<%= entityClass %>Edge> {
@@ -95,10 +75,8 @@ class Delete<%= entityClass %>Mutation {
   result!: number;
 }
 
-const usedClasses = [ <%= usedClasses.join(', ')%> ];
-
 export const Get<%= entityClass %>Document = buildQuery(Get<%= entityClass %>Query, Get<%= entityClass %>Vars);
-export const Get<%= entityClass %>sDocument = buildQuery(Get<%= entityClass %>sQuery, Get<%= entityClass %>sQuery);
+export const Get<%= entityClass %>sDocument = buildQuery(Get<%= entityClass %>sQuery, Get<%= entityClass %>sVars);
 export const Create<%= entityClass %>Document = buildMutation(Create<%= entityClass %>Mutation, Create<%= entityClass %>Vars)
 export const Update<%= entityClass %>Document = buildMutation(Update<%= entityClass %>Mutation, Update<%= entityClass %>Vars)
 export const Delete<%= entityClass %>Document = buildMutation(Delete<%= entityClass %>Mutation, Delete<%= entityClass %>Vars)
@@ -147,27 +125,5 @@ export class Delete<%= entityClass %>GQL extends Apollo.Mutation<Delete<%= entit
   constructor(apollo: Apollo.Apollo) {
     super(apollo);
   }
-}
-<%_ } %>
-
-<%_ if (clientFramework === 'react') {  %>
-export function useGet<%= entityClass %>Query(options?: Apollo.QueryHookOptions<Get<%= entityClass %>Query, Get<%= entityClass %>Vars>) {
-  return Apollo.useQuery<Get<%= entityClass %>Query, Get<%= entityClass %>Vars>(Get<%= entityClass %>Document, options);
-}
-
-export function useGet<%= entityClass %>sQuery(options?: Apollo.QueryHookOptions<Get<%= entityClass %>sQuery, Get<%= entityClass %>sVars>) {
-  return Apollo.useQuery<Get<%= entityClass %>sQuery, Get<%= entityClass %>sVars>(Get<%= entityClass %>sDocument, options);
-}
-
-export function useCreate<%= entityClass %>Mutation(options?: Apollo.MutationHookOptions<Create<%= entityClass %>Mutation, Create<%= entityClass %>Vars>) {
-  return Apollo.useMutation<Create<%= entityClass %>Mutation, Create<%= entityClass %>Vars>(Create<%= entityClass %>Document, options);
-}
-
-export function useUpdate<%= entityClass %>Mutation(options?: Apollo.MutationHookOptions<Update<%= entityClass %>Mutation, Update<%= entityClass %>Vars>) {
-  return Apollo.useMutation<Update<%= entityClass %>Mutation, Update<%= entityClass %>Vars>(Update<%= entityClass %>Document, options);
-}
-
-export function useDelete<%= entityClass %>Mutation(options?: Apollo.MutationHookOptions<Delete<%= entityClass %>Mutation, Delete<%= entityClass %>Vars>) {
-  return Apollo.useMutation<Delete<%= entityClass %>Mutation, Delete<%= entityClass %>Vars>(Delete<%= entityClass %>Document, options);
 }
 <%_ } %>

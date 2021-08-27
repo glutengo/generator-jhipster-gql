@@ -32,11 +32,11 @@ export const httpUrl = '/graphql';
 export const wsUrl = 'ws://localhost:8081/graphql';
 const AUTHENTICATION_TOKEN_KEY = 'jhi-authenticationToken';
 
-function getToken() {
-  return (localStorage.getItem(AUTHENTICATION_TOKEN_KEY) || sessionStorage.getItem(AUTHENTICATION_TOKEN_KEY) || '').replace(/"/g, '');
+function getToken(): string {
+  return (localStorage.getItem(AUTHENTICATION_TOKEN_KEY) ?? sessionStorage.getItem(AUTHENTICATION_TOKEN_KEY) ?? '').replace(/"/g, '');
 }
 
-function getAuthorizationHeader() {
+function getAuthorizationHeader(): string {
   const token = getToken();
   return token ? `Bearer ${token}` : "";
 }

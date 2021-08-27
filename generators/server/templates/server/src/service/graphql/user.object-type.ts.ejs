@@ -1,29 +1,16 @@
 /* eslint-disable max-classes-per-file*/
+<%_ const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string'; _%>
 import { Paginated } from './paginated.object-type';
 import { UserDTO } from '../dto/user.dto';
-import { InputType, Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, PartialType } from '@nestjs/graphql';
 
 @ObjectType()
-@InputType('UserInput')
-export class User extends UserDTO {
-  @Field({nullable: true})
-  login: string;
-  @Field({nullable: true})
-  email: string;
-  @Field({nullable: true})
-  id?: number;
-}
+export class PartialUser extends PartialType(UserDTO) {}
 
-@InputType()
-export class CreateUserArgs extends User {
-  @Field({nullable: true})
-  password: string;
-}
-
-@InputType()
-export class UpdateUserArgs extends User {
-  @Field({nullable: true})
-  password: string;
+@ObjectType()
+export class User extends PartialUser {
+    @Field({ nullable: true })
+    id?: <%= pkType %>;
 }
 
 @ObjectType()

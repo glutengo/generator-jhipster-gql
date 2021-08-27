@@ -1,0 +1,42 @@
+/* eslint-disable max-classes-per-file */
+<%_ const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string'; _%>
+<%_ const unownedRelationships = relationships.filter(r => !r.ownerSide).map(r => `'${r.relationshipName}'`); %>
+import { Field, HideField, InputType, OmitType, PartialType } from '@nestjs/graphql';
+import { <%= entityClass %>DTO } from '../dto/<%= entityFileName %>.dto' %>
+<%_ for (const r of relationships) { _%>
+import { <%= r.otherEntity.entityClass %>DTO } from '../dto/<%= r.otherEntity.entityFileName %>.dto' %>
+import { <%= r.otherEntity.entityClass %>Reference } from './<%= r.otherEntity.entityFileName %>.input-type' %>
+<%_ } _%>
+
+@InputType()
+class Full<%= entityClass %>Input extends <%= entityClass %>DTO {}
+
+@InputType()
+class Partial<%= entityClass %>Input extends OmitType(PartialType(Full<%= entityClass %>Input), [ <%- unownedRelationships.join(', ') %> ]) {
+<%_ for (const r of relationships) { _%>
+  <%_ if (r.ownerSide) { _%>
+    @Field(() => <%= r.otherEntity.entityClass %>Reference)
+    <%= r.relationshipName %>: <%= r.otherEntity.entityClass %>DTO;
+  <%_ } else { _%>
+    @HideField()
+    <%= r.relationshipName %> = []
+  <%_ } _%>
+<%_ } _%>
+}
+
+@InputType()
+export class <%= entityClass %>Reference extends Partial<%= entityClass %>Input {
+    id: <%= pkType %>;
+}
+
+@InputType()
+export class Create<%= entityClass %>Args extends Partial<%= entityClass %>Input {
+<%_ for (const f of fields.filter(f => !f.id)) { _%>
+    <%= f.fieldName %>: <%= f.tsType %>;
+<%_ } _%>
+}
+
+@InputType()
+export class Update<%= entityClass %>Args extends Create<%= entityClass %>Args {
+    id: <%= pkType %>;
+}

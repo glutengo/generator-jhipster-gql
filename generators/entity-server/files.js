@@ -13,6 +13,10 @@ const serverFiles = {
                     renameTo: generator => `server/src/web/graphql/${generator.entityFileName}.resolver.ts`
                 },
                 {
+                    file: 'service/graphql/entity.input-type.ts',
+                    renameTo: generator => `server/src/service/graphql/${generator.entityFileName}.input-type.ts`
+                },
+                {
                     file: 'service/graphql/entity.object-type.ts',
                     renameTo: generator => `server/src/service/graphql/${generator.entityFileName}.object-type.ts`
                 }
@@ -79,8 +83,8 @@ function adjustEntityDTO(generator) {
     if (added) {
         // add class decorators
         const _class = dto.getClass(() => true);
-        _class.addDecorator({ name: 'ObjectType', arguments: [] });
-        _class.addDecorator({ name: 'InputType', arguments: [`'_${generator.entityClass}'`] });
+        _class.addDecorator({ name: 'ObjectType', arguments: ['{ isAbstract: true }'] });
+        _class.addDecorator({ name: 'InputType', arguments: ['{ isAbstract: true }'] });
     }
     dto.saveSync();
 }

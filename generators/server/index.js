@@ -1,4 +1,5 @@
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
+const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
 const { writeFiles } = require('./files');
 const utils = require('../../utils/commons');
 const { askForEndpoint, askForSchemaLocation } = require('../../utils/prompts');
@@ -10,6 +11,7 @@ module.exports = class extends BaseGenerator {
     get initializing() {
         utils.loadConfig(this);
         utils.loadConfig(this, this.options.context);
+        this.databaseType = this.config.get(OptionNames.DATABASE_TYPE);
     }
 
     get prompting() {

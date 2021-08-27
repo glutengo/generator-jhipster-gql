@@ -12,6 +12,7 @@ const serverFiles = {
             templates: [
                 'server/src/module/graphql.module.ts',
                 'server/src/service/graphql/paginated.object-type.ts',
+                'server/src/service/graphql/user.input-type.ts',
                 'server/src/service/graphql/user.object-type.ts',
                 'server/src/service/graphql/pub-sub.service.ts',
                 'server/src/web/graphql/pagination-util.ts',
@@ -105,10 +106,10 @@ function adjustBaseDTO(tsProject) {
     if (added) {
         // add class decorators
         const _class = dto.getClass(() => true);
-        _class.addDecorator({ name: 'ObjectType', arguments: [] });
-        _class.addDecorator({ name: 'InputType', arguments: [] });
+        _class.addDecorator({ name: 'ObjectType', arguments: ['{ isAbstract: true }'] });
+        _class.addDecorator({ name: 'InputType', arguments: ['{ isAbstract: true }'] });
         // add id decorator
-        _class.getInstanceProperty('id').addDecorator({ name: 'Field', arguments: [`{nullable: false}`] });
+        _class.getInstanceProperty('id').addDecorator({ name: 'Field', arguments: ['{nullable: false}'] });
     }
     dto.saveSync();
 }
@@ -125,13 +126,12 @@ function adjustUserDTO(tsProject) {
     if (added) {
         // add class decorators
         const _class = dto.getClass(() => true);
-        _class.addDecorator({ name: 'ObjectType', arguments: [] });
-        _class.addDecorator({ name: 'InputType', arguments: [`'_User'`] });
+        _class.addDecorator({ name: 'ObjectType', arguments: ['{ isAbstract: true }'] });
+        _class.addDecorator({ name: 'InputType', arguments: ['{ isAbstract: true }'] });
         // adjust type of authorities
-        _class.getInstanceProperty('authorities').setType(`string[]`);
+        _class.getInstanceProperty('authorities').setType('string[]');
         // add password decorator
         _class.getInstanceProperty('password').addDecorator({ name: 'HideField', arguments: [] });
-
     }
     dto.saveSync();
 }
@@ -161,10 +161,7 @@ function adjustNestCLIJSON(generator) {
         const nestCLIPlugin = {
             name: constants.NESTJS_GRAPHQL_PLUGIN,
             options: {
-                typeFileNameSuffix: [
-                    '.dto.ts',
-                    '.entity.ts'
-                ]
+                typeFileNameSuffix: ['.dto.ts', '.entity.ts', '.input-type.ts', '.object-type.ts']
             }
         };
         compilerOptions.plugins.push(nestCLIPlugin);

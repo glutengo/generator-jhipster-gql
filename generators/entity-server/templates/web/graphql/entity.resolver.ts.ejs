@@ -2,7 +2,8 @@
 import { Args, Query, Resolver, Mutation, Subscription } from '@nestjs/graphql';
 import { <%= entityClass %>Service } from '../../service/<%= entityFileName %>.service';
 import { PaginationArgs } from './pagination-util';
-import { <%= entityClass %>, Paginated<%= entityClass %>, Create<%= entityClass %>Args, Update<%= entityClass %>Args } from '../../service/graphql/<%= entityFileName %>.object-type';
+import { Create<%= entityClass %>Args, Update<%= entityClass %>Args } from '../../service/graphql/<%= entityFileName %>.input-type';
+import { <%= entityClass %>, Paginated<%= entityClass %> } from '../../service/graphql/<%= entityFileName %>.object-type';
 import { PageRequest } from '../../domain/base/pagination.entity';
 import { pageRequestToFindManyOptions } from './pagination-util';
 import { PubSubAction, PubSubService } from '../../service/graphql/pub-sub.service';

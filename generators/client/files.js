@@ -18,6 +18,10 @@ const clientFiles = {
             condition: generator => generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT,
             templates: [
                 {
+                    file: 'common/graphql/graphql.common-types.ts',
+                    renameTo: generator => `${getClientBaseDir(generator)}/graphql/graphql.common-types.ts`
+                },
+                {
                     file: 'common/entities/user/user.gql.ts',
                     renameTo: generator => `${getClientBaseDir(generator)}/entities/user/user.gql.ts`
                 }
@@ -48,7 +52,7 @@ function adjustPackageJSON(generator) {
     devDependenciesStorage.set('@graphql-codegen/typescript', '1.22.0');
 
     if (generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
-        dependenciesStorage.set('graphql-typeop', '0.1.0-SNAPSHOTE');
+        dependenciesStorage.set('graphql-typeop', '0.2.0-SNAPSHOTG');
     } else {
         devDependenciesStorage.set('@graphql-codegen/typescript-operations', '1.17.16');
     }

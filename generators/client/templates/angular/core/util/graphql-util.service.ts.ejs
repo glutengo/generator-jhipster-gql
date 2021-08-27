@@ -31,12 +31,9 @@ export class GraphQLUtils {
   }
 
   createGraphQlOption(req?: Pagination): any {
-    if (req) {
-      return {
-        page: req.page,
-        size: req.size,
-        sort: req.sort[0],
-      };
+    return {
+      ...req,
+      sort: req?.sort && req.sort.join(',')
     }
   }
 }
