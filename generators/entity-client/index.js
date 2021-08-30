@@ -11,12 +11,10 @@ module.exports = class extends BaseGenerator {
         this.entityFolderName = this.options.entityConfig.entityFolderName;
         this.entityModelFileName = this.options.entityConfig.entityModelFileName;
         this.entityName = this.options.entityConfig.name;
-        this.entityNamePlural = pluralize(this.entityName);
+        this.entityNamePlural = this.upperFirstCamelCase(pluralize(this.entityName));
         this.entityInstancePlural = pluralize(this.entityInstance);
 
         this.entityAngularName = this.entityClass + this.upperFirstCamelCase(this.options.entityConfig.entityAngularJSSuffix);
-        this.entityAngularNamePlural = pluralize(this.entityAngularName);
-        this.entityReactName = this.entityClass + this.upperFirstCamelCase(this.options.entityConfig.entityAngularJSSuffix);
 
         this.fields = this.options.entityConfig.fields;
         this.relationships = this.options.entityConfig.relationships;

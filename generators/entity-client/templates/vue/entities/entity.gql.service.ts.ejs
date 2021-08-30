@@ -2,7 +2,7 @@
 const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string';
 const CreateDocument = `Create${entityAngularName}Document`;
 const FindDocument = `Get${entityAngularName}Document`;
-const GetDocument = `Get${entityAngularName}sDocument`;
+const GetDocument = `Get${entityNamePlural}Document`;
 const DeleteDocument = `Delete${entityAngularName}Document`;
 const UpdateDocument = `Update${entityAngularName}Document`;
 const namedImports = [ CreateDocument, FindDocument, GetDocument, DeleteDocument, UpdateDocument ];
@@ -11,7 +11,7 @@ let createVars, updateVars;
 if (typeDefinition === 'TypeScript') {
     importSpecifier = `./${entityFileName}.gql`;
 } else {
-    importSpecifier = '../../../graphql';
+    importSpecifier = '@/graphql';
 }
 _%>
 

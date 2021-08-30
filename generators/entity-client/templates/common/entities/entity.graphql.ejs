@@ -1,5 +1,5 @@
 <%_
-const listQueryName = `get${entityClass}s`;
+const listQueryName = `get${entityNamePlural}`;
 const pkType = getPkType(databaseType) === 'Long' ? 'Int' : 'String';
 const findQueryName = `get${entityClass}`;
 const deleteMutationName = `delete${entityClass}`;
@@ -7,8 +7,8 @@ const createMutationName = `create${entityClass}`;
 const updateMutationName = `update${entityClass}`;
 _%>
 
-query <%= listQueryName %> {
-    result: <%= listQueryName %> {
+query <%= listQueryName %>($page: Int, $size: Int, $sort: String) {
+    result: <%= listQueryName %>(page: $page, size: $size, sort: $sort) {
         edges {
             node {
                 ...Detail<%= entityClass %>

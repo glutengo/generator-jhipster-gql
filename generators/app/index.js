@@ -44,13 +44,15 @@ module.exports = class extends BaseGenerator {
         const subGenerators = ['../server', '../client'];
         const context = { ...this.context };
         utils.copyConfig(this, context, [constants.CONFIG_KEY_ENDPOINT, constants.CONFIG_KEY_SCHEMA_LOCATION]);
-        subGenerators.forEach(gen => this.composeWith(require.resolve(gen), {
-            context,
-            skipInstall: this.options.skipInstall,
-            fromCli: true,
-            force: this.options.force,
-            debug: this.configOptions.isDebugEnabled
-        }));
+        subGenerators.forEach(gen =>
+            this.composeWith(require.resolve(gen), {
+                context,
+                skipInstall: this.options.skipInstall,
+                fromCli: true,
+                force: this.options.force,
+                debug: this.configOptions.isDebugEnabled
+            })
+        );
     }
 
     async prompting() {

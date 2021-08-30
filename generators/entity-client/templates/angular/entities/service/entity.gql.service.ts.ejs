@@ -2,7 +2,7 @@
 const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string';
 const namedImports = [
     `Create${entityAngularName}GQL`,
-    `Get${entityAngularName}sGQL`,
+    `Get${entityNamePlural}GQL`,
     `Get${entityAngularName}GQL`,
     `Delete${entityAngularName}GQL`,
     `Update${entityAngularName}GQL`
@@ -39,12 +39,12 @@ export class <%= entityAngularName %>GraphQLService {
   constructor(private graphQLUtils: GraphQLUtils,
               private create<%= entityAngularName %>GQL: Create<%= entityAngularName %>GQL,
               private update<%= entityAngularName %>GQL: Update<%= entityAngularName %>GQL,
-              private get<%= entityAngularName %>sGQL: Get<%= entityAngularName %>sGQL,
+              private get<%= entityNamePlural %>GQL: Get<%= entityNamePlural %>GQL,
               private get<%= entityAngularName %>GQL: Get<%= entityAngularName %>GQL,
               private delete<%= entityAngularName %>GQL: Delete<%= entityAngularName %>GQL) {}
 
   query(req?: any): Observable<EntityArrayResponseType> {
-    return this.get<%= entityAngularName %>sGQL
+    return this.get<%= entityNamePlural %>GQL
         .fetch(this.graphQLUtils.createGraphQlOption(req), { fetchPolicy: req?.bypassCache ? 'no-cache' : 'cache-first' })
         .pipe(map(result => this.graphQLUtils.toPagedHttpResponse(result.data.result)));
   }

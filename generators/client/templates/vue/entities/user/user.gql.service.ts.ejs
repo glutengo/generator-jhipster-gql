@@ -1,9 +1,10 @@
 <%_
 const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string';
+const importPath = typeDefinition === 'GraphQL' ? '@/graphql' : '@/entities/user/user.gql';
 %>
 import axios from 'axios';
 import { client } from '@/shared/config/apollo-client';
-import { CreateUserDocument, DeleteUserDocument, GetUserDocument, GetUsersDocument, UpdateUserDocument } from '@/entities/user/user.gql';
+import { CreateUserDocument, DeleteUserDocument, GetUserDocument, GetUsersDocument, UpdateUserDocument } from '<%= importPath %>';
 import { buildPaginationOptions, toHttpResponse, toPagedHttpResponse } from '@/shared/graphql/graphql.util';
 
 export default class UserGraphQLService {

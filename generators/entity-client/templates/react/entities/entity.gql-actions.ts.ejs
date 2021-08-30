@@ -3,13 +3,13 @@ const ENTITY_CLASS_UPPERCASE = entityClass.toUpperCase();
 const importPath = typeDefinition === 'GraphQL' ? 'app/graphql' : `app/entities/${entityFolderName}/${entityFileName}.gql`;
 %>
 import { client } from 'app/config/apollo-client';
-import { Create<%= entityClass %>Document, Delete<%= entityClass %>Document, Get<%= entityClass %>Document, Get<%= entityClass %>sDocument, Update<%= entityClass %>Document } from '<%= importPath %>';
+import { Create<%= entityClass %>Document, Delete<%= entityClass %>Document, Get<%= entityClass %>Document, Get<%= entityNamePlural %>Document, Update<%= entityClass %>Document } from '<%= importPath %>';
 import { I<%= entityClass %> } from 'app/shared/model/<%= entityFileName %>.model';
 import { ICrudDeleteAction, ICrudPutAction } from 'react-jhipster';
 import { ACTION_TYPES } from './<%= entityFileName %>.reducer';
 
 export const getEntities = (page?, size?, sort?, bypassCache?) => {
-  const payload = client.query({ query: Get<%= entityClass %>sDocument, variables: { page, size, sort }, fetchPolicy: bypassCache ? 'no-cache' : 'cache-first' })
+  const payload = client.query({ query: Get<%= entityNamePlural %>Document, variables: { page, size, sort }, fetchPolicy: bypassCache ? 'no-cache' : 'cache-first' })
     .then(res => ({ data: res.data.result.edges.map(e => e.node), headers: {} }));
   return {
     type: ACTION_TYPES.FETCH_<%= ENTITY_CLASS_UPPERCASE %>_LIST,

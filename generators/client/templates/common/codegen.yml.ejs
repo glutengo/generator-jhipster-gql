@@ -13,7 +13,7 @@ generates:
 <%_ if (typeDefinition === 'GraphQL' && clientFramework === 'angularX') {  %>
       - 'typescript-apollo-angular'
 <%_ } %>
-<%_ if (typeDefinition === 'GraphQL' && clientFramework === 'react') {  %>
+<%_ if (typeDefinition === 'GraphQL' && (clientFramework === 'react' || clientFramework === 'vue')) {  %>
       - 'typescript-react-apollo'
 <%_ } %>
 <%_ if (typeDefinition === 'TypeScript') {  %>
@@ -22,3 +22,4 @@ generates:
     config:
       skipTypename: true
       maybeValue: T | undefined
+      withHooks: false

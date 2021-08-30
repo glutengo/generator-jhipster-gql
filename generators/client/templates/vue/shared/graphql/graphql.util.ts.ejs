@@ -11,11 +11,8 @@ export function toPagedHttpResponse(response) {
 }
 
 export function buildPaginationOptions(req) {
-    if (req) {
-        return {
-            page: req.page,
-            size: req.size,
-            sort: req.sort[0],
-        };
+    return {
+        ...req,
+        sort: req?.sort && req.sort.join(',')
     }
 }

@@ -10,7 +10,7 @@ function replaceServiceProvider(tsProject, entityName, disable = false) {
     const addedImport = utils.addImportIfMissing(
         content,
         {
-            moduleSpecifier: `@/entities/${entityName}/${entityName}${disable ? '' : '.gql'}.service`,
+            moduleSpecifier: `@/entities/${entityName.toLowerCase()}/${entityName.toLowerCase()}${disable ? '' : '.gql'}.service`,
             namedImport: serviceName
         },
         true

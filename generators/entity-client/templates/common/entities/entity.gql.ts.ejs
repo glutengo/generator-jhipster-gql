@@ -23,7 +23,7 @@ class Get<%= entityClass %>Query {
 }
 
 @ArgsType()
-class Get<%= entityClass %>sVars extends PaginationVars {}
+class Get<%= entityNamePlural %>Vars extends PaginationVars {}
 
 @ObjectType()
 class <%= entityClass %>EdgeResult implements Partial<<%= entityClass %>Edge> {
@@ -31,15 +31,15 @@ class <%= entityClass %>EdgeResult implements Partial<<%= entityClass %>Edge> {
 }
 
 @ObjectType()
-class Get<%= entityClass %>sResult implements Partial<Paginated<%= entityClass %>> {
+class Get<%= entityNamePlural %>Result implements Partial<Paginated<%= entityClass %>> {
   edges!: <%= entityClass %>EdgeResult[];
   totalCount?: number;
 }
 
 @ObjectType()
-class Get<%= entityClass %>sQuery {
-  @Field<Query, Get<%= entityClass %>sVars>({aliasFor: 'get<%= entityClass %>s'})
-  result!: Get<%= entityClass %>sResult;
+class Get<%= entityNamePlural %>Query {
+  @Field<Query, Get<%= entityNamePlural %>Vars>({aliasFor: 'get<%= entityNamePlural %>'})
+  result!: Get<%= entityNamePlural %>Result;
 }
 
 @ArgsType()
@@ -76,7 +76,7 @@ class Delete<%= entityClass %>Mutation {
 }
 
 export const Get<%= entityClass %>Document = buildQuery(Get<%= entityClass %>Query, Get<%= entityClass %>Vars);
-export const Get<%= entityClass %>sDocument = buildQuery(Get<%= entityClass %>sQuery, Get<%= entityClass %>sVars);
+export const Get<%= entityNamePlural %>Document = buildQuery(Get<%= entityNamePlural %>Query, Get<%= entityNamePlural %>Vars);
 export const Create<%= entityClass %>Document = buildMutation(Create<%= entityClass %>Mutation, Create<%= entityClass %>Vars)
 export const Update<%= entityClass %>Document = buildMutation(Update<%= entityClass %>Mutation, Update<%= entityClass %>Vars)
 export const Delete<%= entityClass %>Document = buildMutation(Delete<%= entityClass %>Mutation, Delete<%= entityClass %>Vars)
@@ -92,8 +92,8 @@ export class Get<%= entityClass %>GQL extends Apollo.Query<Get<%= entityClass %>
 }
 
 @Injectable({ providedIn: 'root'})
-export class Get<%= entityClass %>sGQL extends Apollo.Query<Get<%= entityClass %>sQuery, Get<%= entityClass %>sVars> {
-  document = Get<%= entityClass %>sDocument;
+export class Get<%= entityNamePlural %>GQL extends Apollo.Query<Get<%= entityNamePlural %>Query, Get<%= entityNamePlural %>Vars> {
+  document = Get<%= entityNamePlural %>Document;
 
   constructor(apollo: Apollo.Apollo) {
     super(apollo);

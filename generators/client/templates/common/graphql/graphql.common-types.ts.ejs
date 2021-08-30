@@ -1,5 +1,8 @@
-import { User } from 'app/graphql';
+<%_
+const importPath = clientFramework === 'vue' ? '@/graphql' : 'app/graphql';
+_%>
 import { ArgsType, ObjectType } from 'graphql-typeop';
+import { User } from '<%= importPath %>';
 
 @ArgsType()
 export class PaginationVars {

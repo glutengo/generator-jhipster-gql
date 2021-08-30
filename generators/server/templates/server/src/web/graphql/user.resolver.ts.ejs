@@ -11,7 +11,7 @@ import { PubSubAction, PubSubService } from '../../service/graphql/pub-sub.servi
 import { AuthGuard, AuthUser, RolesGuard } from '../../security';
 
 @UseGuards(AuthGuard, RolesGuard)
-@Resolver()
+@Resolver(() => User)
 export class UserResolver {
     constructor(private readonly userService: UserService, private pubSub: PubSubService) {}
 

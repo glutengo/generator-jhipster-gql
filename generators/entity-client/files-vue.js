@@ -19,7 +19,7 @@ function adjustEntityComponent(generator) {
     const component = tsProject.getSourceFile(filePath);
     const componentClass = component.getClass(() => true);
     if (componentClass) {
-        const retrieveAllName = `retrieveAll${utils.capitalize(generator.entityNamePlural)}`;
+        const retrieveAllName = `retrieveAll${generator.entityNamePlural}`;
         const retrieveAll = componentClass.getMethod(retrieveAllName);
         if (retrieveAll && retrieveAll.getParameters().length === 0) {
             retrieveAll.addParameter({ name: 'bypassCache', type: 'boolean', hasQuestionToken: true });

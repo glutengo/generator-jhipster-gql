@@ -1,4 +1,5 @@
 /* eslint-disable id-blacklist */
+import { UseGuards } from '@nestjs/common';
 import { Args, Query, Resolver, Mutation, Subscription } from '@nestjs/graphql';
 import { <%= entityClass %>Service } from '../../service/<%= entityFileName %>.service';
 import { PaginationArgs } from './pagination-util';
@@ -7,18 +8,20 @@ import { <%= entityClass %>, Paginated<%= entityClass %> } from '../../service/g
 import { PageRequest } from '../../domain/base/pagination.entity';
 import { pageRequestToFindManyOptions } from './pagination-util';
 import { PubSubAction, PubSubService } from '../../service/graphql/pub-sub.service';
+import { AuthGuard, RolesGuard } from '../../security';
 
 <%_
 const pkTypeInterface = getPkType(databaseType) === 'Long' ? 'Number' : 'String';
 const pkType = pkTypeInterface.toLowerCase();
 _%>
 
-@Resolver()
+@UseGuards(AuthGuard, RolesGuard)
+@Resolver(() => <%= entityClass %>)
 export class <%= entityClass %>Resolver {
 constructor(private <%= asEntity(entityInstance) %>Service: <%= entityClass %>Service, private pubSub: PubSubService) {}
 
   @Query(() => Paginated<%= entityClass %>)
-  async get<%= entityClass %>s(@Args() options: PaginationArgs): Promise<Paginated<%= entityClass %>> {
+  async get<%= entityNamePlural %>(@Args() options: PaginationArgs): Promise<Paginated<%= entityClass %>> {
     const pageRequest: PageRequest = new PageRequest(options.page, options.size, options.sort);
     return this.<%= asEntity(entityInstance) %>Service.findAndCount(pageRequestToFindManyOptions(pageRequest))
         .then(([results, count]) => new Paginated<%= entityClass %>(results, count, true));
