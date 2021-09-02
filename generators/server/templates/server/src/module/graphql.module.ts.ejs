@@ -8,7 +8,7 @@ import { PubSubService } from '../service/graphql/pub-sub.service';
     imports: [
         NestJSGraphQLModule.forRoot({
             installSubscriptionHandlers: true,
-            autoSchemaFile: join(process.cwd(), '..', 'server/src/schema.gql'),
+            autoSchemaFile: join(process.cwd(), '..', '<%= schemaLocation %>'),
             buildSchemaOptions: {
                 numberScalarMode: 'integer',
             },

@@ -48,8 +48,10 @@ function adjustPackageJSON(generator) {
     // TODO: versions?
     dependenciesStorage.set('graphql', '15.5.0');
     dependenciesStorage.set('@apollo/client', '3.3.19');
+    dependenciesStorage.set('pluralize', '8.0.0');
     devDependenciesStorage.set('@graphql-codegen/cli', '1.21.4');
     devDependenciesStorage.set('@graphql-codegen/typescript', '1.22.0');
+    dependenciesStorage.set('@types/pluralize', '0.0.29');
 
     if (generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
         dependenciesStorage.set('graphql-typeop', '0.2.0-SNAPSHOTG');

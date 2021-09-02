@@ -1,5 +1,6 @@
 import { ApolloClient, gql, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
 import { Subscribable } from './pub-sub';
+import * as pluralize from 'pluralize';
 
 export class GraphQLCacheWatcher {
   private subscriptions: Set<string> = new Set<string>();
@@ -9,34 +10,53 @@ export class GraphQLCacheWatcher {
     private cache: InMemoryCache,
     private knownQueries: Subscribable<string>,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    private onEvict: (entity: string) => any = () => {}
-  ) {}
+    private onEvict: (entity: string) => any = () => { }
+  ) { }
 
   connect(): void {
     this.knownQueries.subscribe(name => {
-      this.watchQuery(name, 'Added', '{ id }');
-      this.watchQuery(name, 'Updated', '{ id }');
-      this.watchQuery(name, 'Deleted');
+      this.watchQuery(name);
     });
   }
 
   evict(fieldName: string): void {
-    this.cache.evict({fieldName});
+    this.cache.evict({ fieldName });
   }
 
-  private watchQuery(queryName: string, operation: string, selection?: string): void {
-    // TODO: improve entity extraction
-    const entity = queryName.substring(3, queryName.endsWith('s') ? queryName.length - 1 : queryName.length).toLowerCase();
-    const q = `${entity}${operation}`;
+  private extractEntity(queryName: string): string {
+    let result = queryName;
+    const QUERY_PREFIX = 'get'
+    if (queryName.startsWith(QUERY_PREFIX)) {
+      result = queryName.substring(QUERY_PREFIX.length);
+    }
+    return result;
+  }
+
+  private getSubscriptionName(entity: string): string {
+    return `${pluralize(entity).toLowerCase()}Updated`;
+  }
+
+  private getRelevantCacheKeys(entity: string): string[] {
+    const GET_ENTITY = `get${entity}`;
+    const GET_ENTITIES = `get${pluralize(entity)}`;
+    return Object.keys((this.cache as any).data.data.ROOT_QUERY).filter(k => k.startsWith(GET_ENTITY) || k.startsWith(GET_ENTITIES));
+  }
+
+  private hasCacheEntry(key: string): boolean {
+    return !!Object.keys((this.cache as any).data.data.ROOT_QUERY).find(k => k.startsWith(key));
+  }
+
+  private watchQuery(queryName: string): void {
+    const entity = this.extractEntity(queryName);
+    const q = this.getSubscriptionName(entity);
     if (!this.subscriptions.has(q)) {
       this.subscriptions.add(q);
-      const query = selection ? gql`subscription {${q} ${selection}}` : gql`subscription {${q}}`;
+      const query = gql`subscription { ${q} }`;
       this.client.subscribe({ query }).subscribe(() => {
-        this.cache.evict({ fieldName: queryName });
+        this.getRelevantCacheKeys(entity).forEach(fieldName => this.cache.evict({ fieldName }));
         setTimeout(() => {
           // update UI if data is not updated after waiting for 1 second
-          // TODO: check for paging
-          if (!(this.cache as any).data.data.ROOT_QUERY[queryName]) {
+          if (!this.hasCacheEntry(queryName)) {
             this.onEvict(entity);
           }
         }, 1000);

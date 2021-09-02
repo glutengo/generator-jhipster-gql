@@ -7,8 +7,13 @@ import { PageRequest } from '../../domain/base/pagination.entity';
 import { PaginatedUser, User } from '../../service/graphql/user.object-type';
 import { CreateUserArgs, UpdateUserArgs } from '../../service/graphql/user.input-type';
 import { pageRequestToFindManyOptions } from './pagination-util';
-import { PubSubAction, PubSubService } from '../../service/graphql/pub-sub.service';
+import { PubSubService } from '../../service/graphql/pub-sub.service';
 import { AuthGuard, AuthUser, RolesGuard } from '../../security';
+
+<%_
+const pkTypeInterface = getPkType(databaseType) === 'Long' ? 'Number' : 'String';
+const pkType = pkTypeInterface.toLowerCase();
+_%>
 
 @UseGuards(AuthGuard, RolesGuard)
 @Resolver(() => User)
@@ -56,18 +61,8 @@ export class UserResolver {
         return user.authorities;
     }
 
-    @Subscription(() => User)
-    userAdded(): AsyncIterator<User> {
-        return this.pubSub.asyncIterator('user', PubSubAction.ADD);
-    }
-
-    @Subscription(() => User)
-    userUpdated(): AsyncIterator<User> {
-        return this.pubSub.asyncIterator('user', PubSubAction.UPDATE);
-    }
-
-    @Subscription(() => String)
-    userDeleted(): AsyncIterator<String> {
-        return this.pubSub.asyncIterator('user', PubSubAction.DELETE);
+    @Subscription(() => <%= pkTypeInterface %>)
+    usersUpdated(): AsyncIterator<<%= pkTypeInterface %>> {
+        return this.pubSub.asyncIterator('user');
     }
 }

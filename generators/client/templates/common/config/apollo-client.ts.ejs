@@ -31,9 +31,14 @@ import { toast } from 'react-toastify';
 <%_ } _%>
 
 export const httpUrl = '/graphql';
-// TODO: build this dynamically (=> https://stackoverflow.com/a/44547904/2202290) problem: Proxy
-export const wsUrl = 'ws://localhost:8081/graphql';
+export const wsUrl = getWSUrl(httpUrl);
 const AUTHENTICATION_TOKEN_KEY = 'jhi-authenticationToken';
+
+function getWSUrl(url: string): string {
+  const parsedURL = new URL(url, document.baseURI);
+  parsedURL.protocol = parsedURL.protocol === 'https' ? 'wss' : 'ws';
+  return parsedURL.toString();
+}
 
 function getToken(): string {
   return (localStorage.getItem(AUTHENTICATION_TOKEN_KEY) ?? sessionStorage.getItem(AUTHENTICATION_TOKEN_KEY) ?? '').replace(/"/g, '');
@@ -92,7 +97,7 @@ export function createNetworkLink(httpLink: ApolloLink): ApolloLink {
   );
 }
 
-export const cache = new InMemoryCache();
+export const cache = new InMemoryCache({ addTypename: <%= typeDefinition === 'TypeScript' ? false : true %> });0
 
 <% if ((clientFramework === 'react') || (clientFramework === 'vue')) { %>
 const httpLink = new BatchHttpLink({ uri: httpUrl });

@@ -1,5 +1,4 @@
 const constants = require('./constants');
-const utils = require('./commons');
 
 async function askForTypeDefinition() {
     const prompts = [
@@ -18,21 +17,9 @@ async function askForTypeDefinition() {
                 }
             ]
         }
-    ]
+    ];
     const props = await this.prompt(prompts);
     this.typeDefinition = props.typeDefinition;
-    if (utils.isAngular(this) && this.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
-        const secondLevelPrompts = [
-            {
-                type: 'confirm',
-                name: 'experimentalTransformer',
-                message: `Do you want to use the EXPRIMENTAL transformer? This allows for a cleaner syntax when specifying the types but results in an altered build process which may break if the client framework is updated.`,
-                default: false,
-          },
-        ]
-        const secondLevelProps = await this.prompt(secondLevelPrompts);
-        this.experimentalTransformer = secondLevelProps.experimentalTransformer;
-    }
 }
 
 async function askForEndpoint() {
@@ -49,14 +36,14 @@ async function askForEndpoint() {
 }
 
 async function askForSchemaLocation() {
-const prompts = [
+    const prompts = [
         {
             type: 'input',
             name: 'schemaLocation',
             message: 'Where is your GraphQL schema located',
             default: 'server/src/schema.gql'
         }
-    ]
+    ];
     const props = await this.prompt(prompts);
     this.schemaLocation = props.schemaLocation;
 }
@@ -65,4 +52,4 @@ module.exports = {
     askForTypeDefinition,
     askForEndpoint,
     askForSchemaLocation
-}
+};

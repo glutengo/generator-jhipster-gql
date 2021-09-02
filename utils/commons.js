@@ -1,6 +1,9 @@
 const nodejsConstants = require('generator-jhipster-nodejs/generators/generator-nodejs-constants');
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
 const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
+const babel = require('@babel/core');
+const t = require('@babel/types');
+const traverse = require('@babel/traverse').default;
 const path = require('path');
 const { Node, Project } = require('ts-morph');
 const constants = require('./constants');
@@ -72,7 +75,6 @@ function saveConfig(generator) {
     const config = {};
     copyConfig(generator, config, [
         constants.CONFIG_KEY_TYPE_DEFINITION,
-        constants.CONFIG_KEY_EXPERIMENTAL_TRANSFORMER,
         constants.CONFIG_KEY_SCHEMA_LOCATION,
         constants.CONFIG_KEY_ENDPOINT
     ]);
@@ -83,7 +85,6 @@ function loadConfig(generator, config) {
     config = config || generator.config.get(constants.CONFIG_KEY);
     copyConfig(config, generator, [
         constants.CONFIG_KEY_TYPE_DEFINITION,
-        constants.CONFIG_KEY_EXPERIMENTAL_TRANSFORMER,
         constants.CONFIG_KEY_SCHEMA_LOCATION,
         constants.CONFIG_KEY_ENDPOINT
     ]);
@@ -143,6 +144,30 @@ function findExpressionWithName(expression, name) {
     return null;
 }
 
+function findBrowserSyncPlugin(ast) {
+    let result;
+    traverse(ast, {
+        enter(path) {
+            if (t.isNewExpression(path) && path.node.callee.name === 'BrowserSyncPlugin') {
+                result = path.node;
+            }
+        }
+    });
+    return result;
+}
+
+function getWSProxyDeclaration(react) {
+    return babel.parse(`
+const entry = {
+  context: [
+    '/graphql',
+  ],
+  target: 'ws' + (${react ? 'options.' : ''}tls ? 's' : '') + '://localhost:8081',
+  ws: true
+}`
+    ).program.body[0].declarations[0].init;
+}
+
 module.exports = {
     addImportIfMissing,
     getClientBaseDir,
@@ -157,5 +182,7 @@ module.exports = {
     copyConfig,
     capitalize,
     getFunctionCall,
-    getVariableAssignment
+    getVariableAssignment,
+    findBrowserSyncPlugin,
+    getWSProxyDeclaration
 };

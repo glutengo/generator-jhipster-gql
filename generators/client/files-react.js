@@ -83,6 +83,15 @@ function adjustProxyConfig(generator, vue = false) {
         const proxy = devServer.value.properties.find(p => p.key.name === 'proxy');
         const context = proxy.value.elements[0].properties.find(p => p.key.name === 'context');
         context.value.elements.push(t.stringLiteral(generator.endpoint));
+        proxy.value.elements.push(utils.getWSProxyDeclaration(true));
+
+        // insert proxy conf for WebSocket to BrowserSync config
+        const browserSyncPlugin = utils.findBrowserSyncPlugin(ast);
+        if (browserSyncPlugin) {
+            const proxyDeclaration = browserSyncPlugin.arguments[0].properties.find(p => p.key.name === 'proxy').value;
+            proxyDeclaration.properties.push(t.objectProperty(t.identifier('ws'), t.booleanLiteral(true)));
+        }
+
         const generatedFileContent = babelGenerator(ast, { quotes: 'single' });
         generator.fs.write(filePath, generatedFileContent.code);
     }

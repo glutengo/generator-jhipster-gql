@@ -10,7 +10,7 @@ import { ACTION_TYPES } from './<%= entityFileName %>.reducer';
 
 export const getEntities = (page?, size?, sort?, bypassCache?) => {
   const payload = client.query({ query: Get<%= entityNamePlural %>Document, variables: { page, size, sort }, fetchPolicy: bypassCache ? 'no-cache' : 'cache-first' })
-    .then(res => ({ data: res.data.result.edges.map(e => e.node), headers: {} }));
+    .then(res => ({ data: res.data.result.edges.map(e => e.node), headers: { 'x-total-count': res.data.result.totalCount } }));
   return {
     type: ACTION_TYPES.FETCH_<%= ENTITY_CLASS_UPPERCASE %>_LIST,
     payload

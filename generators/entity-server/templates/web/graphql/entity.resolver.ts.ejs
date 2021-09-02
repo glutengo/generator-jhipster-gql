@@ -7,7 +7,7 @@ import { Create<%= entityClass %>Args, Update<%= entityClass %>Args } from '../.
 import { <%= entityClass %>, Paginated<%= entityClass %> } from '../../service/graphql/<%= entityFileName %>.object-type';
 import { PageRequest } from '../../domain/base/pagination.entity';
 import { pageRequestToFindManyOptions } from './pagination-util';
-import { PubSubAction, PubSubService } from '../../service/graphql/pub-sub.service';
+import { PubSubService } from '../../service/graphql/pub-sub.service';
 import { AuthGuard, RolesGuard } from '../../security';
 
 <%_
@@ -48,19 +48,9 @@ constructor(private <%= asEntity(entityInstance) %>Service: <%= entityClass %>Se
     return id;
   }
 
-  @Subscription(() => <%= entityClass %>)
-  <%= entityInstance %>Added(): AsyncIterator<<%= entityClass %>> {
-    return this.pubSub.asyncIterator('<%= entityInstance%>', PubSubAction.ADD);
-  }
-
-  @Subscription(() => <%= entityClass %>)
-  <%= entityInstance %>Updated(): AsyncIterator<<%= entityClass %>> {
-    return this.pubSub.asyncIterator('<%= entityInstance%>', PubSubAction.UPDATE);
-  }
-
-  @Subscription(() => <%= pkTypeInterface%>)
-  <%= entityInstance %>Deleted(): AsyncIterator<<%= pkType %>> {
-    return this.pubSub.asyncIterator('<%= entityInstance%>', PubSubAction.DELETE);
+  @Subscription(() => <%= pkTypeInterface %>)
+  <%= entityNamePlural.toLowerCase() %>Updated(): AsyncIterator<<%= pkTypeInterface %>> {
+    return this.pubSub.asyncIterator('<%= entityInstance %>');
   }
 }
 

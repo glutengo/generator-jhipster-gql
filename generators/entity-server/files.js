@@ -47,7 +47,6 @@ function adjustEntityModule(generator) {
 function adjustEntityService(generator) {
     const entityService = utils.getSourceFile(generator.tsProject, `src/service/${generator.entityFileName}.service.ts`, true);
     const added = utils.addImportIfMissing(entityService, { moduleSpecifier: './graphql/pub-sub.service', namedImport: 'PubSubService' });
-    utils.addImportIfMissing(entityService, { moduleSpecifier: './graphql/pub-sub.service', namedImport: 'PubSubAction' });
 
     if (added) {
         const _class = entityService.getClass(() => true);
@@ -58,18 +57,10 @@ function adjustEntityService(generator) {
         const _save = _class.getMethod('save');
         const _update = _class.getMethod('update');
         const _delete = _class.getMethod('deleteById');
-        _save.insertStatements(
-            _save.getChildSyntaxList().getChildCount() - 1,
-            `this.pubSub.publish('${generator.entityInstance}', PubSubAction.ADD, result)`
-        );
-        _update.insertStatements(
-            _update.getChildSyntaxList().getChildCount() - 1,
-            `this.pubSub.publish('${generator.entityInstance}', PubSubAction.UPDATE, entity)`
-        );
-        _delete.insertStatements(
-            _delete.getChildSyntaxList().getChildCount() - 1,
-            `this.pubSub.publish('${generator.entityInstance}', PubSubAction.DELETE, id)`
-        );
+        const statement = arg => `this.pubSub.publish('${generator.entityInstance}', ${arg})`
+        _save.insertStatements(_save.getChildSyntaxList().getChildCount() - 1, statement('result.id'));
+        _update.insertStatements(_update.getChildSyntaxList().getChildCount() - 1, statement('entity.id'));
+        _delete.insertStatements(_delete.getChildSyntaxList().getChildCount() - 1, statement('id'));
         entityService.saveSync();
     }
 }

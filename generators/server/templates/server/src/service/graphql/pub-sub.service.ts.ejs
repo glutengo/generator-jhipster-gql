@@ -1,26 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
-export enum PubSubAction {
-  ADD = 'Added',
-  UPDATE = 'Updated',
-  DELETE = 'Deleted'
-}
-
 @Injectable()
 export class PubSubService {
   private pubSub = new PubSub();
 
-  publish(entity: string, action: PubSubAction, payload: any): void {
-    const triggerName = this.getTriggerName(entity, action);
+  publish(entity: string, payload: any): void {
+    const triggerName = this.getTriggerName(entity);
     this.pubSub.publish(triggerName, { [triggerName]: payload });
   }
 
-  asyncIterator(entity: string, action: PubSubAction): AsyncIterator<any> {
-    return this.pubSub.asyncIterator(this.getTriggerName(entity, action));
+  asyncIterator(entity: string): AsyncIterator<any> {
+    return this.pubSub.asyncIterator(this.getTriggerName(entity));
   }
 
-  private getTriggerName(entity: string, action: PubSubAction): string {
-    return `${entity}${action}`;
+  private getTriggerName(entity: string): string {
+    return `${entity}Updated`;
   }
 }

@@ -66,6 +66,8 @@ function adjustProxyConfig(generator) {
         // if none is found, add it and write the manipulated file
         propertyNode.value.elements.push(t.stringLiteral(generator.endpoint));
         const generatedFileContent = babelGenerator(ast, { quotes: 'single' });
+
+        confDeclarator.init.elements.push(utils.getWSProxyDeclaration());
         generator.fs.write(filePath, generatedFileContent.code);
     }
 }
@@ -115,6 +117,14 @@ function addGraphQLTransformer(config) {
         if (arrowFunction) {
             const functionCall = t.callExpression(t.identifier('addGraphQLTransformer'), [t.identifier('config')]);
             arrowFunction.body.body.unshift(functionCall);
+
+            // insert proxy conf for WebSocket to BrowserSync config
+            const browserSyncPlugin = utils.findBrowserSyncPlugin(ast);
+            if (browserSyncPlugin) {
+                const proxyDeclaration = browserSyncPlugin.arguments[0].properties.find(p => p.key.name === 'proxy').value;
+                proxyDeclaration.properties.push(t.objectProperty(t.identifier('ws'), t.booleanLiteral(true)));
+            }
+
             const generatedFileContent = babelGenerator(ast, { quotes: 'single' });
             generator.fs.write(filePath, generatedFileContent.code);
         }
@@ -174,14 +184,12 @@ function adjustUserManagement(generator) {
 }
 
 function adjustAngularFiles(generator) {
-    addGraphQLModuleToAppModule(generator);
-    adjustPagination(generator);
-    adjustProxyConfig(generator);
-    adjustUserManagement(generator);
-    if (generator.experimentalTransformer) {
-        adjustWebpackConfig(generator);
-    }
     adjustTSConfig(generator);
+    adjustWebpackConfig(generator);
+    adjustProxyConfig(generator);
+    addGraphQLModuleToAppModule(generator);
+    adjustUserManagement(generator);
+    adjustPagination(generator);
 }
 
 module.exports = {

@@ -66,29 +66,20 @@ function adjustUserService(tsProject) {
 
     // add TypeScript module imports
     const added = utils.addImportIfMissing(userService, { moduleSpecifier: './graphql/pub-sub.service', namedImport: 'PubSubService' });
-    utils.addImportIfMissing(userService, { moduleSpecifier: './graphql/pub-sub.service', namedImport: 'PubSubAction' });
 
     if (added) {
         const _class = userService.getClass(() => true);
         // add pubSub to constructor
         const constructor = _class.getConstructors()[0];
         constructor.addParameter({ name: 'private pubSub', type: 'PubSubService' });
+        const statement = arg => `this.pubSub.publish('user', ${arg})`;
         // use pub sub in save, update and delete
         const _save = _class.getMethod('save');
         const _update = _class.getMethod('update');
         const _delete = _class.getMethod('delete');
-        _save.insertStatements(
-            _save.getChildSyntaxList().getChildCount() - 1,
-            `this.pubSub.publish('user', PubSubAction.ADD, result)`
-        );
-        _update.insertStatements(
-            _update.getChildSyntaxList().getChildCount() - 1,
-            `this.pubSub.publish('user', PubSubAction.UPDATE, userDTO)`
-        );
-        _delete.insertStatements(
-            _delete.getChildSyntaxList().getChildCount() - 1,
-            `this.pubSub.publish('user', PubSubAction.DELETE, user.login)`
-        );
+        _save.insertStatements(_save.getChildSyntaxList().getChildCount() - 1, statement('result.id'));
+        _update.insertStatements(_update.getChildSyntaxList().getChildCount() - 1, statement('userDTO.id'));
+        _delete.insertStatements(_delete.getChildSyntaxList().getChildCount() - 1, statement('user.id'));
         userService.saveSync();
     }
 }
