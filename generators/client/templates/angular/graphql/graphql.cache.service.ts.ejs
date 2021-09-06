@@ -1,15 +1,14 @@
 import { Inject, Injectable } from '@angular/core';
-import { gql, InMemoryCache } from '@apollo/client';
+import { InMemoryCache } from '@apollo/client';
 import { Apollo } from 'apollo-angular';
 import { Subscribable } from 'app/core/util/pub-sub';
 import { AlertService } from 'app/core/util/alert.service';
-import { CACHE_TOKEN, KNOWN_QUERIES_TOKEN } from './graphql.module';
+import { CACHE_TOKEN, KNOWN_QUERIES_TOKEN } from './graphql.providers';
 import { GraphQLCacheWatcher } from 'app/core/util/graphql-cache-watcher';
 
 @Injectable({ providedIn: 'root' })
 export class GraphQLCacheService {
   private cacheWatcher: GraphQLCacheWatcher;
-  private subscriptions: Set<string> = new Set<string>();
 
   constructor(
     @Inject(KNOWN_QUERIES_TOKEN)

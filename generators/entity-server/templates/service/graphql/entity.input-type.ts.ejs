@@ -15,11 +15,11 @@ class Full<%= entityClass %>Input extends <%= entityClass %>DTO {}
 class Partial<%= entityClass %>Input extends OmitType(PartialType(Full<%= entityClass %>Input), [ <%- unownedRelationships.join(', ') %> ]) {
 <%_ for (const r of relationships) { _%>
   <%_ if (r.ownerSide) { _%>
-    @Field(() => <%= r.otherEntity.entityClass %>Reference)
-    <%= r.relationshipName %>: <%= r.otherEntity.entityClass %>DTO;
+    @Field(() => <%= r.collection ? `[${r.otherEntity.entityClass}Reference]`: `${r.otherEntity.entityClass}Reference` %>)
+    <%= r.relationshipName %>: <%= r.otherEntity.entityClass %>DTO <%= r.collection ? '[]' : '' %>;
   <%_ } else { _%>
     @HideField()
-    <%= r.relationshipName %> = []
+    <%= r.relationshipName %>
   <%_ } _%>
 <%_ } _%>
 }

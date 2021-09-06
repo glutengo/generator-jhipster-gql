@@ -54,7 +54,7 @@ function adjustPackageJSON(generator) {
     dependenciesStorage.set('@types/pluralize', '0.0.29');
 
     if (generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
-        dependenciesStorage.set('graphql-typeop', '0.2.0-SNAPSHOTG');
+        dependenciesStorage.set('graphql-typeop', '0.2.0-SNAPSHOTI');
     } else {
         devDependenciesStorage.set('@graphql-codegen/typescript-operations', '1.17.16');
     }

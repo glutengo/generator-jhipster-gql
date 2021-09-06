@@ -4,6 +4,7 @@ const babelGenerator = require('@babel/generator').default;
 const fs = require('fs');
 const path = require('path');
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
+const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
 const constants = require('../../utils/constants');
 const utils = require('../../utils/commons');
 
@@ -83,7 +84,7 @@ function adjustProxyConfig(generator, vue = false) {
         const proxy = devServer.value.properties.find(p => p.key.name === 'proxy');
         const context = proxy.value.elements[0].properties.find(p => p.key.name === 'context');
         context.value.elements.push(t.stringLiteral(generator.endpoint));
-        proxy.value.elements.push(utils.getWSProxyDeclaration(true));
+        proxy.value.elements.push(utils.getWSProxyDeclaration(generator.getJhipsterConfig().get(OptionNames.SERVER_PORT)), true);
 
         // insert proxy conf for WebSocket to BrowserSync config
         const browserSyncPlugin = utils.findBrowserSyncPlugin(ast);

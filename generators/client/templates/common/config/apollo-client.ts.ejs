@@ -14,18 +14,22 @@ const onEvict = clientFramework === 'react'
         ? 'entity => toast.info(`Data for ${entity} has changed. Please Refresh to see the changes.`)'
         : 'entity => app.$root.$bvToast.toast(`Data for ${entity} has changed. Please Refresh to see the changes.`)';
 %>
-import { InMemoryCache, ApolloLink, HttpLink, split, ApolloClient, from } from '@apollo/client';
 import { WebSocketLink } from '@apollo/client/link/ws';
 <%_ if (clientFramework === 'vue' || clientFramework === 'react') { _%>
+import { InMemoryCache, ApolloLink, split, ApolloClient, from } from '@apollo/client';
 import { BatchHttpLink } from '@apollo/client/link/batch-http';
-<%_ } _%>
+<%_ } else { _%>
+import { InMemoryCache, ApolloLink, split } from '@apollo/client';
+<%_ }  _%>
 import { getMainDefinition } from '@apollo/client/utilities';
 import { setContext } from '@apollo/client/link/context';
 <%_ if (clientFramework === 'vue') { _%>
   import Vue from 'vue';
 <%_ } _%>
 import { PubSub } from '<%= utilImportPath %>/pub-sub';
+<%_ if (clientFramework === 'vue' || clientFramework === 'react') { _%>
 import { GraphQLCacheWatcher } from '<%= utilImportPath %>/graphql-cache-watcher';
+<%_ }  _%>
 <%_ if (clientFramework === 'react') { _%>
 import { toast } from 'react-toastify';
 <%_ } _%>
@@ -88,9 +92,10 @@ export function createNetworkLink(httpLink: ApolloLink): ApolloLink {
       uri: wsUrl,
       options: {
         reconnect: true,
-        connectionParams: {
+        lazy: true,
+        connectionParams: () => ({
           headers: { authorization: getAuthorizationHeader() }
-        }
+        })
       },
     }),
     httpLink

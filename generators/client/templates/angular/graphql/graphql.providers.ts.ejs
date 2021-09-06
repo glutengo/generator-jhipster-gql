@@ -1,4 +1,9 @@
-import { Provider } from '@angular/core';
+import { Provider, InjectionToken } from '@angular/core';
+import { PubSub } from 'app/core/util/pub-sub';
+import { InMemoryCache } from '@apollo/client/core';
 
 export const graphQLProviders: Provider[] = [
 ]
+
+export const CACHE_TOKEN = new InjectionToken<InMemoryCache>('CACHE');
+export const KNOWN_QUERIES_TOKEN = new InjectionToken<PubSub<string>>('KNOWN_QUERIES');

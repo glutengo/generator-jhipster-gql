@@ -72,7 +72,7 @@ function adjustUserService(tsProject) {
         // add pubSub to constructor
         const constructor = _class.getConstructors()[0];
         constructor.addParameter({ name: 'private pubSub', type: 'PubSubService' });
-        const statement = arg => `this.pubSub.publish('user', ${arg})`;
+        const statement = arg => `this.pubSub.publish('users', ${arg})`;
         // use pub sub in save, update and delete
         const _save = _class.getMethod('save');
         const _update = _class.getMethod('update');

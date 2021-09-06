@@ -156,13 +156,13 @@ function findBrowserSyncPlugin(ast) {
     return result;
 }
 
-function getWSProxyDeclaration(react) {
+function getWSProxyDeclaration(port, react) {
     return babel.parse(`
 const entry = {
   context: [
     '/graphql',
   ],
-  target: 'ws' + (${react ? 'options.' : ''}tls ? 's' : '') + '://localhost:8081',
+  target: 'ws' + (${react ? 'options.' : ''}tls ? 's' : '') + '://localhost:${port}',
   ws: true
 }`
     ).program.body[0].declarations[0].init;

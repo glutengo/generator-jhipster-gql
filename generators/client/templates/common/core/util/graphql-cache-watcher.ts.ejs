@@ -27,7 +27,7 @@ export class GraphQLCacheWatcher {
     let result = queryName;
     const QUERY_PREFIX = 'get'
     if (queryName.startsWith(QUERY_PREFIX)) {
-      result = queryName.substring(QUERY_PREFIX.length);
+      result = pluralize.singular(queryName.substring(QUERY_PREFIX.length));
     }
     return result;
   }

@@ -1,8 +1,8 @@
-import { APP_INITIALIZER, InjectionToken, NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { APOLLO_OPTIONS } from 'apollo-angular';
-import { from, InMemoryCache } from '@apollo/client/core';
-import { HttpBatchLink, HttpLink } from 'apollo-angular/http';
-import { graphQLProviders } from './graphql.providers';
+import { from } from '@apollo/client/core';
+import { HttpBatchLink } from 'apollo-angular/http';
+import { graphQLProviders, CACHE_TOKEN, KNOWN_QUERIES_TOKEN } from './graphql.providers';
 import { cache, createNetworkLink, createRegisterQueryLink, httpUrl, omitTypenameLink } from 'app/config/apollo-client';
 import { PubSub } from 'app/core/util/pub-sub';
 import { GraphQLCacheService } from './graphql.cache.service';
@@ -11,7 +11,7 @@ const sub = new PubSub<string>();
 
 const registerQueryLink = createRegisterQueryLink(sub);
 
-export function createApollo(httpLink: HttpLink): any {
+export function createApollo(httpLink: HttpBatchLink): any {
   const networkLink = createNetworkLink(httpLink.create({ uri: httpUrl }));
   return {
     link: from([omitTypenameLink, registerQueryLink, networkLink]),
@@ -19,9 +19,6 @@ export function createApollo(httpLink: HttpLink): any {
     defaultOptions: {},
   };
 }
-
-export const CACHE_TOKEN = new InjectionToken<InMemoryCache>('CACHE');
-export const KNOWN_QUERIES_TOKEN = new InjectionToken<PubSub<string>>('KNOWN_QUERIES');
 
 @NgModule({
   providers: [

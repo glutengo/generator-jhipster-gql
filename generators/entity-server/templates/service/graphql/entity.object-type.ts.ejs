@@ -13,12 +13,12 @@ export class Partial<%= entityClass %> extends PartialType(<%= entityClass %>DTO
 @ObjectType()
 export class <%= entityClass %> extends Partial<%= entityClass %> {
 <%_ for (const r of relationships) { _%>
-  <%_ if (r.ownerSide) { _%>
-    @Field(() => <%= r.otherEntity.entityClass %>)
-    <%= r.relationshipName %>?: <%= r.otherEntity.entityClass %>DTO;
-  <%_ } else { _%>
-    @Field(() => [<%= r.otherEntity.entityClass %>])
+  <%_ if (r.collection) { _%>
+    @Field(() => [<%= r.otherEntity.entityClass %>], { nullable: true })
     <%= r.relationshipName %>?: <%= r.otherEntity.entityClass %>DTO[];
+  <%_ } else { _%>
+    @Field(() => <%= r.otherEntity.entityClass %>,  { nullable: true })
+    <%= r.relationshipName %>?: <%= r.otherEntity.entityClass %>DTO;
   <%_ } _%>
 <%_ } _%>
 }

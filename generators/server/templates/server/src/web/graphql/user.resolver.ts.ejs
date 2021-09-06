@@ -63,6 +63,6 @@ export class UserResolver {
 
     @Subscription(() => <%= pkTypeInterface %>)
     usersUpdated(): AsyncIterator<<%= pkTypeInterface %>> {
-        return this.pubSub.asyncIterator('user');
+        return this.pubSub.asyncIterator('users');
     }
 }

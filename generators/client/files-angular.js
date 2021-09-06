@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const jHipsterConstants = require('generator-jhipster/generators/generator-constants');
 const AngularNeedleClient = require('generator-jhipster/generators/client/needle-api/needle-client-angular');
+const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
 const constants = require('../../utils/constants');
 const utils = require('../../utils/commons');
 
@@ -65,9 +66,9 @@ function adjustProxyConfig(generator) {
     if (!existingGraphQLEntry) {
         // if none is found, add it and write the manipulated file
         propertyNode.value.elements.push(t.stringLiteral(generator.endpoint));
-        const generatedFileContent = babelGenerator(ast, { quotes: 'single' });
+        confDeclarator.init.elements.push(utils.getWSProxyDeclaration(generator.getJhipsterConfig().get(OptionNames.SERVER_PORT)));
 
-        confDeclarator.init.elements.push(utils.getWSProxyDeclaration());
+        const generatedFileContent = babelGenerator(ast, { quotes: 'single' });
         generator.fs.write(filePath, generatedFileContent.code);
     }
 }

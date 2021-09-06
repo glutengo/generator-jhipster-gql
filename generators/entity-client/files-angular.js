@@ -23,7 +23,7 @@ function adjustEntityComponent(generator) {
         if (loadPage) {
             const call = utils.getFunctionCall(loadPage, 'query');
             const objectLiteralExpression = call.getArguments()[0];
-            if (objectLiteralExpression) {
+            if (objectLiteralExpression && !objectLiteralExpression.getProperty('bypassCache')) {
                 objectLiteralExpression.addPropertyAssignment({ name: 'bypassCache', initializer: '!dontNavigate' });
                 component.saveSync();
             }

@@ -25,11 +25,13 @@ function addObjectTypes(generator) {
             extends: `Base${entityClass}`,
             implements: [`Partial<${entityClass}>`],
             decorators: [{ name: 'ObjectType', arguments: [] }],
-            properties: relationships.map(r => ({
-                name: r.relationshipName,
-                hasExclamationToken: true,
-                type: `Base${r.otherEntityNameCapitalized}${r.ownerSide ? '' : '[]'}`
-            }))
+            properties: relationships
+                .filter(r => r.ownerSide)
+                .map(r => ({
+                    name: r.relationshipName,
+                    hasExclamationToken: true,
+                    type: `Base${r.otherEntityNameCapitalized}${r.collection ? '[]' : ''}`
+                }))
         });
         commonTypes.saveSync();
     }
