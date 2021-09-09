@@ -28,7 +28,7 @@
     "@babel/traverse": "^7.15.0",
     "chalk": "3.0.0",
     "generator-jhipster": "7.0.1",
-    "generator-jhipster-nodejs": "^2.0.0-beta.1",
+    "generator-jhipster-nodejs": "2.0.0",
     "mkdirp": "0.5.1",
     "pluralize": "^8.0.0",
     "semver": "7.1.1",

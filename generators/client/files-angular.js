@@ -77,6 +77,7 @@ function adjustWebpackConfig(generator) {
     const filePath = path.join('webpack', 'webpack.custom.js');
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const ast = babel.parseSync(fileContent);
+    let expressionStatement;
     // stop if there already is an import statement for GraphQLTransformer
     const existingGraphQLTransformerImportStatement = ast.program.body.find(
         e =>
@@ -94,7 +95,9 @@ function adjustWebpackConfig(generator) {
             e.expression.left.property &&
             e.expression.left.property.name === 'exports'
     );
-    const expressionStatement = ast.program.body[expressionStatementIndex];
+    if (generator.typeDefinition === 'TypeScript') {
+        expressionStatement = ast.program.body[expressionStatementIndex];
+    }
     if (expressionStatement) {
         const functionDeclaration = babel.parseSync(`
 function addGraphQLTransformer(config) {
@@ -118,17 +121,18 @@ function addGraphQLTransformer(config) {
         if (arrowFunction) {
             const functionCall = t.callExpression(t.identifier('addGraphQLTransformer'), [t.identifier('config')]);
             arrowFunction.body.body.unshift(functionCall);
-
-            // insert proxy conf for WebSocket to BrowserSync config
-            const browserSyncPlugin = utils.findBrowserSyncPlugin(ast);
-            if (browserSyncPlugin) {
-                const proxyDeclaration = browserSyncPlugin.arguments[0].properties.find(p => p.key.name === 'proxy').value;
-                proxyDeclaration.properties.push(t.objectProperty(t.identifier('ws'), t.booleanLiteral(true)));
-            }
-
-            const generatedFileContent = babelGenerator(ast, { quotes: 'single' });
-            generator.fs.write(filePath, generatedFileContent.code);
         }
+    }
+    // insert proxy conf for WebSocket to BrowserSync config
+    const browserSyncPlugin = utils.findBrowserSyncPlugin(ast);
+    if (browserSyncPlugin) {
+        const proxyDeclaration = browserSyncPlugin.arguments[0].properties.find(p => p.key.name === 'proxy').value;
+        proxyDeclaration.properties.push(t.objectProperty(t.identifier('ws'), t.booleanLiteral(true)));
+    }
+
+    if (browserSyncPlugin || expressionStatement) {
+        const generatedFileContent = babelGenerator(ast, { quotes: 'single' });
+        generator.fs.write(filePath, generatedFileContent.code);
     }
 }
 

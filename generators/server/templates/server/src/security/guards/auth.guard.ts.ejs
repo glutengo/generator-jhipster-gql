@@ -10,7 +10,7 @@ export class AuthGuard extends NestAuthGuard('jwt') {
         return super.canActivate(context.getType() === 'http' ? context : GqlExecutionContext.create(context));
     }
 
-    getRequest(context) {
+    getRequest(context): any {
       return context.getType() === 'http'
         ? context.switchToHttp().getRequest()
         : context.getContext().req;
