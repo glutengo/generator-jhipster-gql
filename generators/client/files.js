@@ -1,5 +1,5 @@
 const constants = require('../../utils/constants');
-const { isAngular, isReact, isVue, getClientBaseDir } = require('../../utils/commons');
+const { isAngular, isReact, isVue, getClientBaseDir, getDependabotPackageJSON } = require('../../utils/commons');
 const { adjustAngularFiles, angularFiles } = require('./files-angular');
 const { adjustReactFiles, reactFiles } = require('./files-react');
 const { vueFiles, adjustVueFiles } = require('./files-vue');
@@ -36,52 +36,73 @@ const clientFiles = {
                 }
             ]
         }
-
     ]
 };
 
+/**
+ * Adjust package JSON: Install libraries and adjust build / dev scripts
+ *
+ * @param generator The Yeoman generators
+ */
 function adjustPackageJSON(generator) {
     const packageJsonStorage = generator.createStorage('package.json');
     const dependenciesStorage = packageJsonStorage.createStorage('dependencies');
     const devDependenciesStorage = packageJsonStorage.createStorage('devDependencies');
     const scriptsStorage = packageJsonStorage.createStorage('scripts');
-    // TODO: versions?
-    dependenciesStorage.set('graphql', '15.5.0');
-    dependenciesStorage.set('@apollo/client', '3.3.19');
-    dependenciesStorage.set('pluralize', '8.0.0');
-    devDependenciesStorage.set('@graphql-codegen/cli', '1.21.4');
-    devDependenciesStorage.set('@graphql-codegen/typescript', '1.22.0');
-    dependenciesStorage.set('@types/pluralize', '0.0.29');
+
+    const dependabotPackageJSON = getDependabotPackageJSON(generator);
+
+    dependenciesStorage.set('graphql', dependabotPackageJSON.dependencies.graphql);
+    dependenciesStorage.set('@apollo/client', dependabotPackageJSON.dependencies['@apollo/client']);
+    dependenciesStorage.set('pluralize', dependabotPackageJSON.dependencies.pluralize);
+    devDependenciesStorage.set('@graphql-codegen/cli', dependabotPackageJSON.devDependencies['@graphql-codegen/cli']);
+    devDependenciesStorage.set('@graphql-codegen/typescript', dependabotPackageJSON.devDependencies['@graphql-codegen/typescript']);
+    devDependenciesStorage.set('@types/pluralize', dependabotPackageJSON.devDependencies['@types/pluralize']);
 
     if (generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
-        dependenciesStorage.set('graphql-typeop', '0.2.0-SNAPSHOTI');
+        dependenciesStorage.set('graphql-typeop', dependabotPackageJSON.dependencies['graphql-typeop']);
     } else {
-        devDependenciesStorage.set('@graphql-codegen/typescript-operations', '1.17.16');
+        devDependenciesStorage.set(
+            '@graphql-codegen/typescript-operations',
+            dependabotPackageJSON.devDependencies['@graphql-codegen/typescript-operations']
+        );
     }
 
     if (isAngular(generator)) {
-        dependenciesStorage.set('apollo-angular', '2.6.0');
+        dependenciesStorage.set('apollo-angular', dependabotPackageJSON.dependencies['apollo-angular']);
         if (generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL) {
-            devDependenciesStorage.set('@graphql-codegen/typescript-apollo-angular', '2.3.3');
+            devDependenciesStorage.set(
+                '@graphql-codegen/typescript-apollo-angular',
+                dependabotPackageJSON.devDependencies['@graphql-codegen/typescript-apollo-angular']
+            );
         }
         scriptsStorage.set('webapp:dev', 'concurrently "npm run codegen:watch" "ng serve"');
     }
-    if (generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL) {
-        devDependenciesStorage.set('@graphql-codegen/typescript-operations', '1.17.16');
-    }
     if (isReact(generator) || isVue(generator)) {
         if (generator.typeDefinition === constants.TYPE_DEFINITION_GRAPHQL) {
-            devDependenciesStorage.set('@graphql-codegen/typescript-react-apollo', '2.3.0');
+            devDependenciesStorage.set(
+                '@graphql-codegen/typescript-react-apollo',
+                dependabotPackageJSON.devDependencies['@graphql-codegen/typescript-react-apollo']
+            );
         }
-        scriptsStorage.set('webapp:dev', 'concurrently "npm run codegen:watch" "npm run webpack-dev-server -- --config webpack/webpack.dev.js --inline --port=9060 --env stats=minimal"');
+        scriptsStorage.set(
+            'webapp:dev',
+            'concurrently "npm run codegen:watch" "npm run webpack-dev-server -- --config webpack/webpack.dev.js --inline --port=9060 --env stats=minimal"'
+        );
         scriptsStorage.set('webapp:build:dev', 'npm run codegen && npm run webpack -- --config webpack/webpack.dev.js --env stats=minimal');
-        scriptsStorage.set('webapp:build:prod', 'npm run codegen && npm run webpack -- --config webpack/webpack.prod.js --progress=profile');
+        scriptsStorage.set(
+            'webapp:build:prod',
+            'npm run codegen && npm run webpack -- --config webpack/webpack.prod.js --progress=profile'
+        );
     }
     scriptsStorage.set('codegen', 'graphql-codegen --config codegen.yml');
     scriptsStorage.set('codegen:watch', 'graphql-codegen --config codegen.yml --watch');
     packageJsonStorage.save();
 }
 
+/**
+ * Writes the client files
+ */
 function writeFiles() {
     return {
         writeGraphQLFiles() {

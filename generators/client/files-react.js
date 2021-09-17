@@ -40,6 +40,11 @@ const reactFiles = [
     }
 ];
 
+/**
+ * Adds the GraphQL TypeScript transformer
+ *
+ * @param generator The Yeoman generator
+ */
 function adjustWebpackConfig(generator) {
     const filePath = path.join('webpack', 'webpack.common.js');
     const fileContent = fs.readFileSync(filePath, 'utf-8');
@@ -65,6 +70,12 @@ const rules = [
     }
 }
 
+/**
+ * Adds an for the GraphQL endpoint to the proxy configuration
+ *
+ * @param generator The Yeoman generator
+ * @param vue The method can also be called for vue, in this case, this parameter is to be passed as true
+ */
 function adjustProxyConfig(generator, vue = false) {
     const filePath = path.join('webpack', 'webpack.dev.js');
     const fileContent = fs.readFileSync(filePath, 'utf-8');
@@ -84,7 +95,7 @@ function adjustProxyConfig(generator, vue = false) {
         const proxy = devServer.value.properties.find(p => p.key.name === 'proxy');
         const context = proxy.value.elements[0].properties.find(p => p.key.name === 'context');
         context.value.elements.push(t.stringLiteral(generator.endpoint));
-        proxy.value.elements.push(utils.getWSProxyDeclaration(generator.getJhipsterConfig().get(OptionNames.SERVER_PORT)), true);
+        proxy.value.elements.push(utils.getWSProxyDeclaration(generator.getJhipsterConfig().get(OptionNames.SERVER_PORT), vue ? 'vue' : 'react'));
 
         // insert proxy conf for WebSocket to BrowserSync config
         const browserSyncPlugin = utils.findBrowserSyncPlugin(ast);
@@ -98,43 +109,11 @@ function adjustProxyConfig(generator, vue = false) {
     }
 }
 
-function adjustUserManagement(generator) {
-    const tsProject = utils.getTsProject(generator);
-    const filePath = `${jHipsterConstants.REACT_DIR}/modules/administration/user-management/user-management.tsx`;
-    const component = tsProject.getSourceFile(filePath);
-    const componentName = 'UserManagement';
-    const functionName = 'getUsersFromProps';
-    const reactComponentStatement = component.getVariableStatement(componentName);
-    const reactComponent = reactComponentStatement && reactComponentStatement.getDeclarations().find(d => d.getName() === componentName);
-    if (reactComponent) {
-        const getUsersFromProps = utils.getVariableAssignment(reactComponent.getInitializer(), functionName);
-        if (getUsersFromProps) {
-            const arrowFunction = getUsersFromProps.getInitializer();
-            arrowFunction.addParameter({ name: 'bypassCache', type: 'boolean', hasQuestionToken: true });
-            const handleSyncList = utils.getVariableAssignment(reactComponent.getInitializer(), 'handleSyncList');
-            if (handleSyncList) {
-                const getUsersFromPropsCall = utils.getFunctionCall(handleSyncList.getInitializer(), functionName);
-                if (getUsersFromPropsCall && getUsersFromPropsCall.getArguments().length === 0) {
-                    getUsersFromPropsCall.addArgument('true');
-
-                    // TODO: move to entity-client-enable because the default action creator only accepts three arguments
-                    const getUsersAsAdminCall = utils.getFunctionCall(getUsersFromProps.getInitializer(), 'getUsersAsAdmin');
-                    if (getUsersAsAdminCall) {
-                        getUsersAsAdminCall.addArgument('bypassCache');
-                        component.saveSync();
-                    }
-                }
-            }
-        }
-    }
-}
-
 function adjustReactFiles(generator) {
     adjustProxyConfig(generator);
     if (generator.typeDefinition === constants.TYPE_DEFINITION_TYPESCRIPT) {
         adjustWebpackConfig(generator);
     }
-    adjustUserManagement(generator);
 }
 
 module.exports = {

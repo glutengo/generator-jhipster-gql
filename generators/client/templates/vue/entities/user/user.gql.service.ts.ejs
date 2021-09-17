@@ -2,9 +2,8 @@
 const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string';
 const importPath = typeDefinition === 'GraphQL' ? '@/graphql' : '@/entities/user/user.gql';
 %>
-import axios from 'axios';
 import { client } from '@/shared/config/apollo-client';
-import { CreateUserDocument, DeleteUserDocument, GetUserDocument, GetUsersDocument, UpdateUserDocument } from '<%= importPath %>';
+import { CreateUserDocument, DeleteUserDocument, GetAuthoritiesDocument, GetUserDocument, GetUsersDocument, UpdateUserDocument } from '<%= importPath %>';
 import { buildPaginationOptions, toHttpResponse, toPagedHttpResponse } from '@/shared/graphql/graphql.util';
 
 export default class UserGraphQLService {
@@ -34,6 +33,6 @@ export default class UserGraphQLService {
   }
 
   public retrieveAuthorities(): Promise<any> {
-    return axios.get('api/authorities');
+    return client.query({query: GetAuthoritiesDocument}).then(res => toHttpResponse(res));
   }
 }

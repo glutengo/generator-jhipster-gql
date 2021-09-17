@@ -1,5 +1,10 @@
 const constants = require('./constants');
 
+/**
+ * Prompting function for the GraphQL Type Definition
+ *
+ * @returns {Promise<void>}
+ */
 async function askForTypeDefinition() {
     const prompts = [
         {
@@ -22,6 +27,11 @@ async function askForTypeDefinition() {
     this.typeDefinition = props.typeDefinition;
 }
 
+/**
+ * Prompting function for the GraphQL endpoint
+ *
+ * @returns {Promise<void>}
+ */
 async function askForEndpoint() {
     const prompts = [
         {
@@ -30,18 +40,23 @@ async function askForEndpoint() {
             message: 'Which is the endpoint of your GraphQL API?',
             default: '/graphql'
         }
-    ]
+    ];
     const props = await this.prompt(prompts);
     this.endpoint = props.endpoint;
 }
 
+/**
+ * Prompting function for the GraphQL Schema Location
+ *
+ * @returns {Promise<void>}
+ */
 async function askForSchemaLocation() {
     const prompts = [
         {
             type: 'input',
             name: 'schemaLocation',
             message: 'Where is your GraphQL schema located',
-            default: 'server/src/schema.gql'
+            default: 'server/schema.gql'
         }
     ];
     const props = await this.prompt(prompts);

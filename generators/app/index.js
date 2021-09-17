@@ -10,7 +10,13 @@ const packagejs = require('../../package.json');
 const { askForEndpoint, askForSchemaLocation } = require('../../utils/prompts');
 const constants = require('../../utils/constants');
 
+/**
+ * App generator
+ */
 module.exports = class extends BaseGenerator {
+    /**
+     * Initializes the generator by reading the configuration
+     */
     get initializing() {
         return {
             readConfig() {
@@ -21,28 +27,46 @@ module.exports = class extends BaseGenerator {
                 this.clientPackageManager = this.jhipsterAppConfig.get(OptionNames.CLIENT_PACKAGE_MANAGER);
             },
             displayLogo() {
-                // it's here to show that you can use functions from generator-jhipster
-                // this function is in: generator-jhipster/generators/generator-base.js
                 this.printJHipsterLogo();
 
                 // Have Yeoman greet the user.
                 this.log(`\nWelcome to the ${chalk.bold.yellow('JHipster gql')} generator! ${chalk.yellow(`v${packagejs.version}\n`)}`);
             },
             checkJhipster() {
-                const currentJhipsterVersion = this.jhipsterAppConfig.jhipsterVersion;
+                const currentJhipsterVersion = this.jhipsterAppConfig.get(OptionNames.JHIPSTER_VERSION);
                 const minimumJhipsterVersion = packagejs.dependencies['generator-jhipster'];
                 if (!semver.satisfies(currentJhipsterVersion, minimumJhipsterVersion)) {
                     this.warning(
                         `\nYour generated project used an old JHipster version (${currentJhipsterVersion})... you need at least (${minimumJhipsterVersion})\n`
                     );
                 }
+            },
+            checkNodeJSBlueprint() {
+                if (!utils.isNodeJSBlueprint(this)) {
+                    this.warning(
+                        '\nYour generated project does not use the Node.js Blueprint. generator-jhipster-gql will only be able to generate client code.\n'
+                    );
+                }
             }
         };
     }
 
+    /**
+     * Prompts for the GraphQL endpoint and schema location
+     */
+    async prompting() {
+        await askForEndpoint.call(this);
+        await askForSchemaLocation.call(this);
+        utils.saveConfig(this);
+    }
+
+    /**
+     * Composes the generator. The server and client sub-generators are called
+     */
     composing() {
         const subGenerators = ['../server', '../client'];
         const context = { ...this.context };
+        // forward the config obtained in the prompts
         utils.copyConfig(this, context, [constants.CONFIG_KEY_ENDPOINT, constants.CONFIG_KEY_SCHEMA_LOCATION]);
         subGenerators.forEach(gen =>
             this.composeWith(require.resolve(gen), {
@@ -55,12 +79,9 @@ module.exports = class extends BaseGenerator {
         );
     }
 
-    async prompting() {
-        await askForEndpoint.call(this);
-        await askForSchemaLocation.call(this);
-        utils.saveConfig(this);
-    }
-
+    /**
+     * Registers the entity sub generator as a post entity creation hook
+     */
     writing() {
         try {
             this.registerModule('generator-jhipster-gql', 'entity', 'post', 'entity', 'GraphQL integration for JHipster');
@@ -69,6 +90,9 @@ module.exports = class extends BaseGenerator {
         }
     }
 
+    /**
+     * Installs the NPM dependencies, builds the GraphQL schema and the client typing information
+     */
     install() {
         const logMsg = `To install your dependencies manually, run: ${chalk.yellow.bold(`${this.clientPackageManager} install`)}`;
         if (this.options['skip-install']) {
@@ -83,6 +107,9 @@ module.exports = class extends BaseGenerator {
         }
     }
 
+    /**
+     * Runs the entity sub-generator for all entities known to the application
+     */
     end() {
         const entities = this.getJhipsterConfig().get('entities');
         if (entities) {
@@ -116,9 +143,6 @@ module.exports = class extends BaseGenerator {
                     debug: this.configOptions.isDebugEnabled
                 });
             });
-
-
         }
     }
-
 };

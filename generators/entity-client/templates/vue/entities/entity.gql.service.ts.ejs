@@ -22,7 +22,8 @@ import { <%= namedImports.join(', ') %> } from '<%= importSpecifier %>';
 
 export default class <%= entityAngularName %>Service {
 
-  public find(id: <%= pkType %>) : Promise<I<%= entityAngularName %>> {
+  public find(_id: any) : Promise<I<%= entityAngularName %>> {
+    const id = this.getId(_id);
     return client.query({ query: <%= FindDocument %>, variables: { id } })
       .then(res => toHttpResponse(res).data);
   }
@@ -32,7 +33,8 @@ export default class <%= entityAngularName %>Service {
       .then(res => toPagedHttpResponse(res));
   }
 
-  public delete(id: <%= pkType %>) : Promise<any> {
+  public delete(_id: any) : Promise<any> {
+    const id = this.getId(_id);
     return client.mutate({ mutation: <%= DeleteDocument %>, variables: { id } })
       .then(res => toHttpResponse(res).data);
   }
@@ -50,5 +52,13 @@ export default class <%= entityAngularName %>Service {
   public partialUpdate(<%= entityInstance %>: I<%= entityAngularName %>): Promise<I<%= entityAngularName %>> {
     return client.mutate({ mutation: <%= UpdateDocument %>, variables: { <%= entityInstance %> } })
       .then(res => toHttpResponse(res).data);
+  }
+
+  private getId(id: any): <%= pkType %> {
+    <%_ if(pkType === 'number') { _%>
+    return parseInt(id, 10);
+    <%_ } else { _%>
+    return id;
+    <% } _%>
   }
 }

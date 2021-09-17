@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "@apollo/client": "3.3.19",
+    "apollo-angular": "2.6.0",
+    "graphql": "15.5.0",
+    "graphql-typeop": "0.2.0-SNAPSHOTJ",
+    "pluralize": "8.0.0"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "1.21.4",
+    "@graphql-codegen/typescript": "1.22.0",
+    "@types/pluralize": "0.0.29",
+    "@graphql-codegen/typescript-operations": "1.17.16",
+    "@graphql-codegen/typescript-apollo-angular": "2.3.3",
+    "@graphql-codegen/typescript-react-apollo": "2.3.0"
+  }
+}

@@ -1,6 +1,11 @@
 const utils = require('../../utils/commons');
 const constants = require('../../utils/constants');
 
+/**
+ * Adds the common object types (BaseObjectType and DetailObjectType) for the generated entity
+ *
+ * @param generator The Yeoman generator
+ */
 function addObjectTypes(generator) {
     const tsProject = utils.getTsProject(generator);
     const relativeFilePath = 'graphql/graphql.common-types';

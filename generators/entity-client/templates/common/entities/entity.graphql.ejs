@@ -50,6 +50,9 @@ fragment Detail<%= entityClass %> on <%= entityClass %> {
     ...Base<%= entityClass %>
 <%_ for (const relationship of relationships) { _%>
     <%= relationship.relationshipName %> {
+        <%_ if (relationship.otherEntityField !== 'id') { _%>
+        id
+        <%_ } _%>
         <%= relationship.otherEntityField%>
     }
 <%_ } _%>

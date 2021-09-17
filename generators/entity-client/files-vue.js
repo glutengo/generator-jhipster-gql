@@ -13,31 +13,32 @@ const vueFiles = [
     }
 ];
 
+/**
+ * Adds the bypassCache parameter to the entity component
+ *
+ * @param generator The Yeoman generator
+ */
 function adjustEntityComponent(generator) {
     const tsProject = utils.getTsProject(generator);
     const filePath = `${jHipsterConstants.VUE_DIR}/entities/${generator.entityFolderName}/${generator.entityFileName}.component.ts`;
     const component = tsProject.getSourceFile(filePath);
     const componentClass = component.getClass(() => true);
-    if (componentClass) {
-        const retrieveAllName = `retrieveAll${generator.entityNamePlural}`;
-        const retrieveAll = componentClass.getMethod(retrieveAllName);
-        if (retrieveAll && retrieveAll.getParameters().length === 0) {
-            retrieveAll.addParameter({ name: 'bypassCache', type: 'boolean', hasQuestionToken: true });
-            const paginationQuery = utils.getVariableAssignment(retrieveAll, 'paginationQuery');
-            const objectLiteralExpression = paginationQuery && paginationQuery.getInitializer();
-            if (objectLiteralExpression) {
-                objectLiteralExpression.addShorthandPropertyAssignment({ name: 'bypassCache' });
-                const clear = componentClass.getMethod('clear');
-                if (clear) {
-                    const retrieveAllCall = utils.getFunctionCall(clear, retrieveAllName);
-                    if (retrieveAllCall && retrieveAllCall.getArguments().length === 0) {
-                        retrieveAllCall.addArgument('true');
-                        component.saveSync();
-                    }
-                }
-                component.saveSync();
-            }
+    if (!componentClass) return;
+    const retrieveAllName = `retrieveAll${generator.entityNamePlural}`;
+    const retrieveAll = componentClass.getMethod(retrieveAllName);
+    if (retrieveAll && retrieveAll.getParameters().length === 0) {
+        retrieveAll.addParameter({ name: 'bypassCache', type: 'boolean', hasQuestionToken: true });
+        const paginationQuery = utils.getVariableAssignment(retrieveAll, 'paginationQuery');
+        const objectLiteralExpression = paginationQuery && paginationQuery.getInitializer();
+        if (!objectLiteralExpression) return;
+        objectLiteralExpression.addShorthandPropertyAssignment({ name: 'bypassCache' });
+        const clear = componentClass.getMethod('clear');
+        if (!clear) return;
+        const retrieveAllCall = utils.getFunctionCall(clear, retrieveAllName);
+        if (retrieveAllCall && retrieveAllCall.getArguments().length === 0) {
+            retrieveAllCall.addArgument('true');
         }
+        component.saveSync();
     }
 }
 

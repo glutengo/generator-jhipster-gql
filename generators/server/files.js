@@ -15,6 +15,7 @@ const serverFiles = {
                 'server/src/service/graphql/user.input-type.ts',
                 'server/src/service/graphql/user.object-type.ts',
                 'server/src/service/graphql/pub-sub.service.ts',
+                'server/src/web/graphql/field-resolver-util.ts',
                 'server/src/web/graphql/pagination-util.ts',
                 'server/src/web/graphql/user.resolver.ts',
                 'server/src/security/guards/auth.guard.ts',
@@ -127,15 +128,22 @@ function adjustUserDTO(tsProject) {
     dto.saveSync();
 }
 
+/**
+ * Adjust package JSON: Install libraries and adjust build / dev scripts
+ *
+ * @param generator The Yeoman generators
+ */
 function adjustPackageJSON(generator) {
     const packageJSONStorage = generator.createStorage('server/package.json');
     const dependenciesStorage = packageJSONStorage.createStorage('dependencies');
-    // TODO: versions?
-    dependenciesStorage.set('@nestjs/graphql', '7.10.6');
-    dependenciesStorage.set('graphql', '15.5.0');
-    dependenciesStorage.set('graphql-tools', '7.0.5');
-    dependenciesStorage.set('graphql-subscriptions', '1.2.1');
-    dependenciesStorage.set('apollo-server-express', '2.24.0');
+    const dependabotPackageJSON = utils.getDependabotPackageJSON(generator, true);
+
+    dependenciesStorage.set('@nestjs/graphql', dependabotPackageJSON.dependencies['@nestjs/graphql']);
+    dependenciesStorage.set('graphql', dependabotPackageJSON.dependencies.graphql);
+    dependenciesStorage.set('graphql-tools', dependabotPackageJSON.dependencies['graphql-tools']);
+    dependenciesStorage.set('graphql-subscriptions', dependabotPackageJSON.dependencies['graphql-subscriptions']);
+    dependenciesStorage.set('apollo-server-express', dependabotPackageJSON.dependencies['apollo-server-express']);
+
     const scriptsStorage = packageJSONStorage.createStorage('scripts');
     scriptsStorage.set('start:dev', 'npm run copy-resources && nest start -w');
     scriptsStorage.set('start:nest', 'npm run copy-resources && nest start');
@@ -178,5 +186,5 @@ function writeFiles() {
             adjustBaseDTO(tsProject);
             adjustUserDTO(tsProject);
         }
-    }
+    };
 }

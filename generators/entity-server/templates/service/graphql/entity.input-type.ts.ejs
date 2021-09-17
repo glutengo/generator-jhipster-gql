@@ -39,4 +39,8 @@ export class Create<%= entityClass %>Args extends Partial<%= entityClass %>Input
 @InputType()
 export class Update<%= entityClass %>Args extends Create<%= entityClass %>Args {
     id: <%= pkType %>;
+<%_ for (const r of relationships.filter(r => r.ownerSide)) { _%>
+    @Field(() => <%= r.collection ? `[${r.otherEntity.entityClass}Reference]`: `${r.otherEntity.entityClass}Reference` %>, { nullable: true })
+    <%= r.relationshipName %>: <%= r.otherEntity.entityClass %>DTO <%= r.collection ? '[]' : '' %>;
+<%_ } _%>
 }

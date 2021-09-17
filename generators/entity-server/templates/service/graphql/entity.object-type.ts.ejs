@@ -1,4 +1,5 @@
 /* eslint-disable max-classes-per-file */
+/* eslint-disable id-blacklist */
 import { Paginated } from './paginated.object-type';
 import { <%= entityClass %>DTO } from '../dto/<%= entityFileName %>.dto';
 import { Field, ObjectType, PartialType } from '@nestjs/graphql';
@@ -21,6 +22,10 @@ export class <%= entityClass %> extends Partial<%= entityClass %> {
     <%= r.relationshipName %>?: <%= r.otherEntity.entityClass %>DTO;
   <%_ } _%>
 <%_ } _%>
+<%_ for (const field of gqlFields) { %>
+    @Field(() => <%= field.target.type %>, { nullable: <%= !field.required %> })
+    <%= field.name%>?: <%= field.target.type.toLowerCase() %>;
+<%_ }%>
 }
 
 @ObjectType()

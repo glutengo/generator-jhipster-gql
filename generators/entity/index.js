@@ -3,13 +3,17 @@ const BaseGenerator = require('generator-jhipster/generators/generator-base');
 const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
 const packagejs = require('../../package.json');
 const constants = require('../../utils/constants');
+const { parseFieldResolverOptions } = require('../../utils/field-resolver');
 
 module.exports = class extends BaseGenerator {
-
+    /**
+     * Initializes the generator by reading the configuration
+     */
     get initializing() {
         return {
             readConfig() {
                 this.entityConfig = this.options.entityConfig;
+                parseFieldResolverOptions(this.entityConfig);
                 this.jhipsterAppConfig = this.getJhipsterConfig();
                 if (!this.jhipsterAppConfig) {
                     this.error('Cannot read .yo-rc.json');
@@ -32,6 +36,9 @@ module.exports = class extends BaseGenerator {
         };
     }
 
+    /**
+     * Composes the generator. The entity-server and entity-client sub-generators are called
+     */
     composing() {
         ['../entity-server', '../entity-client'].forEach(gen =>
             this.composeWith(require.resolve(gen), {

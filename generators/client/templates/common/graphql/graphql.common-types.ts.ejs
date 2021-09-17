@@ -1,5 +1,6 @@
 <%_
 const importPath = clientFramework === 'vue' ? '@/graphql' : 'app/graphql';
+const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string';
 _%>
 import { ArgsType, ObjectType } from 'graphql-typeop';
 import { User } from '<%= importPath %>';
@@ -13,7 +14,7 @@ export class PaginationVars {
 
 @ObjectType()
 export class BaseUser implements Partial<User> {
-  id!: number;
+  id!: <%= pkType %>;
   login!: string;
 }
 

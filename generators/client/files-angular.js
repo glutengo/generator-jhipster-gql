@@ -48,6 +48,11 @@ const angularFiles = [
     }
 ];
 
+/**
+ * Adds an for the GraphQL endpoint to the proxy configuration
+ *
+ * @param generator The Yeoman generator
+ */
 function adjustProxyConfig(generator) {
     // read and parse the proxy configuration file
     const filePath = path.join('webpack', 'proxy.conf.js');
@@ -73,6 +78,12 @@ function adjustProxyConfig(generator) {
     }
 }
 
+/**
+ * Adds the GraphQL TypeScript transformer (if needed)
+ * and adds an entry to the proxy config of the BrowserSyncPlugin for WebSocket support
+ *
+ * @param generator The Yeoman generator
+ */
 function adjustWebpackConfig(generator) {
     const filePath = path.join('webpack', 'webpack.custom.js');
     const fileContent = fs.readFileSync(filePath, 'utf-8');
@@ -85,9 +96,8 @@ function adjustWebpackConfig(generator) {
             e.declarations &&
             e.declarations.find(d => d.type === 'VariableDeclarator' && d.id && d.id.name === 'GraphQLTransformer')
     );
-    if (existingGraphQLTransformerImportStatement) {
-        return;
-    }
+    if (existingGraphQLTransformerImportStatement) return;
+
     const expressionStatementIndex = ast.program.body.findIndex(
         e =>
             e.type === 'ExpressionStatement' &&
@@ -136,6 +146,11 @@ function addGraphQLTransformer(config) {
     }
 }
 
+/**
+ * Adds the required TypeScript language features to the TypeScript configuration
+ *
+ * @param generator The Yeoman generator
+ */
 function adjustTSConfig(generator) {
     const tsConfigJsonStorage = generator.createStorage('tsconfig.json');
     const compilerOptionsStorage = tsConfigJsonStorage.createStorage('compilerOptions');
@@ -150,37 +165,50 @@ function adjustTSConfig(generator) {
     tsConfigJsonStorage.save();
 }
 
+/**
+ * Adds the GraphQL module to the Angular app module
+ *
+ * @param generator The Yeoman generator
+ */
 function addGraphQLModuleToAppModule(generator) {
     const needleClient = new AngularNeedleClient(generator);
     needleClient.addModule('', 'GraphQL', 'graphql', 'graphql', false, null);
 }
 
+/**
+ * Adds the bypassCache parameter to the pagination util method
+ *
+ * @param generator The Yeoman generator
+ */
 function adjustPagination(generator) {
     const tsProject = utils.getTsProject(generator);
     const filePath = `${jHipsterConstants.ANGULAR_DIR}/core/request/request.model.ts`;
     const requestModel = tsProject.getSourceFile(filePath);
     const pagination = requestModel.getInterface('Pagination');
-    if (pagination) {
-        pagination.addMember('bypassCache?: boolean');
-        requestModel.saveSync();
-    }
+    if (!pagination) return;
+    pagination.addMember('bypassCache?: boolean');
+    requestModel.saveSync();
 }
 
+/**
+ * Adjusts the user management component so that the bypassCache parameter is used
+ *
+ * @param generator
+ */
 function adjustUserManagement(generator) {
     const tsProject = utils.getTsProject(generator);
     const filePath = `${jHipsterConstants.ANGULAR_DIR}/admin/user-management/list/user-management.component.ts`;
     const component = tsProject.getSourceFile(filePath);
+    if (!component) return;
     const componentClass = component.getClass(() => true);
-    if (componentClass) {
-        const loadAll = componentClass.getMethod('loadAll');
-        if (loadAll) {
-            loadAll.addParameter({ name: 'bypassCache', type: 'boolean', hasQuestionToken: true });
-            const call = utils.getFunctionCall(loadAll, 'query');
-            if (call && call.getArguments()[0]) {
-                call.getArguments()[0].addShorthandPropertyAssignment({ name: 'bypassCache' });
-                component.saveSync();
-            }
-        }
+    if (!componentClass) return;
+    const loadAll = componentClass.getMethod('loadAll');
+    if (!loadAll) return;
+    loadAll.addParameter({ name: 'bypassCache', type: 'boolean', hasQuestionToken: true });
+    const call = utils.getFunctionCall(loadAll, 'query');
+    if (call && call.getArguments()[0]) {
+        call.getArguments()[0].addShorthandPropertyAssignment({ name: 'bypassCache' });
+        component.saveSync();
     }
 
     const templateFilePath = `${jHipsterConstants.ANGULAR_DIR}/admin/user-management/list/user-management.component.html`;

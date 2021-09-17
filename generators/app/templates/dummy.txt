@@ -1,2 +1,0 @@
-hello gql!
-It's dummy.txt

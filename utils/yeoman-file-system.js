@@ -1,8 +1,9 @@
 const tsMorphCommons = require('@ts-morph/common');
 
+/**
+ * YeomanFileSystem implementation for ts-morph
+ */
 class YeomanFileSystem extends tsMorphCommons.RealFileSystemHost {
-    generator;
-
     constructor(generator) {
         super();
         this.generator = generator;

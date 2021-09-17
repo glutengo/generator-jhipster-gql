@@ -13,6 +13,11 @@ const angularFiles = [
     }
 ];
 
+/**
+ * Adds the bypassCache parameter to the entity component
+ *
+ * @param generator The Yeoman generator
+ */
 function adjustEntityComponent(generator) {
     const tsProject = utils.getTsProject(generator);
     const filePath = `${jHipsterConstants.ANGULAR_DIR}/entities/${generator.entityFolderName}/list/${generator.entityFileName}.component.ts`;

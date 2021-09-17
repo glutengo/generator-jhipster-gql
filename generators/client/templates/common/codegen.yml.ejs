@@ -1,24 +1,24 @@
 overwrite: true
 schema: '<%= schemaLocation %>'
-<%_ if (typeDefinition === 'GraphQL') {  %>
+<%_ if (typeDefinition === 'GraphQL') {  _%>
 documents: 'src/**/*.graphql'
-<%_ } %>
+<%_ } _%>
 generates:
   src/main/webapp/app/graphql.ts:
     plugins:
       - 'typescript'
-<%_ if (typeDefinition === 'GraphQL') {  %>
+<%_ if (typeDefinition === 'GraphQL') {  _%>
       - 'typescript-operations'
-<%_ } %>
-<%_ if (typeDefinition === 'GraphQL' && clientFramework === 'angularX') {  %>
+<%_ } _%>
+<%_ if (typeDefinition === 'GraphQL' && clientFramework === 'angularX') {  _%>
       - 'typescript-apollo-angular'
-<%_ } %>
-<%_ if (typeDefinition === 'GraphQL' && (clientFramework === 'react' || clientFramework === 'vue')) {  %>
+<%_ } _%>
+<%_ if (typeDefinition === 'GraphQL' && (clientFramework === 'react' || clientFramework === 'vue')) {  _%>
       - 'typescript-react-apollo'
-<%_ } %>
-<%_ if (typeDefinition === 'TypeScript') {  %>
+<%_ } _%>
+<%_ if (typeDefinition === 'TypeScript') {  _%>
       - 'graphql-typeop/plugins'
-<%_ } %>
+<%_ } _%>
     config:
       skipTypename: true
       maybeValue: T | undefined

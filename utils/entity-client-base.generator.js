@@ -3,10 +3,13 @@ const { prepareEntityForTemplates } = require('generator-jhipster/utils/entity')
 const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
 const { capitalize } = require('./commons');
 
-module.exports = class extends BaseGenerator {
+/**
+ * EntityClientBaseGenerator to use along with a single entity
+ */
+class EntityClientBaseGenerator extends BaseGenerator {
     constructor(args, opts) {
         super(args, opts);
-        // This makes `name` a required argument.
+        // single argument: the name of the entity
         this.argument('name', {
             type: String,
             required: true,
@@ -39,4 +42,6 @@ module.exports = class extends BaseGenerator {
         this.entityName = this.options.entityConfig.name;
         this.clientFramework = this.config.get(OptionNames.CLIENT_FRAMEWORK);
     }
-};
+}
+
+module.exports = EntityClientBaseGenerator;

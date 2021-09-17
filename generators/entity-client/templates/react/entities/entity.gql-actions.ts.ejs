@@ -1,9 +1,18 @@
 <%_
 const ENTITY_CLASS_UPPERCASE = entityClass.toUpperCase();
-const importPath = typeDefinition === 'GraphQL' ? 'app/graphql' : `app/entities/${entityFolderName}/${entityFileName}.gql`;
+const pkType = getPkType(databaseType) === 'Long' ? 'number' : 'string';
+const rootImportPath = 'app/graphql';
+const entityImportPath = `app/entities/${entityFolderName}/${entityFileName}.gql`;
+const documentImports = [`Create${entityClass}Document`, `Delete${entityClass}Document`, `Get${entityClass}Document`, `Get${entityNamePlural}Document`, `Update${entityClass}Document`];
+const argImports = [`Create${entityClass}Args`, `Update${entityClass}Args`];
 %>
 import { client } from 'app/config/apollo-client';
-import { Create<%= entityClass %>Document, Delete<%= entityClass %>Document, Get<%= entityClass %>Document, Get<%= entityNamePlural %>Document, Update<%= entityClass %>Document } from '<%= importPath %>';
+<%_ if (typeDefinition === 'GraphQL') { _%>
+import { <%= [...documentImports, ...argImports].join(',') %> } from '<%= rootImportPath%>';
+<%_ } else { _%>
+import { <%= argImports.join(',') %> } from '<%= rootImportPath%>';
+import { <%= documentImports.join(',') %> } from '<%= entityImportPath%>';
+<%_ } _%>
 import { I<%= entityClass %> } from 'app/shared/model/<%= entityFileName %>.model';
 import { ICrudDeleteAction, ICrudPutAction } from 'react-jhipster';
 import { ACTION_TYPES } from './<%= entityFileName %>.reducer';
@@ -18,7 +27,7 @@ export const getEntities = (page?, size?, sort?, bypassCache?) => {
 }
 
 export const getEntity = id => {
-  const payload = client.query({ query: Get<%= entityClass %>Document, variables: { id } })
+  const payload = client.query({ query: Get<%= entityClass %>Document, variables: { id: <%= pkType === 'number' ? 'parseInt(id, 10)' : 'id' %> } })
     .then(res => ({data: res.data.result}));
   return {
     type: ACTION_TYPES.FETCH_<%= ENTITY_CLASS_UPPERCASE %>,
@@ -26,8 +35,26 @@ export const getEntity = id => {
   }
 }
 
+function toCreateEntityArgs(entity: any): Create<%= entityClass %>Args {
+  return {
+<%_ for (const f of fields) { _%>
+    <%= f.fieldName %>: entity.<%= f.fieldName%>,
+<%_ } _%>
+<%_ for (const r of relationships.filter(r => r.ownerSide)) { _%>
+    <%= r.relationshipName %>: entity.<%= r.relationshipName%>,
+<%_ } _%>
+  }
+}
+
+function toUpdateEntityArgs(entity: any): Update<%= entityClass %>Args {
+  return {
+    id: entity.id,
+    ...toCreateEntityArgs(entity)
+  }
+}
+
 export const createEntity: ICrudPutAction<I<%= entityClass %>> = <%= entityInstance %> => async dispatch => {
-  const payload = client.mutate({ mutation: Create<%= entityClass %>Document, variables: { <%= entityInstance %> }});
+  const payload = client.mutate({ mutation: Create<%= entityClass %>Document, variables: { <%= entityInstance %>: toCreateEntityArgs(<%= entityInstance %>) }});
   const result = await dispatch({
     type: ACTION_TYPES.CREATE_<%= ENTITY_CLASS_UPPERCASE %>,
     payload
@@ -37,7 +64,7 @@ export const createEntity: ICrudPutAction<I<%= entityClass %>> = <%= entityInsta
 }
 
 export const updateEntity: ICrudPutAction<I<%= entityClass %>> = <%= entityInstance %> => async dispatch => {
-  const payload = client.mutate({ mutation: Update<%= entityClass %>Document, variables: { <%= entityInstance %> }});
+  const payload = client.mutate({ mutation: Update<%= entityClass %>Document, variables: { <%= entityInstance %>: toUpdateEntityArgs(<%= entityInstance %>) }});
   const result = await dispatch({
     type: ACTION_TYPES.UPDATE_<%= ENTITY_CLASS_UPPERCASE %>,
     payload
@@ -46,8 +73,8 @@ export const updateEntity: ICrudPutAction<I<%= entityClass %>> = <%= entityInsta
   return result;
 }
 
-export const deleteEntity: ICrudDeleteAction<I<%= entityClass %>> = login => async dispatch => {
-  const payload = client.mutate({ mutation: Delete<%= entityClass %>Document, variables: { login }});
+export const deleteEntity: ICrudDeleteAction<I<%= entityClass %>> = id => async dispatch => {
+  const payload = client.mutate({ mutation: Delete<%= entityClass %>Document, variables: { id }});
   const result = await dispatch({
     type: ACTION_TYPES.DELETE_<%= ENTITY_CLASS_UPPERCASE %>,
     payload

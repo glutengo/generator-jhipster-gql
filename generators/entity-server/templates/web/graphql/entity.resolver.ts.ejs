@@ -1,6 +1,6 @@
 /* eslint-disable id-blacklist */
 import { UseGuards } from '@nestjs/common';
-import { Args, Query, Resolver, Mutation, Subscription } from '@nestjs/graphql';
+import { Args, Query, Resolver, ResolveField, Mutation, Parent, Subscription } from '@nestjs/graphql';
 import { <%= entityClass %>Service } from '../../service/<%= entityFileName %>.service';
 import { PaginationArgs } from './pagination-util';
 import { Create<%= entityClass %>Args, Update<%= entityClass %>Args } from '../../service/graphql/<%= entityFileName %>.input-type';
@@ -9,6 +9,7 @@ import { PageRequest } from '../../domain/base/pagination.entity';
 import { pageRequestToFindManyOptions } from './pagination-util';
 import { PubSubService } from '../../service/graphql/pub-sub.service';
 import { AuthGuard, RolesGuard } from '../../security';
+import { transformField } from './field-resolver-util';
 
 <%_
 const pkTypeInterface = getPkType(databaseType) === 'Long' ? 'Number' : 'String';
@@ -47,6 +48,26 @@ constructor(private <%= asEntity(entityInstance) %>Service: <%= entityClass %>Se
     await this.<%= asEntity(entityInstance) %>Service.deleteById(id);
     return id;
   }
+
+<%_
+  function mapArg(a) {
+    const resolvedArg = typeof a === 'string' && a.startsWith('@') && a.substr(1);
+    return resolvedArg || a;
+  }
+
+  function getOptions(a) {
+    return `{ nullable: ${!a.required } ${a.defaultValue ? (', defaultValue: ' + a.defaultValue) : ''} }`;
+  }
+
+  for (const field of gqlFields) {
+_%>
+  @ResolveField()
+  <%= field.name %>(@Parent() <%= entityInstance %>: <%= entityClass %>, <%- field.args.map(a => `@Args('${a.name}', ${getOptions(a)}) ${a.name}${a.required ? '' : '?'}: ${a.type}`)%>) {
+    return transformField(<%= entityInstance %>.<%= field.target.name %>, [<%- field.transform.map(t => `{ operation: '${t.operation}', args: [ ${t.args.map(a => mapArg(a)).join(',')} ] }`).join(',') %>]);
+  }
+<%_
+  }
+_%>
 
   @Subscription(() => <%= pkTypeInterface %>)
   <%= entityNamePlural.toLowerCase() %>Updated(): AsyncIterator<<%= pkTypeInterface %>> {

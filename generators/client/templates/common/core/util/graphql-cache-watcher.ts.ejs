@@ -33,12 +33,12 @@ export class GraphQLCacheWatcher {
   }
 
   private getSubscriptionName(entity: string): string {
-    return `${pluralize(entity).toLowerCase()}Updated`;
+    return `${pluralize.plural(entity).toLowerCase()}Updated`;
   }
 
   private getRelevantCacheKeys(entity: string): string[] {
     const GET_ENTITY = `get${entity}`;
-    const GET_ENTITIES = `get${pluralize(entity)}`;
+    const GET_ENTITIES = `get${pluralize.plural(entity)}`;
     return Object.keys((this.cache as any).data.data.ROOT_QUERY).filter(k => k.startsWith(GET_ENTITY) || k.startsWith(GET_ENTITIES));
   }
 

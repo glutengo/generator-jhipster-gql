@@ -1,24 +1,28 @@
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
-const { OptionNames } = require('generator-jhipster/jdl/jhipster/application-options');
-const pluralize = require('pluralize');
 const { writeFiles } = require('./files');
+const utils = require('../../utils/commons');
+const { prepareEntitySubGenerator } = require('../../utils/entity');
 
 module.exports = class extends BaseGenerator {
-
     initializing() {
-        this.entityClass = this.options.entityConfig.entityClass;
-        this.entityFileName = this.options.entityConfig.entityFileName;
-        this.entityInstance = this.options.entityConfig.entityInstance;
-        this.entityName = this.options.entityConfig.name;
-        this.entityNamePlural = this.upperFirstCamelCase(pluralize(this.entityName));
-        this.relationships = this.options.entityConfig.relationships;
-        this.fields = this.options.entityConfig.fields;
-        this.databaseType = this.config.get(OptionNames.DATABASE_TYPE);
+        prepareEntitySubGenerator(this);
+        this.gqlFields = this.options.entityConfig.gqlFields;
     }
 
     get writing() {
-        return {
-            ...writeFiles()
+        if (utils.isNodeJSBlueprint(this)) {
+            return {
+                ...writeFiles()
+            };
+        }
+        return {};
+    }
+
+    end() {
+        if (!this.options.skipInstall) {
+            if (utils.isNodeJSBlueprint(this)) {
+                this.spawnCommandSync(this.clientPackageManager, ['run', 'build:schema-gql'], { cwd: `${process.cwd()}/server` });
+            }
         }
     }
-}
+};
