@@ -277,8 +277,7 @@ const entry = {
   ],
   target: ${target},
   ws: true
-}`
-    ).program.body[0].declarations[0].init;
+}`).program.body[0].declarations[0].init;
 }
 
 /**
@@ -289,7 +288,7 @@ const entry = {
  * @returns {*}
  */
 function getDependabotPackageJSON(generator, server = false) {
-    return generator.fs.readJSON(path.join(__dirname, '..', 'generators', server ? 'server' : 'client', 'package.json'));
+    return generator.fs.readJSON(path.join(__dirname, '..', 'generators', server ? 'server' : 'client', 'templates', 'package.json'));
 }
 
 module.exports = {

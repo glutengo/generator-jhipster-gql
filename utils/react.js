@@ -11,11 +11,9 @@ const utils = require('./commons');
  * @param disable whether to reverse the change: results in using the standard reducer instead of the gql actions
  */
 function replaceImportPath(generator, disable = false) {
-    console.log('REPLACE IMPORT PATH', generator.entityName);
     const fileName = generator.entityName === 'user' ? 'user-management' : generator.entityName.toLowerCase();
     let oldFileName = `${fileName}.reducer`;
     let newFileName = `${fileName}.gql-actions`;
-    console.log(oldFileName, newFileName);
     if (disable) {
         const tmp = oldFileName;
         oldFileName = newFileName;
@@ -26,8 +24,6 @@ function replaceImportPath(generator, disable = false) {
     sourceFiles.forEach(file => {
         const oldImport = file.getImportDeclaration(declaration => declaration.getModuleSpecifierValue().includes(oldFileName));
         if (oldImport) {
-            console.log('FOUND AN IMPORT');
-            console.log(file.getFilePath());
             oldImport.setModuleSpecifier(oldImport.getModuleSpecifierValue().replace(oldFileName, newFileName));
             file.saveSync();
         }
@@ -81,7 +77,6 @@ function adjustUserComponent(generator, disable = false) {
             .find(a => a.compilerNode.escapedText === parameterName);
         if (!getUsersAsAdminCallByPassCacheArgument) return;
         getUsersAsAdminCall.removeArgument(getUsersAsAdminCallByPassCacheArgument);
-
     } else {
         // add the bypassCache parameter to the geUsersFromProps method declaration
         arrowFunction.addParameter({ name: 'bypassCache', type: 'boolean', hasQuestionToken: true });

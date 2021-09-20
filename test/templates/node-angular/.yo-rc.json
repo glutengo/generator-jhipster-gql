@@ -1,0 +1,57 @@
+{
+  "generator-jhipster": {
+    "authenticationType": "jwt",
+    "cacheProvider": "ehcache",
+    "clientFramework": "angularX",
+    "serverPort": "8080",
+    "serviceDiscoveryType": false,
+    "skipUserManagement": false,
+    "withAdminUi": true,
+    "baseName": "news",
+    "buildTool": "maven",
+    "databaseType": "sql",
+    "devDatabaseType": "sqlite",
+    "enableHibernateCache": true,
+    "enableSwaggerCodegen": false,
+    "enableTranslation": true,
+    "jhiPrefix": "jhi",
+    "languages": ["en"],
+    "messageBroker": false,
+    "prodDatabaseType": "postgresql",
+    "searchEngine": false,
+    "skipClient": false,
+    "testFrameworks": [],
+    "websocket": false,
+    "blueprints": [
+      {
+        "name": "generator-jhipster-nodejs",
+        "version": "2.0.0"
+      }
+    ],
+    "applicationType": "monolith",
+    "clientPackageManager": "npm",
+    "jhipsterVersion": "7.0.1",
+    "skipServer": false,
+    "packageFolder": "com/mycompany/myapp",
+    "packageName": "com.jhipster.node",
+    "dtoSuffix": "DTO",
+    "entitySuffix": "",
+    "reactive": false,
+    "clientTheme": "none",
+    "clientThemeVariant": "",
+    "entities": [],
+    "skipCheckLengthOfIdentifier": false,
+    "skipFakeData": false,
+    "otherModules": [
+      {
+        "name": "generator-jhipster-nodejs",
+        "version": "2.0.0"
+      }
+    ],
+    "pages": [],
+    "nativeLanguage": "en",
+    "creationTimestamp": 1631095705669,
+    "jwtSecretKey": "N2NlMmI3NGI4MzM3OTc2MDdkYTVjNzNlMDEzZDdhOTIwYzQ0ZjZlNmNmNGRhNTQzNDU5OTM0NjMxNDE3MDU1N2I0M2E2OTY3NTk5MmZjODk1ZjZjZTdmMjhkZGZlNTA0MmMwMmExNDM1YzA1YTczZDQxNTU5NjZjMWIzYmNiODQ=",
+    "lastLiquibaseTimestamp": 1631095825000
+  }
+}

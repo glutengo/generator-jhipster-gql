@@ -13,6 +13,7 @@ const constants = {
     CONFIG_KEY_TYPE_DEFINITION,
     CONFIG_KEY_ENDPOINT,
     CONFIG_KEY_SCHEMA_LOCATION,
-    NESTJS_GRAPHQL_PLUGIN };
+    NESTJS_GRAPHQL_PLUGIN
+};
 
 module.exports = constants;

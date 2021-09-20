@@ -7,7 +7,7 @@ const jHipsterConstants = require('generator-jhipster/generators/generator-const
 const constants = require('../../utils/constants');
 const { adjustProxyConfig } = require('./files-react');
 const utils = require('../../utils/commons');
-const { connectCacheWatcherOnCreated, replaceServiceProvider } = require('../../utils/vue');
+const { connectCacheWatcherOnCreated } = require('../../utils/vue');
 
 const vueFiles = [
     {

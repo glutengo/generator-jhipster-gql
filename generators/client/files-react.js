@@ -95,7 +95,9 @@ function adjustProxyConfig(generator, vue = false) {
         const proxy = devServer.value.properties.find(p => p.key.name === 'proxy');
         const context = proxy.value.elements[0].properties.find(p => p.key.name === 'context');
         context.value.elements.push(t.stringLiteral(generator.endpoint));
-        proxy.value.elements.push(utils.getWSProxyDeclaration(generator.getJhipsterConfig().get(OptionNames.SERVER_PORT), vue ? 'vue' : 'react'));
+        proxy.value.elements.push(
+            utils.getWSProxyDeclaration(generator.getJhipsterConfig().get(OptionNames.SERVER_PORT), vue ? 'vue' : 'react')
+        );
 
         // insert proxy conf for WebSocket to BrowserSync config
         const browserSyncPlugin = utils.findBrowserSyncPlugin(ast);

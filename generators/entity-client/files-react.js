@@ -12,8 +12,7 @@ const reactFiles = [
     }
 ];
 
-function adjustReactFiles(generator) {
-}
+function adjustReactFiles(generator) {}
 
 module.exports = {
     reactFiles,

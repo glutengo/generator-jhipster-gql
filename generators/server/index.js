@@ -5,9 +5,7 @@ const utils = require('../../utils/commons');
 const { askForEndpoint, askForSchemaLocation } = require('../../utils/prompts');
 const constants = require('../../utils/constants');
 
-
 module.exports = class extends BaseGenerator {
-
     initializing() {
         utils.loadConfig(this);
         utils.loadConfig(this, this.options.context);

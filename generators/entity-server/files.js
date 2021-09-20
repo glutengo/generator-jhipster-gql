@@ -57,7 +57,7 @@ function adjustEntityService(generator) {
         const _save = _class.getMethod('save');
         const _update = _class.getMethod('update');
         const _delete = _class.getMethod('deleteById');
-        const statement = arg => `this.pubSub.publish('${generator.entityNamePlural.toLowerCase()}', ${arg})`
+        const statement = arg => `this.pubSub.publish('${generator.entityNamePlural.toLowerCase()}', ${arg})`;
         _save.insertStatements(_save.getChildSyntaxList().getChildCount() - 1, statement('result.id'));
         _update.insertStatements(_update.getChildSyntaxList().getChildCount() - 1, statement('entity.id'));
         _delete.insertStatements(_delete.getChildSyntaxList().getChildCount() - 1, statement('id'));

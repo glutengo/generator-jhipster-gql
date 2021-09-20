@@ -18,7 +18,6 @@ function prepareEntitySubGenerator(generator) {
     generator.entityFolderName = generator.options.entityConfig.entityFolderName;
     generator.entityModelFileName = generator.options.entityConfig.entityModelFileName;
 
-
     generator.fields = generator.options.entityConfig.fields;
     generator.relationships = generator.options.entityConfig.relationships;
     generator.databaseType = generator.config.get(OptionNames.DATABASE_TYPE);

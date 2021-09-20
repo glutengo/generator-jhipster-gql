@@ -38,7 +38,10 @@ function adjustAppModule(generator, tsProject) {
         // add NestJS module import
         const _class = appModule.getClass(() => true);
         const moduleDecorator = _class.getDecorator('Module');
-        const moduleImports = moduleDecorator.getArguments()[0].getProperty('imports').getInitializer();
+        const moduleImports = moduleDecorator
+            .getArguments()[0]
+            .getProperty('imports')
+            .getInitializer();
         moduleImports.insertElement(moduleImports.getElements().length - 1, graphQLModuleIdentifier);
         appModule.saveSync();
     }
@@ -55,7 +58,10 @@ function adjustUserModule(tsProject) {
         // add User resolver to providers
         const _class = userModule.getClass(() => true);
         const moduleDecorator = _class.getDecorator('Module');
-        const moduleProviders = moduleDecorator.getArguments()[0].getProperty('providers').getInitializer();
+        const moduleProviders = moduleDecorator
+            .getArguments()[0]
+            .getProperty('providers')
+            .getInitializer();
         moduleProviders.addElement('UserResolver');
     }
     userModule.saveSync();
@@ -90,8 +96,8 @@ function adjustBaseDTO(tsProject) {
     const dto = tsProject.getSourceFile(filePath);
 
     // add graphql module imports
-    const addedFieldImport = utils.addImportIfMissing(dto, { moduleSpecifier: '@nestjs/graphql', namedImport: 'Field' })
-    const addedInputTypeImport = utils.addImportIfMissing(dto, { moduleSpecifier: '@nestjs/graphql', namedImport: 'InputType' })
+    const addedFieldImport = utils.addImportIfMissing(dto, { moduleSpecifier: '@nestjs/graphql', namedImport: 'Field' });
+    const addedInputTypeImport = utils.addImportIfMissing(dto, { moduleSpecifier: '@nestjs/graphql', namedImport: 'InputType' });
     const addedObjectTypeImport = utils.addImportIfMissing(dto, { moduleSpecifier: '@nestjs/graphql', namedImport: 'ObjectType' });
     const added = addedFieldImport || addedInputTypeImport || addedObjectTypeImport;
 
@@ -110,7 +116,7 @@ function adjustUserDTO(tsProject) {
     const filePath = `${nodejsConstants.SERVER_NODEJS_SRC_DIR}/src/service/dto/user.dto.ts`;
     const dto = tsProject.getSourceFile(filePath);
 
-    const addedInputTypeImport = utils.addImportIfMissing(dto, { moduleSpecifier: '@nestjs/graphql', namedImport: 'InputType' })
+    const addedInputTypeImport = utils.addImportIfMissing(dto, { moduleSpecifier: '@nestjs/graphql', namedImport: 'InputType' });
     const addedObjectTypeImport = utils.addImportIfMissing(dto, { moduleSpecifier: '@nestjs/graphql', namedImport: 'ObjectType' });
     const addedHideFieldImport = utils.addImportIfMissing(dto, { moduleSpecifier: '@nestjs/graphql', namedImport: 'HideField' });
     const added = addedInputTypeImport || addedObjectTypeImport || addedHideFieldImport;
