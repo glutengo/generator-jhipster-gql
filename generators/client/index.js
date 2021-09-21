@@ -12,11 +12,15 @@ module.exports = class extends BaseGenerator {
     /**
      * Initializes the generator by reading the configuration
      */
-    initializing() {
-        this.clientFramework = this.config.get(OptionNames.CLIENT_FRAMEWORK);
-        this.databaseType = this.config.get(OptionNames.DATABASE_TYPE);
-        loadConfig(this);
-        loadConfig(this, this.options.context);
+    get initializing() {
+        return {
+            prepare() {
+                this.clientFramework = this.config.get(OptionNames.CLIENT_FRAMEWORK);
+                this.databaseType = this.config.get(OptionNames.DATABASE_TYPE);
+                loadConfig(this);
+                loadConfig(this, this.options.context);
+            }
+        };
     }
 
     /**
@@ -26,13 +30,15 @@ module.exports = class extends BaseGenerator {
         return {
             askForEndpoint() {
                 if (!this[constants.CONFIG_KEY_ENDPOINT]) {
-                    askForEndpoint.call(this);
+                    return askForEndpoint.call(this);
                 }
+                return null;
             },
             askForSchemaLocation() {
                 if (!this[constants.CONFIG_KEY_SCHEMA_LOCATION]) {
-                    askForSchemaLocation.call(this);
+                    return askForSchemaLocation.call(this);
                 }
+                return null;
             },
             askForTypeDefinition,
             saveConfig() {
@@ -45,13 +51,19 @@ module.exports = class extends BaseGenerator {
      * Writes the client files
      */
     get writing() {
-        return writeFiles();
+        return {
+            ...writeFiles()
+        };
     }
 
     /**
      * Runs the entity-client-enable generator for the user entity
      */
-    end() {
-        this.composeWith(require.resolve('../entity-client-enable'), { arguments: ['user'], name: 'user' });
+    get end() {
+        return {
+            end() {
+                this.composeWith(require.resolve('../entity-client-enable'), { arguments: ['user'], name: 'user' });
+            }
+        };
     }
 };

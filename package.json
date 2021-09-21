@@ -1,11 +1,11 @@
 {
   "name": "generator-jhipster-gql",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "GraphQL integration for JHipster",
   "keywords": [
     "yeoman-generator",
     "jhipster-module",
-    "jhipster-6"
+    "jhipster-7"
   ],
   "homepage": "https://github.com/glutengo/generator-jhipster-gql",
   "author": {
@@ -28,6 +28,7 @@
     "@babel/types": "^7.14.5",
     "@ts-morph/common": "^0.11.0",
     "chalk": "3.0.0",
+    "comment-json": "^4.1.1",
     "generator-jhipster": "7.0.1",
     "generator-jhipster-nodejs": "2.0.0",
     "json5": "^2.2.0",

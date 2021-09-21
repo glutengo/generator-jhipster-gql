@@ -1,0 +1,31 @@
+application {
+  config {
+  	baseName news
+    blueprints [nodejs]
+    applicationType monolith
+    authenticationType jwt
+    clientFramework vue
+    clientPackageManager npm
+    databaseType sql
+  }
+  entities *
+}
+
+entity Post {
+  title String
+  @gqlField("{
+    args: [{ name: 'length', type: 'number' }],
+    transform: [{ operation: 'substring', args: [0, '@length'] }]
+  }")
+  content String
+  coverImageUrl String
+}
+
+relationship ManyToOne {
+  Post{author(login)} to User
+}
+
+dto Post with mapstruct
+paginate Post with pagination
+service Post with serviceClass
+

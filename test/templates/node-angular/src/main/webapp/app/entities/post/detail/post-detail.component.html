@@ -1,0 +1,44 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+    <div *ngIf="post">
+      <h2 data-cy="postDetailsHeading"><span jhiTranslate="newsApp.post.detail.title">Post</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ post.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="newsApp.post.title">Title</span></dt>
+        <dd>
+          <span>{{ post.title }}</span>
+        </dd>
+        <dt><span jhiTranslate="newsApp.post.content">Content</span></dt>
+        <dd>
+          <span>{{ post.content }}</span>
+        </dd>
+        <dt><span jhiTranslate="newsApp.post.coverImageUrl">Cover Image Url</span></dt>
+        <dd>
+          <span>{{ post.coverImageUrl }}</span>
+        </dd>
+        <dt><span jhiTranslate="newsApp.post.author">Author</span></dt>
+        <dd>
+          <span>{{ post.author?.login }}</span>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/post', post.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

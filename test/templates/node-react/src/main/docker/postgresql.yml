@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  news-postgresql:
+    image: postgres:13.2
+    # volumes:
+    #     - ~/volumes/jhipster/news/postgresql/:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=yourStrong(!)Password
+      - POSTGRES_DB=news
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - 5433:5432

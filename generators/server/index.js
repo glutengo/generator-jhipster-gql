@@ -6,16 +6,20 @@ const { askForEndpoint, askForSchemaLocation } = require('../../utils/prompts');
 const constants = require('../../utils/constants');
 
 module.exports = class extends BaseGenerator {
-    initializing() {
-        utils.loadConfig(this);
-        utils.loadConfig(this, this.options.context);
-        this.databaseType = this.config.get(OptionNames.DATABASE_TYPE);
+    get initializing() {
+        return {
+            prepare() {
+                utils.loadConfig(this);
+                utils.loadConfig(this, this.options.context);
+                this.databaseType = this.config.get(OptionNames.DATABASE_TYPE);
 
-        if (!utils.isNodeJSBlueprint(this)) {
-            this.warning(
-                '\nYour generated project does not use the Node.js Blueprint. generator-jhipster-gql will only be able to generate client code.\n'
-            );
-        }
+                if (!utils.isNodeJSBlueprint(this)) {
+                    this.warning(
+                        '\nYour generated project does not use the Node.js Blueprint. generator-jhipster-gql will only be able to generate client code.\n'
+                    );
+                }
+            }
+        };
     }
 
     get prompting() {
@@ -23,13 +27,15 @@ module.exports = class extends BaseGenerator {
             return {
                 askForEndpoint() {
                     if (!this[constants.CONFIG_KEY_ENDPOINT]) {
-                        askForEndpoint.call(this);
+                        return askForEndpoint.call(this);
                     }
+                    return null;
                 },
                 askForSchemaLocation() {
                     if (!this[constants.CONFIG_KEY_SCHEMA_LOCATION]) {
-                        askForSchemaLocation.call(this);
+                        return askForSchemaLocation.call(this);
                     }
+                    return null;
                 },
                 saveConfig() {
                     utils.saveConfig(this);
@@ -41,7 +47,9 @@ module.exports = class extends BaseGenerator {
 
     get writing() {
         if (utils.isNodeJSBlueprint(this)) {
-            return writeFiles();
+            return {
+                ...writeFiles()
+            };
         }
         this.warning(
             '\nYour generated project does not use the Node.js Blueprint. generator-jhipster-gql will only be able to generate client code.\n'

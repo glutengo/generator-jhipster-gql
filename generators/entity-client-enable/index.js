@@ -8,8 +8,10 @@ module.exports = class extends EntityClientBaseGenerator {
     /**
      * Initializes the generator by reading the configuration
      */
-    initializing() {
-        super.initializing();
+    get initializing() {
+        return {
+            ...super.initializing
+        };
     }
 
     /**

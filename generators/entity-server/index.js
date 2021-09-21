@@ -4,9 +4,13 @@ const utils = require('../../utils/commons');
 const { prepareEntitySubGenerator } = require('../../utils/entity');
 
 module.exports = class extends BaseGenerator {
-    initializing() {
-        prepareEntitySubGenerator(this);
-        this.gqlFields = this.options.entityConfig.gqlFields;
+    get initializing() {
+        return {
+            prepare() {
+                prepareEntitySubGenerator(this);
+                this.gqlFields = this.options.entityConfig.gqlFields;
+            }
+        };
     }
 
     get writing() {
@@ -18,11 +22,16 @@ module.exports = class extends BaseGenerator {
         return {};
     }
 
-    end() {
-        if (!this.options.skipInstall) {
-            if (utils.isNodeJSBlueprint(this)) {
-                this.spawnCommandSync(this.clientPackageManager, ['run', 'build:schema-gql'], { cwd: `${process.cwd()}/server` });
-            }
+    get end() {
+        if (!this.options.skipInstall && utils.isNodeJSBlueprint(this)) {
+            return {
+                end() {
+                    this.spawnCommandSync(this.clientPackageManager, ['run', 'build:schema-gql'], {
+                        cwd: `${process.cwd()}/server`
+                    });
+                }
+            };
         }
+        return {};
     }
 };

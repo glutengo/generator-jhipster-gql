@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  news-app:
+    build: ../../..
+    container_name: news-app
+    environment:
+    ports:
+      - 8080:8080

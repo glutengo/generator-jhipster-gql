@@ -48,7 +48,7 @@ fragment Base<%= entityClass %> on <%= entityClass %> {
 
 fragment Detail<%= entityClass %> on <%= entityClass %> {
     ...Base<%= entityClass %>
-<%_ for (const relationship of relationships) { _%>
+<%_ for (const relationship of relationships.filter(r => r.ownerSide)) { _%>
     <%= relationship.relationshipName %> {
         <%_ if (relationship.otherEntityField !== 'id') { _%>
         id

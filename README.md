@@ -1,6 +1,7 @@
 # generator-jhipster-gql
 
-[![NPM version][npm-image]][npm-url] [![Build Status][github-actions-image]][github-actions-url] [![Dependency Status][daviddm-image]][daviddm-url]
+[![npm version](https://badge.fury.io/js/generator-jhipster-gql.svg)](https://www.npmjs.com/package/generator-jhipster-gql) 
+[![pipeline status](https://github.com/glutengo/generator-jhipster-gql/actions/workflows/github-ci.yml/badge.svg)](https://github.com/glutengo/generator-jhipster-gql/actions)
 
 > JHipster module, GraphQL integration for JHipster
 

@@ -24,8 +24,7 @@
     "websocket": false,
     "blueprints": [
       {
-        "name": "generator-jhipster-nodejs",
-        "version": "2.0.0"
+        "name": "generator-jhipster-nodejs"
       }
     ],
     "applicationType": "monolith",
@@ -39,7 +38,7 @@
     "reactive": false,
     "clientTheme": "none",
     "clientThemeVariant": "",
-    "entities": [],
+    "entities": ["Post"],
     "skipCheckLengthOfIdentifier": false,
     "skipFakeData": false,
     "otherModules": [
@@ -50,8 +49,8 @@
     ],
     "pages": [],
     "nativeLanguage": "en",
-    "creationTimestamp": 1631095705669,
-    "jwtSecretKey": "N2NlMmI3NGI4MzM3OTc2MDdkYTVjNzNlMDEzZDdhOTIwYzQ0ZjZlNmNmNGRhNTQzNDU5OTM0NjMxNDE3MDU1N2I0M2E2OTY3NTk5MmZjODk1ZjZjZTdmMjhkZGZlNTA0MmMwMmExNDM1YzA1YTczZDQxNTU5NjZjMWIzYmNiODQ=",
-    "lastLiquibaseTimestamp": 1631095825000
+    "creationTimestamp": 1632203851738,
+    "jwtSecretKey": "MWQyNzZkODJlMGZkYzQ4ZjFlNDJlMTAxOGRiOWFiMTM1ZjRmOTE2NWUzNTM1ZWJlMmNkMmIyZGNiNGI3OTc3NTg1ZWI3MDVhNWI0MmQyMmQ2Nzg4Y2ViOGM3M2IwZDhlMzVhNmI1Y2M5NGY5ODA0NjE1MzUyNjU2MjMxODY5YjM=",
+    "lastLiquibaseTimestamp": 1632203911000
   }
 }

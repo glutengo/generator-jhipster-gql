@@ -1,4 +1,5 @@
 const nodejsConstants = require('generator-jhipster-nodejs/generators/generator-nodejs-constants');
+const cjson = require('comment-json');
 const utils = require('../../utils/commons');
 const constants = require('../../utils/constants');
 
@@ -175,11 +176,26 @@ function adjustNestCLIJSON(generator) {
     }
 }
 
+function adjustESlintrc(generator) {
+    const filePath = 'server/.server.eslintrc.json';
+    const eslintRC = cjson.parse(generator.fs.read(filePath));
+    const rules = eslintRC.rules || {};
+    const indentRule = rules['@typescript-eslint/indent'];
+    if (indentRule) {
+        indentRule[2] = {
+            ...indentRule[2],
+            SwitchCase: 1
+        };
+        generator.fs.write(filePath, cjson.stringify(eslintRC, null, 4));
+    }
+}
+
 function writeFiles() {
     return {
         adjustConfigFiles() {
             adjustPackageJSON(this);
             adjustNestCLIJSON(this);
+            adjustESlintrc(this);
         },
         writeGraphQLFiles() {
             this.writeFilesToDisk(serverFiles, this, false);

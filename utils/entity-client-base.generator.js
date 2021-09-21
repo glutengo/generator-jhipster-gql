@@ -35,12 +35,16 @@ class EntityClientBaseGenerator extends BaseGenerator {
         };
     }
 
-    initializing() {
-        this.entityClass = this.options.entityConfig.entityClass;
-        this.entityFileName = this.options.entityConfig.entityFileName;
-        this.entityFolderName = this.options.entityConfig.entityFolderName;
-        this.entityName = this.options.entityConfig.name;
-        this.clientFramework = this.config.get(OptionNames.CLIENT_FRAMEWORK);
+    get initializing() {
+        return {
+            preparing() {
+                this.entityClass = this.options.entityConfig.entityClass;
+                this.entityFileName = this.options.entityConfig.entityFileName;
+                this.entityFolderName = this.options.entityConfig.entityFolderName;
+                this.entityName = this.options.entityConfig.name;
+                this.clientFramework = this.config.get(OptionNames.CLIENT_FRAMEWORK);
+            }
+        };
     }
 }
 

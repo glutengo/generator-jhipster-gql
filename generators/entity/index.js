@@ -39,19 +39,23 @@ module.exports = class extends BaseGenerator {
     /**
      * Composes the generator. The entity-server and entity-client sub-generators are called
      */
-    composing() {
-        ['../entity-server', '../entity-client'].forEach(gen =>
-            this.composeWith(require.resolve(gen), {
-                context: this.context,
-                skipInstall: this.options.skipInstall,
-                fromCli: true,
-                force: this.options.force,
-                entityConfig: this.entityConfig,
-                debug: this.configOptions.isDebugEnabled,
-                gqlConfig: this.gqlConfig,
-                databaseType: this.databaseType,
-                clientFramework: this.clientFramework
-            })
-        );
+    get composing() {
+        return {
+            composing() {
+                ['../entity-server', '../entity-client'].forEach(gen =>
+                    this.composeWith(require.resolve(gen), {
+                        context: this.context,
+                        skipInstall: this.options.skipInstall,
+                        fromCli: true,
+                        force: this.options.force,
+                        entityConfig: this.entityConfig,
+                        debug: this.configOptions.isDebugEnabled,
+                        gqlConfig: this.gqlConfig,
+                        databaseType: this.databaseType,
+                        clientFramework: this.clientFramework
+                    })
+                );
+            }
+        };
     }
 };

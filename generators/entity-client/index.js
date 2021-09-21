@@ -7,12 +7,16 @@ module.exports = class extends BaseGenerator {
     /**
      * Initializes the generator by reading the configuration
      */
-    initializing() {
-        prepareEntitySubGenerator(this);
-        this.entityAngularName = this.entityClass + this.upperFirstCamelCase(this.options.entityConfig.entityAngularJSSuffix);
-        this.gqlConfig = this.options.gqlConfig;
-        this.clientFramework = this.options.clientFramework;
-        this.typeDefinition = this.gqlConfig.typeDefinition;
+    get initializing() {
+        return {
+            prepare() {
+                prepareEntitySubGenerator(this);
+                this.entityAngularName = this.entityClass + this.upperFirstCamelCase(this.options.entityConfig.entityAngularJSSuffix);
+                this.gqlConfig = this.options.gqlConfig;
+                this.clientFramework = this.options.clientFramework;
+                this.typeDefinition = this.gqlConfig.typeDefinition;
+            }
+        };
     }
 
     /**
@@ -27,10 +31,14 @@ module.exports = class extends BaseGenerator {
     /**
      * Runs the entity-client-enable and generates the client typing information
      */
-    end() {
-        this.composeWith(require.resolve('../entity-client-enable'), { arguments: [this.entityName], name: this.entityName });
-        if (!this.options.skipInstall) {
-            this.spawnCommandSync(this.clientPackageManager, ['run', 'codegen']);
-        }
+    get end() {
+        return {
+            end() {
+                this.composeWith(require.resolve('../entity-client-enable'), { arguments: [this.entityName], name: this.entityName });
+                if (!this.options.skipInstall) {
+                    this.spawnCommandSync(this.clientPackageManager, ['run', 'codegen']);
+                }
+            }
+        };
     }
 };
